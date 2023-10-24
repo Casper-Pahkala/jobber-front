@@ -199,8 +199,8 @@ export const useAppStore = defineStore('app', {
         })
       })
     },
-    formatDate(date) {
-      return moment(date).format('DD.MM.YYYY');
+    formatDate(date, format = 'DD.MM.YYYY') {
+      return moment(date).format(format);
     },
     uploadImage(payload) {
       return new Promise((resolve, reject) => {
