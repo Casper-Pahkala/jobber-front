@@ -1,5 +1,4 @@
 <template>
-  <h1>Viestit</h1>
   <div class="main-wrapper">
       <div class="main-content">
         <v-container>
@@ -8,6 +7,7 @@
             :key="index"
             @click="openChat(message)"
             class="message-container"
+            elevation="10"
           >
             <div class="message-wrapper">
               <v-img class="pic" src="/mowing.jpg" aspect-ratio="1" cover>
@@ -15,10 +15,10 @@
 
               <div class="message-info">
                 <div class="name">
-                  {{ message.job.user.first_name }} {{ message.job.user.last_name }}
+                  {{ getFullName(message.job) }}
                 </div>
                 <div class="job-title">
-                  {{ message.job.title }}
+                  {{ message.job ? message.job.title : 'Poistettu' }}
                 </div>
                 <div class="latest-message">
                   <div class="message">
@@ -36,6 +36,10 @@
                 </div>
               </div>
             </div>
+
+            <div v-if="!message.job" class="deleted">
+
+            </div>
           </v-card>
         </v-container>
       </div>
@@ -52,7 +56,6 @@ const router = useRouter();
 const store = useAppStore();
 const messages = ref([]);
 
-
 if (store.user) {
   store.getAllMessages().then((response) => {
     messages.value = response.messages;
@@ -60,11 +63,12 @@ if (store.user) {
 } else {
   router.replace({ path: '/' })
   store.tab = '';
+  store.redirect = { url: 'messages', tab: 'messages'};
   store.loginDialogShowing = true;
 }
 
 function openChat(message) {
-  store.currentJobId = message.job.hashed_id;
+  store.currentJobId = message.job_hashed_id;
   store.currentChatUserId = message.other_user_id;
   store.chatOpen = true;
 }
@@ -78,6 +82,13 @@ function timeFromDate (date) {
   return moment(date).format('DD.MM HH:mm');
 }
 
+function getFullName(job) {
+  if (!job) {
+    return '';
+  }
+  let user = job.user;
+  return user.first_name + ' ' + user.last_name;
+}
 
 </script>
 <style scoped>
@@ -101,6 +112,7 @@ function timeFromDate (date) {
   .message-container {
     padding: 10px;
     margin: 20px;
+    position: relative;
   }
 
   .message-wrapper {
@@ -137,5 +149,14 @@ function timeFromDate (date) {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+
+  .deleted {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #00000040;
   }
 </style>

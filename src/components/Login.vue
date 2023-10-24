@@ -42,7 +42,9 @@
 <script setup>
 import { ref } from 'vue';
 import { useAppStore } from '@/store/app';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const store = useAppStore();
 const email = ref(null);
 const password = ref(null);
@@ -65,6 +67,11 @@ function login() {
           store.snackbarText = 'Kirjauduit sisään';
           store.snackbarColor = 'green-darken-2';
           store.snackbar = true;
+
+          if (store.redirect) {
+            router.replace({ path: '/' + store.redirect.url })
+            store.tab = store.redirect.tab;
+          }
         });
       }, 10);
     } else {

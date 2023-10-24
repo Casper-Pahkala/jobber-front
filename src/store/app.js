@@ -21,7 +21,8 @@ export const useAppStore = defineStore('app', {
     websocket: null,
     currentMessages: [],
     currentJobId: null,
-    currentChatUserId: null
+    currentChatUserId: null,
+    redirect: null
   }),
   actions: {
     connectToWebsocket() {
