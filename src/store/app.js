@@ -34,13 +34,12 @@ export const useAppStore = defineStore('app', {
 
       this.websocket.addEventListener('message', (event) => {
         let data = JSON.parse(event.data);
-        console.log(data);
         if (data.action == 'CHAT_MESSAGE') {
-          if (moment(data.time).isSame(moment(), 'day')) {
-            let timeData = {
-              is_date_seperator: true,
-              time: 'Tänään'
-            };
+          let timeData = {
+            is_date_seperator: true,
+            time: 'Tänään'
+          };
+          if (moment(data.time).isSame(moment(), 'day') && !this.currentMessages.find(m => m.time === timeData.time)) {
             this.currentMessages.push(timeData);
           }
           this.currentMessages.push(data);

@@ -23,7 +23,7 @@
                     cols="4"
                   >
                     <v-card
-                      elevation="12"
+                      elevation="8"
                       width="140"
                       height="140"
                     >
@@ -38,7 +38,7 @@
                       <v-btn
                         class="close-btn"
                         icon="mdi-delete"
-                        elevation="12"
+                        elevation="8"
                         size="35"
                         @click="deleteImage(index)"
                       >
@@ -51,7 +51,7 @@
                     cols="4"
                   >
                     <v-card
-                      elevation="12"
+                      elevation="8"
                       width="140"
                       height="140"
                     >
@@ -190,14 +190,14 @@
                 </v-row>
               </v-container>
               <v-container>
-                <v-textarea label="Kuvaus" :rules="descriptionRules" required v-model="jobDescription"></v-textarea>
+                <v-textarea label="Lisätiedot" :rules="descriptionRules" required v-model="jobDescription"></v-textarea>
               </v-container>
               <v-card-actions>
                 <v-col class="d-flex justify-space-between">
                   <v-btn @click="close()" class="text-none">Peruuta</v-btn>
                   <div>
                     <v-btn @click="changeJobTab('one')" class="text-none">Takaisin</v-btn>
-                    <v-btn color="primary" type="submit" class="text-none">Seuraava</v-btn>
+                    <v-btn color="primary" type="submit" class="text-none">Luo ilmoitus</v-btn>
                   </div>
                 </v-col>
               </v-card-actions>
@@ -287,7 +287,7 @@ const descriptionRules = [
     if (value) {
       valid = true;
     }
-    if (value && value.length < 20) {
+    if (value && value.replace(/\s/g, "").length < 20) {
       valid = false;
     }
 

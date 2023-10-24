@@ -68,7 +68,7 @@
         <v-divider></v-divider>
         <div class="job-info">
           <v-icon icon="mdi-map-marker"></v-icon>
-          {{ job.location || 'Seinäjoki' }}
+          {{ job.address }}
         </div>
         <div class="job-info">
           <v-icon icon="mdi-calendar-range"></v-icon>
