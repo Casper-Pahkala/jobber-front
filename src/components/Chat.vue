@@ -8,7 +8,31 @@
       >
         <div class="chat">
           <div class="contact bar">
-            <img class="pic" src="/mowing.jpg">
+            <v-img
+                v-if="jobUser && job.has_image"
+                :src="`${store.url}/profile-image/${jobUser.hashed_id}`"
+                cover
+                class="profile-image"
+              >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="grey-lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
+              </v-img>
+
+              <div v-if="jobUser && !jobUser.has_image" class="profile-image empty">
+                <v-icon class="empty-icon">
+                  mdi-account
+                </v-icon>
+              </div>
             <div class="name">
               {{ jobUserFullName }}
             </div>
@@ -89,7 +113,7 @@ const jobUserFullName = ref(null);
 const messages = computed(() => {
   return store.currentMessages;
 });
-
+const job = ref(null);
 const message = ref('');
 const otherTyping = ref(false);
 const chatContainer = ref(null);
@@ -131,7 +155,7 @@ function init() {
     store.currentMessages = response.messages;
     jobUserFullName.value = response.job.user.first_name + ' ' + response.job.user.last_name;
     jobUser.value = response.job.user;
-
+    job.value = response.job;
     let usedDates = [];
     let toUpdate = [];
     store.currentMessages.forEach((m, index) => {

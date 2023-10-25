@@ -14,7 +14,7 @@
             :loading="queryLoading"
             density="compact"
             variant="solo"
-            label="Search templates"
+            label="Hae"
             append-inner-icon="mdi-magnify"
             single-line
             hide-details
@@ -35,6 +35,9 @@
           </v-btn>
           </v-col>
         </v-row>
+      </div>
+      <div v-if="loading" class="loading-container">
+        <span class="loader"></span>
       </div>
 
       <div id="jobs-container">
@@ -82,6 +85,20 @@
           </v-hover>
         </template>
       </div>
+
+      <div class="pagination-container" v-if="!loading">
+        <v-pagination
+          v-model="store.jobParams.page"
+          :length="totalPages"
+          :total-visible="7"
+          @update:modelValue="pageChange()"
+        ></v-pagination>
+
+        <div class="pagination-info-container">
+          Näytetään tulokset {{ firstItem() }} - {{ lastItem() }} / {{ store.jobParams.totalCount }}
+        </div>
+      </div>
+
   </div>
   <add-job-component
     v-if="showAddJob"
@@ -93,21 +110,41 @@
 
 <script setup>
 import { useAppStore } from '@/store/app'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router';
+import { ref, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router';
 import AddJobComponent from'@/components/AddJob.vue';
 
-const store = useAppStore();
 const router = useRouter();
+const route = useRoute();
+const query = route.query;
+const store = useAppStore();
+const loading = ref(false);
+loading.value = true;
+
+store.jobParams.page = query.p ?? 1;
+store.jobParams.limit = query.l ?? 5;
+
+const totalPages = computed(() => {
+  return Math.ceil(store.jobParams.totalCount / store.jobParams.limit);
+});
 const jobs = ref([]);
 const showAddJob = ref(false);
 const queryLoading = ref(false);
+const params = computed(() => {
+  let p = {
+    p: store.jobParams.page,
+    l: store.jobParams.limit
+  };
+  return p;
+})
+router.push({ query: params.value });
 
 store.fetchJobs().then((response) => {
   let data = response.data;
   if (!data.error) {
     jobs.value = data.jobs;
   }
+  loading.value = false;
 })
 
 function handleJobClick(job) {
@@ -130,6 +167,27 @@ function submit() {
   }, 2000)
 }
 
+function pageChange() {
+  loading.value = true;
+  jobs.value = [];
+  window.scrollTo(0, 0);
+  router.push({ query: params.value });
+  store.fetchJobs().then((response) => {
+    let data = response.data;
+    if (!data.error) {
+      jobs.value = data.jobs;
+    }
+    loading.value = false;
+  });
+}
+
+function firstItem() {
+  return ((store.jobParams.page - 1) * store.jobParams.limit) + 1;
+}
+
+function lastItem() {
+  return store.jobParams.page * store.jobParams.limit;
+}
 </script>
 
 <style scoped>
@@ -205,4 +263,37 @@ function submit() {
   .job-info-item {
     direction: rtl;
   }
+
+  .dark-background {
+  pointer-events: all;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.loader {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 3px solid #2a2a2a;
+  border-right: 3px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 70vh;
+}
 </style>

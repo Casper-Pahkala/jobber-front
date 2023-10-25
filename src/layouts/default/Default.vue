@@ -46,5 +46,4 @@ import 'moment/dist/locale/fi';
 moment.locale('fi');
 const store = useAppStore();
 
-
 </script>

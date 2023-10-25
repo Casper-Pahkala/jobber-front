@@ -138,6 +138,7 @@
                   v-model="jobAddress"
                   auto-select-first
                   clearable
+                  :loading="addressSuggestionsLoading"
                 ></v-autocomplete>
               </v-container>
 
@@ -234,6 +235,8 @@ const fileInput = ref(null);
 const jobAddress = ref(null);
 const jobAddressSearch = ref(null);
 const jobAddressSuggestions = ref([]);
+const addressSuggestionsLoading = ref(false);
+
 const suggestions = computed(() => {
   let s = [...jobAddressSuggestions.value];
   if (jobAddressSearch.value) {
@@ -438,8 +441,10 @@ function getAddressSuggestions() {
   }, 100);
   setTimeout(() => {
     if (jobAddressSearch.value && jobAddressSearch.value.length > 2 && term === jobAddressSearch.value) {
+      addressSuggestionsLoading.value = true;
       store.getAddressSuggestions(jobAddressSearch.value).then((response) => {
         jobAddressSuggestions.value = response.suggestions;
+        addressSuggestionsLoading.value = false;
       });
     }
   }, 500);

@@ -10,6 +10,7 @@ export const useAppStore = defineStore('app', {
     user: null,
     auth_token: null,
     loading: false,
+    loadingBackground: false,
     loginDialogShowing: false,
     registerDialogShowing: false,
     snackbar: false,
@@ -22,7 +23,12 @@ export const useAppStore = defineStore('app', {
     currentMessages: [],
     currentJobId: null,
     currentChatUserId: null,
-    redirect: null
+    redirect: null,
+    jobParams: {
+      page: 1,
+      limit: 5,
+      totalCount: 0
+    }
   }),
   actions: {
     connectToWebsocket() {
@@ -77,7 +83,16 @@ export const useAppStore = defineStore('app', {
     },
     fetchJobs() {
       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + '/api/get-jobs.json').then((response) => {
+        this.axios.get(this.url + '/api/get-jobs.json', {
+          params: {
+            page: this.jobParams.page,
+            limit: this.jobParams.limit,
+          }
+        }).then((response) => {
+          let data = response.data;
+          this.jobParams.page = parseInt(data.page);
+          this.jobParams.limit = parseInt(data.limit);
+          this.jobParams.totalCount = parseInt(data.totalCount);
           resolve(response);
         })
         .catch((error) => {
@@ -208,6 +223,23 @@ export const useAppStore = defineStore('app', {
         formData.append('image', payload.image);
         formData.append('job_id', payload.job_id);
         this.axios.post(this.url + `/api/jobs/upload-image.json`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }).then((response) => {
+          let data = response.data;
+          resolve(data);
+        })
+        .catch((error) => {
+          reject(error);
+        })
+      })
+    },
+    uploadProfileImage(payload) {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('image', payload.image);
+        this.axios.post(this.url + `/api/users/update-profile-image.json`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           }

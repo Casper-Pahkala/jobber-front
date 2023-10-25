@@ -115,6 +115,7 @@ const router = useRouter();
 
 const store = useAppStore();
 const job = ref({});
+store.loading = true;
 
 const jobUserFullName = ref('');
 const isMyJob = computed(() => {
@@ -132,6 +133,7 @@ store.fetchJob(store.currentJobId).then((response) => {
     jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
     store.currentChatUserId = data.job.user.hashed_id;
   }
+  store.loading = false;
 })
 
 function goBack() {
@@ -182,7 +184,9 @@ function imageUrl(index = 0, lazy = false) {
     flex-direction: column;
     align-items: center;
     /* padding-bottom: 500px; */
-    gap: 20px;
+    /* gap: 20px; */
+    /* background-color: #ededed; */
+    border-radius: 12px;
   }
   #back-btn {
     width: 60px;
@@ -194,24 +198,29 @@ function imageUrl(index = 0, lazy = false) {
   .carousel {
     height: 100px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    /* justify-content: center; */
+    /* align-items: center; */
     gap: 15px;
+    width: 100%;
   }
 
   .carousel-img {
     /* width: 80px; */
     height: 100%;
-    width: 100px;
+    width: 70px;
     object-fit: contain;
     filter: brightness(0.8);
     cursor: pointer;
+    flex: none;
     background-color: transparent !important;
   }
   .main-image-container {
-    height: 400px;
+    height: 500px;
     display: flex;
     justify-content: center;
+    background-color: #ededed;
+    padding: 0;
+    /* margin: 10px; */
   }
   .carousel-img.selected {
     filter: brightness(1);

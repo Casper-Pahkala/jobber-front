@@ -1,9 +1,14 @@
 <template>
-  <div class="loading-overlay" v-if="store.loading">
-    <v-progress-circular
+  <div
+    class="loading-overlay" v-if="store.loading"
+    :class="!store.loadingBackground ?? 'dark-background'"
+  >
+    <!-- <v-progress-circular
       indeterminate
       color="primary"
-    ></v-progress-circular>
+    ></v-progress-circular> -->
+
+    <span class="loader" :style="!store.loadingBackground ?? 'color: #fff'"></span>
   </div>
 </template>
 
@@ -23,8 +28,31 @@ const store = useAppStore();
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  pointer-events: all;
   z-index: 10000;
+}
+
+.dark-background {
+  pointer-events: all;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.loader {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 3px solid #2a2a2a;
+  border-right: 3px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

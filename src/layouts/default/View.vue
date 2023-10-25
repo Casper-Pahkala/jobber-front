@@ -7,3 +7,10 @@
 <script setup>
   //
 </script>
+
+<style>
+
+  .main-content {
+    min-height: calc(100vh - 64px);
+  }
+</style>

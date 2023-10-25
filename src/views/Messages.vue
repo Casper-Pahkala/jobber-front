@@ -1,7 +1,7 @@
 <template>
   <div class="main-wrapper">
       <div class="main-content">
-        <v-container>
+        <v-container v-if="messages.length > 0">
           <v-card
             v-for="(message, index) in messages"
             :key="index"
@@ -10,8 +10,31 @@
             elevation="10"
           >
             <div class="message-wrapper">
-              <v-img class="pic" src="/mowing.jpg" aspect-ratio="1" cover>
+              <v-img
+                v-if="message.user && message.user.has_image"
+                :src="`${store.url}/profile-image/${message.user.hashed_id}`"
+                cover
+                class="profile-image"
+              >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="grey-lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
               </v-img>
+
+              <div v-if="message.user && !message.user.has_image" class="profile-image empty">
+                <v-icon class="empty-icon">
+                  mdi-account
+                </v-icon>
+              </div>
 
               <div class="message-info">
                 <div class="name">
@@ -41,7 +64,18 @@
 
             </div>
           </v-card>
+
+          <div v-if="loading" class="loading-container">
+            <span class="loader"></span>
+          </div>
+
         </v-container>
+        <div v-if="messages.length == 0" class="no-messages-text">
+          Ei viestejä
+          <v-btn color="primary" class="text-none" @click="toJobs()">
+            Etsi töitä
+          </v-btn>
+        </div>
       </div>
   </div>
 </template>
@@ -55,10 +89,13 @@ import moment from 'moment';
 const router = useRouter();
 const store = useAppStore();
 const messages = ref([]);
+const loading = ref(false);
+loading.value = true;
 
 if (store.user) {
   store.getAllMessages().then((response) => {
     messages.value = response.messages;
+    loading.value = false;
   })
 } else {
   router.replace({ path: '/' })
@@ -90,15 +127,12 @@ function getFullName(job) {
   return user.first_name + ' ' + user.last_name;
 }
 
+function toJobs() {
+  store.tab = 'jobs';
+  router.push('/jobs');
+}
 </script>
 <style scoped>
-
-.pic {
-  width: 100px;
-  max-width: 100px;
-  height: 100%;
-  border-radius: 50%;
-}
   .main-wrapper {
     display: flex;
     justify-content: center;
@@ -158,5 +192,64 @@ function getFullName(job) {
     right: 0;
     bottom: 0;
     background-color: #00000040;
+  }
+
+  .loader {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 3px solid #2a2a2a;
+  border-right: 3px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 70vh;
+}
+
+.no-messages-text {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    max-width: 80px;
+    border-radius: 50%;
+  }
+
+  .profile-image.empty {
+    background-color: #efefef;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-image.empty .empty-icon {
+    font-size: 100px;
+    color: #838383;
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
   }
 </style>
