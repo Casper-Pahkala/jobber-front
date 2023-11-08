@@ -62,6 +62,17 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/my-listings',
+    component: () => import('@/layouts/default/Default.vue'),
+    children: [
+      {
+        path: '',
+        name: 'my-listings',
+        component: () => import('@/views/MyListings.vue'),
+      },
+    ],
+  },
 ]
 
 const router = createRouter({

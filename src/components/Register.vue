@@ -4,7 +4,7 @@
   max-width="500"
   >
       <v-card min-width="300">
-        <v-card-title class="headline">Luo käyttäjä</v-card-title>
+        <v-card-title class="headline pa-4">Luo käyttäjä</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="register">
             <v-text-field v-model="firstName" label="Etunimi" type="text" name="fname"></v-text-field>
@@ -16,6 +16,9 @@
             </v-col>
           </v-form>
         </v-card-text>
+        <v-btn icon @click="store.registerDialogShowing = false" class="dialog-close-btn" flat>
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
       </v-card>
   </v-dialog>
 </template>

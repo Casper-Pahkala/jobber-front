@@ -2,7 +2,7 @@
   <v-app>
     <default-bar />
 
-    <default-view />
+    <default-view :key="store.updateMainComponent"/>
 
     <LoginComponent></LoginComponent>
 
@@ -47,3 +47,11 @@ moment.locale('fi');
 const store = useAppStore();
 
 </script>
+
+<style>
+
+.v-dialog > .v-overlay__content {
+  width: calc(100% - 18px);
+}
+
+</style>

@@ -2,7 +2,7 @@
 
 <v-dialog
     width="600px"
-    class=""
+    persistent
   >
     <v-card>
       <v-card-item>
@@ -130,7 +130,7 @@
 
               <v-container>
                 <v-autocomplete
-                  label="Osoite"
+                  label="Alue"
                   :items="suggestions"
                   @update:search="getAddressSuggestions()"
                   hide-no-data
@@ -206,6 +206,9 @@
           </v-window-item>
         </v-window>
       </v-card-item>
+      <v-btn icon @click="close()" class="dialog-close-btn" flat>
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
     </v-card>
   </v-dialog>
 </template>
@@ -239,11 +242,11 @@ const addressSuggestionsLoading = ref(false);
 
 const suggestions = computed(() => {
   let s = [...jobAddressSuggestions.value];
-  if (jobAddressSearch.value) {
-    if (!s.find(_s => _s === jobAddressSearch.value)) {
-      s.unshift(jobAddressSearch.value);
-    }
-  }
+  // if (jobAddressSearch.value) {
+  //   if (!s.find(_s => _s === jobAddressSearch.value)) {
+  //     s.unshift(jobAddressSearch.value);
+  //   }
+  // }
   return s;
 });
 
@@ -384,6 +387,8 @@ function addjob() {
           store.snackbarText = 'Työ lisätty onnistuneesti';
           store.snackbarColor = 'green-darken-2';
           store.snackbar = true;
+
+          store.fetchJobs();
         } else {
           store.snackbarText = 'Työn lisäyksessä tapahtui virhe';
           store.snackbarColor = 'red-darken-2';
@@ -401,12 +406,14 @@ function confirmDateSelection() {
 
 function calculateFullSalary(value) {
   if (jobEstimatedTime.value) {
-    jobFullSalary.value = value * jobEstimatedTime.value;
+    let newVal = value * jobEstimatedTime.value;
+    jobFullSalary.value = newVal.toFixed(2);
   }
 }
 function calculateHourlySalary(value) {
   if (jobEstimatedTime.value) {
-    jobHourlySalary.value = value / jobEstimatedTime.value;
+    let newVal = value / jobEstimatedTime.value;
+    jobHourlySalary.value = newVal.toFixed(2);
   }
 }
 function estimatedTimeUpdated(value) {

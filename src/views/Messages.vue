@@ -11,10 +11,9 @@
           >
             <div class="message-wrapper">
               <v-img
-                v-if="message.user && message.user.has_image"
-                :src="`${store.url}/profile-image/${message.user.hashed_id}`"
+                :src="`${store.url}/job-image/${message.job_hashed_id}/image_0`"
                 cover
-                class="profile-image"
+                class="job-image"
               >
                 <template v-slot:placeholder>
                   <v-row
@@ -30,18 +29,12 @@
                 </template>
               </v-img>
 
-              <div v-if="message.user && !message.user.has_image" class="profile-image empty">
-                <v-icon class="empty-icon">
-                  mdi-account
-                </v-icon>
-              </div>
-
               <div class="message-info">
                 <div class="name">
-                  {{ getFullName(message.job) }}
+                  {{ message.other_full_name }}
                 </div>
                 <div class="job-title">
-                  {{ message.job ? message.job.title : 'Poistettu' }}
+                  {{ message.job_title ?? 'Poistettu' }}
                 </div>
                 <div class="latest-message">
                   <div class="message">
@@ -60,7 +53,7 @@
               </div>
             </div>
 
-            <div v-if="!message.job" class="deleted">
+            <div v-if="message.deleted" class="deleted">
 
             </div>
           </v-card>
@@ -70,10 +63,22 @@
           </div>
 
         </v-container>
-        <div v-if="messages.length == 0" class="no-messages-text">
+        <div v-if="messages.length == 0 && store.user && !loading" class="no-messages-text">
           Ei viestejä
           <v-btn color="primary" class="text-none" @click="toJobs()">
             Etsi töitä
+          </v-btn>
+        </div>
+
+        <div v-if="!store.user" class="no-messages-text">
+          Kirjaudu sisään niin pääset näkemään viestisi
+          <v-btn
+            class="mt-7"
+            size="large"
+            color="primary"
+            @click="store.loginDialogShowing = true"
+          >
+            Kirjaudu
           </v-btn>
         </div>
       </div>
@@ -98,9 +103,9 @@ if (store.user) {
     loading.value = false;
   })
 } else {
-  router.replace({ path: '/' })
-  store.tab = '';
-  store.redirect = { url: 'messages', tab: 'messages'};
+  // router.replace({ path: '/' })
+  // store.tab = '';
+  // store.redirect = { url: 'messages', tab: 'messages'};
   store.loginDialogShowing = true;
 }
 
@@ -117,14 +122,6 @@ function timeFromDate (date) {
     return 'Eilen ' + moment(date).format('HH:mm');
   }
   return moment(date).format('DD.MM HH:mm');
-}
-
-function getFullName(job) {
-  if (!job) {
-    return '';
-  }
-  let user = job.user;
-  return user.first_name + ' ' + user.last_name;
 }
 
 function toJobs() {
@@ -168,6 +165,9 @@ function toJobs() {
   .name, .job-title {
     font-weight: 500;
     margin-bottom: 0.125rem;
+  }
+  .job-title {
+    font-size: 16px;
   }
 
   .latest-message {
@@ -232,19 +232,19 @@ function toJobs() {
   gap: 20px;
 }
 
-.profile-image {
+.job-image {
     width: 80px;
     height: 80px;
     max-width: 80px;
     border-radius: 50%;
   }
 
-  .profile-image.empty {
+  .job-image.empty {
     background-color: #efefef;
     position: relative;
     overflow: hidden;
   }
-  .profile-image.empty .empty-icon {
+  .job-image.empty .empty-icon {
     font-size: 100px;
     color: #838383;
     position: absolute;

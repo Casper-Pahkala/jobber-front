@@ -4,16 +4,18 @@
 
       <v-container
        style="margin-top: 120px;"
+       v-if="store.user"
       >
         <div
           class="row"
         >
           <div class="profile-image-container">
             <v-img
-                v-if="store.user && store.user.has_image"
-                :src="`${store.url}/profile-image/${store.user.id}`"
+                v-if="store.user.has_image"
+                :src="`${store.url}/profile-image/${store.user.id}?${Date.now()}`"
                 cover
                 class="profile-image"
+                :key="profileImageUpdated"
               >
                 <template v-slot:placeholder>
                   <v-row
@@ -28,7 +30,7 @@
                   </v-row>
                 </template>
               </v-img>
-              <div v-if="store.user && !store.user.has_image" class="profile-image empty">
+              <div v-if="!store.user.has_image" class="profile-image empty">
                 <v-icon class="empty-icon">
                   mdi-account
                 </v-icon>
@@ -94,16 +96,14 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useAppStore } from '@/store/app';
-import { useRouter } from 'vue-router';
 
 const store = useAppStore();
-const router = useRouter();
 const fileInput = ref(null);
 const profileImageDialog = ref(false);
 
 const newProfileImageResult = ref(null);
 const newProfileImage = ref(null);
-const profileImageCanvas = ref(null);
+const profileImageUpdated = ref(0);
 
 const fullName = computed(() => {
   if (!store.user) {
@@ -116,7 +116,7 @@ const joinedAt = computed(() => {
   if (!store.user) {
     return '';
   }
-  return 'Käyttäjä luotu ' + store.formatDate(store.user.joined_at);
+  return 'Käyttäjä luotu ' + store.formatDate(store.user.created_at);
 });
 if (store.user) {
   // router.replace({ path: '/' })
@@ -127,18 +127,16 @@ if (store.user) {
 }
 
 function handleFileChange(event) {
-  profileImageDialog.value = true;
   const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    newProfileImage.value = null;
-    newProfileImageResult.value = null;
-    store.loading = true;
-  }
   // Check if a file is selected
   if (selectedFile) {
     // Check if the selected file is an image (you can adjust the accepted image types)
     if (selectedFile.type.startsWith('image/') && !selectedFile.type.startsWith('image/gif')) {
+      newProfileImage.value = null;
+      newProfileImageResult.value = null;
+      store.loading = true;
       // selectedFiles.value.push(selectedFile);
+      profileImageDialog.value = true;
       var reader = new FileReader();
       reader.onload = function (e) {
         // selectedFileResults.value.push(e.target.result);
@@ -207,13 +205,21 @@ function confirmProfileImage() {
     image: newProfileImage.value
   };
   store.loading = true;
+  store.loadingBackground = true;
   store.uploadProfileImage(payload).then((res) => {
     profileImageDialog.value = false;
     store.loading = false;
-  }).catch(() => {
-
+    store.loadingBackground = false;
+    setTimeout(() => {
+      profileImageUpdated.value++;
+    }, 500);
+  }).catch((e) => {
+    store.loading = false;
+    store.loadingBackground = false;
   })
 }
+
+store.tab = 'account';
 
 </script>
 

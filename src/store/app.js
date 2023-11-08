@@ -7,6 +7,7 @@ export const useAppStore = defineStore('app', {
   state: () => ({
     tab: null,
     url: window.url,
+    baseUrl: window.baseUrl,
     user: null,
     auth_token: null,
     loading: false,
@@ -28,18 +29,33 @@ export const useAppStore = defineStore('app', {
       page: 1,
       limit: 5,
       totalCount: 0
-    }
+    },
+    updateMainComponent: 0
   }),
   actions: {
     connectToWebsocket() {
-      this.websocket = new WebSocket('ws://165.227.145.175:8000?token=' + this.auth_token);
+       // Check if websocket instance exists and its state is not 'CLOSED'
+        // readyState values:
+        // CONNECTING 0 The connection is not yet open.
+        // OPEN 1 The connection is open and ready to communicate.
+        // CLOSING 2 The connection is in the process of closing.
+        // CLOSED 3 The connection is closed or couldn't be opened.
+
+      if (this.websocket && this.websocket.readyState !== 3) {
+        console.log('WebSocket connection is already open or in progress.');
+        return;
+      }
+
+      this.websocket = new WebSocket('ws://' + this.baseUrl + ':8000?token=' + this.auth_token);
 
       this.websocket.addEventListener('open', () => {
         this.websocketStatus = 'Connected';
+        console.log('Connected to ws');
       });
 
       this.websocket.addEventListener('message', (event) => {
         let data = JSON.parse(event.data);
+        console.log('WS_MESSAGE', data);
         if (data.action == 'CHAT_MESSAGE') {
           let timeData = {
             is_date_seperator: true,
@@ -57,7 +73,7 @@ export const useAppStore = defineStore('app', {
         this.websocketStatus = 'Closed';
         setTimeout(() => {
           this.connectToWebsocket();
-        }, 3000);
+        }, 1000);
       });
     },
     initializeAxios() {
@@ -137,7 +153,13 @@ export const useAppStore = defineStore('app', {
     sendMessage(payload) {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/messages/send-message.json`, payload).then((response) => {
-          resolve(response);
+          let data = response.data;
+          if (data.status == 'error') {
+            this.errorToast('Tapahtui virhe: ' + data.message);
+            reject(data.message);
+          } else {
+            resolve(data);
+          }
         })
         .catch((error) => {
           reject(error);
@@ -192,9 +214,9 @@ export const useAppStore = defineStore('app', {
         })
       })
     },
-    getMessages(jobId) {
+    getMessages(jobId, userId) {
       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + `/api/messages/${jobId}.json`).then((response) => {
+        this.axios.get(this.url + `/api/messages/${jobId}/${userId}.json`).then((response) => {
           let data = response.data;
           resolve(data);
         })
@@ -206,6 +228,17 @@ export const useAppStore = defineStore('app', {
     getAllMessages() {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/users/my-messages.json`).then((response) => {
+          let data = response.data;
+          resolve(data);
+        })
+        .catch((error) => {
+          reject(error);
+        })
+      })
+    },
+    getMyListings() {
+      return new Promise((resolve, reject) => {
+        this.axios.get(this.url + `/api/users/my-listings.json`).then((response) => {
           let data = response.data;
           resolve(data);
         })
@@ -245,9 +278,11 @@ export const useAppStore = defineStore('app', {
           }
         }).then((response) => {
           let data = response.data;
+          this.successToast('Kuva vaihdettu onnistuneesti');
           resolve(data);
         })
         .catch((error) => {
+          this.errorToast('Kuvan latauksessa tapahtui virhe (' + error.code +')');
           reject(error);
         })
       })
@@ -259,6 +294,63 @@ export const useAppStore = defineStore('app', {
           resolve(data);
         })
         .catch((error) => {
+          reject(error);
+        })
+      })
+    },
+    toggleFullscreen(element) {
+      console.log(element);
+      if (document.fullscreenElement) {
+        return document.exitFullscreen() // exit fullscreen on next click
+      }
+      if (element.requestFullscreen) {
+        element.requestFullscreen()
+      } else if (this.element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen() // Safari
+      } else if (this.element.msRequestFullscreen) {
+        element.msRequestFullscreen() // IE11
+      }
+    },
+    successToast(message) {
+      this.snackbar = false;
+      setTimeout(() => {
+        this.snackbarText = message;
+        this.snackbarColor = 'green-darken-2';
+        this.snackbar = true;
+      }, 10);
+    },
+    errorToast(message) {
+      this.snackbar = false;
+      setTimeout(() => {
+        this.snackbarText = message;
+        this.snackbarColor = 'red-darken-2';
+        this.snackbar = true;
+      }, 10);
+    },
+    toast(message) {
+      this.snackbar = false;
+      setTimeout(() => {
+        this.snackbarText = message;
+        this.snackbarColor = 'red-darken-2';
+        this.snackbar = true;
+      }, 10);
+    },
+    logOut() {
+      this.loading = true;
+      this.loadingBackground = true;
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
+          const data = response.data;
+          this.auth_token = null;
+          this.user = null;
+
+          this.loading = false;
+          this.loadingBackground = false;
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.loadingBackground = false;
           reject(error);
         })
       })

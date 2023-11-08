@@ -2,6 +2,7 @@
   <v-dialog
     v-model="store.chatOpen"
     max-width="700"
+    persistent
   >
       <v-card
       min-width="300"
@@ -9,10 +10,10 @@
         <div class="chat">
           <div class="contact bar">
             <v-img
-                v-if="jobUser && job.has_image"
-                :src="`${store.url}/profile-image/${jobUser.hashed_id}`"
+                :src="jobUser && jobUser.has_profile_image ? `${store.url}/profile-image/${jobUser.id}` : `${store.url}/no-profile-img.png`"
                 cover
                 class="profile-image"
+
               >
                 <template v-slot:placeholder>
                   <v-row
@@ -26,19 +27,17 @@
                     ></v-progress-circular>
                   </v-row>
                 </template>
-              </v-img>
+            </v-img>
 
-              <div v-if="jobUser && !jobUser.has_image" class="profile-image empty">
-                <v-icon class="empty-icon">
-                  mdi-account
-                </v-icon>
+            <div>
+              <div class="name">
+                {{ jobUserFullName }}
               </div>
-            <div class="name">
-              {{ jobUserFullName }}
+              <div class="seen">
+                {{ '11:41' }}
+              </div>
             </div>
-            <div class="seen">
-              {{ '11:41' }}
-            </div>
+
           </div>
           <div class="messages" id="messages" ref="chatContainer">
             <div
@@ -65,6 +64,39 @@
               <div class="typing typing-2"></div>
               <div class="typing typing-3"></div>
             </div>
+
+            <v-hover v-slot="{ isHovering, props }">
+              <v-card
+                class="job-container"
+                :elevation="isHovering ? 12 : 8"
+                color="grey-lighten-3"
+                v-bind="props"
+                @click="openJob()"
+              >
+                <v-card-item>
+                  <v-img
+                    v-if="job"
+                    :src="`${store.url}/job-image/${job.hashed_id}/image_0`"
+                    cover
+                    aspect-ratio="1"
+                    class="job-image"
+                  >
+                    <template v-slot:placeholder>
+                      <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                      >
+                        <v-progress-circular
+                          indeterminate
+                          color="grey-lighten-5"
+                        ></v-progress-circular>
+                      </v-row>
+                    </template>
+                  </v-img>
+                </v-card-item>
+              </v-card>
+            </v-hover>
           </div>
           <v-card class="chat-container" elevation="3">
             <v-card-text>
@@ -72,14 +104,16 @@
                   <v-text-field
                     v-model="message"
                     outlined
-                    placeholder="Kirjoita viestisi"
+                    placeholder="Viesti"
                     solo
                     hide-details
-                    variant="underlined"
+                    variant="solo"
                     @keyup.enter="sendMessage"
-                    class="message-input"
+                    class="message-input ml-2 mr-2 mb-2 mt-2"
+                    elevation="12"
+                    bg-color="grey-lighten-2"
                   ></v-text-field>
-                  <v-btn @click="sendMessage" color="primary" dark fab small class="send-btn">
+                  <v-btn @click="sendMessage" color="primary" dark fab small class="send-btn mr-1">
                     <v-icon>mdi-send</v-icon>
                   </v-btn>
               </v-row>
@@ -103,7 +137,9 @@
 import { ref, watch, computed } from 'vue';
 import { useAppStore } from '@/store/app';
 import moment from 'moment';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const store = useAppStore();
 const chatOpen = computed(() => {
   return store.chatOpen;
@@ -151,10 +187,10 @@ watch(messages, async (newVal, oldVal) => {
 
 function init() {
   store.currentMessages = [];
-  store.getMessages(store.currentJobId).then((response) => {
+  store.getMessages(store.currentJobId, store.currentChatUserId).then((response) => {
     store.currentMessages = response.messages;
-    jobUserFullName.value = response.job.user.first_name + ' ' + response.job.user.last_name;
-    jobUser.value = response.job.user;
+    jobUserFullName.value = response.user.name;
+    jobUser.value = response.user;
     job.value = response.job;
     let usedDates = [];
     let toUpdate = [];
@@ -200,6 +236,13 @@ function timeFromDate(date) {
   return moment(date).format('HH:mm');
 }
 
+function openJob() {
+  if (job.value) {
+    router.push('/jobs/' + job.value.hashed_id);
+    store.chatOpen = false;
+    store.tab = 'jobs';
+  }
+}
 </script>
 
 <style scoped>
@@ -259,24 +302,25 @@ body, html {
   transform: translate(-50%, -50%);
 }
 
-.pic {
+.profile-image {
   width: 4rem;
   height: 4rem;
   background-size: cover;
   background-position: center;
   border-radius: 50%;
+  max-width: none;
+  max-height: none;
 }
-
 .contact {
   position: relative;
   margin-bottom: 1rem;
   padding-left: 5rem;
-  height: 4.5rem;
+  height: 2.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.contact .pic {
+.contact .profile-image {
   position: absolute;
   left: 0;
 }
@@ -343,7 +387,8 @@ body, html {
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: 43rem;
+  height: calc(100vh - 100px);
+  max-height: 45rem;
   z-index: 2;
   box-sizing: border-box;
   border-radius: 1rem;
@@ -358,12 +403,14 @@ body, html {
   flex: 1;
 }
 .chat .messages {
+  position: relative;
   padding: 1rem;
   background: #F7F7F7;
   flex-shrink: 2;
   overflow-y: auto;
   box-shadow: inset 0 2rem 2rem -2rem rgba(0, 0, 0, 0.05), inset 0 -2rem 2rem -2rem rgba(0, 0, 0, 0.05);
-  flex: 4;
+  flex: 8;
+  margin-top: 105px;
 }
 .chat .messages .date {
   font-size: 0.8rem;
@@ -493,25 +540,6 @@ body, html {
     opacity: 1;
   }
 }
-.pic.received {
-  /* background-image: url("https://vignette.wikia.nocookie.net/marvelcinematicuniverse/images/7/73/SMH_Mentor_6.png"); */
-}
-
-.pic.banner {
-  background-image: url("https://vignette.wikia.nocookie.net/marvelcinematicuniverse/images/4/4f/BruceHulk-Endgame-TravelingCapInPast.jpg");
-}
-
-.pic.thor {
-  background-image: url("https://vignette.wikia.nocookie.net/marvelcinematicuniverse/images/9/98/ThorFliesThroughTheAnus.jpg");
-}
-
-.pic.danvers {
-  background-image: url("https://vignette.wikia.nocookie.net/marvelcinematicuniverse/images/0/05/HeyPetersent.png");
-}
-
-.pic.rogers {
-  background-image: url("https://vignette.wikia.nocookie.net/marvelcinematicuniverse/images/7/7c/Cap.America_%28We_Don%27t_Trade_Lives_Vision%29.png");
-}
 
 .close-btn {
   position: absolute;
@@ -519,13 +547,21 @@ body, html {
   right: 10px;
   z-index: 100;
 }
+.send-btn {
+  height: 45px;
+  border-radius: 50%;
+  min-width: 45px;
+  width: 45px;
+  padding: 0;
+}
 
 @media (max-width: 599px) {
   .send-btn {
-    width: 36px;
+    width: 40px;
     padding: 0;
-    min-width: 36px;
+    min-width: 40px;
     border-radius: 50%;
+    height: 40px;
   }
 }
 #messages {
@@ -555,9 +591,24 @@ body, html {
   background: #f0f0f0; /* Scrollbar track color */
 }
 
+.job-container {
+  position: fixed;
+  height: 100px;
+  top: 90px;
+  left: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.job-image {
+  /* height: 100%; */
+  width: 80px;
+}
 </style>
 <style>
 .message-input input {
-  padding: 0 5px;
+  padding: 0 10px;
+  min-height: 45px !important;
+  height: 45px;
 }
 </style>

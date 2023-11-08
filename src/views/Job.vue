@@ -15,6 +15,8 @@
             :lazy-src="imageUrl(imageIndex, true)"
             contain
             class="job-image"
+            id="mainJobImage"
+            @click="toggleFullscreen()"
           >
             <template v-slot:placeholder>
               <v-row
@@ -117,6 +119,7 @@ const store = useAppStore();
 const job = ref({});
 store.loading = true;
 
+const mainJobImage = ref(null);
 const jobUserFullName = ref('');
 const isMyJob = computed(() => {
   return job.value.user && store.user && job.value.user.hashed_id === store.user.id;
@@ -154,6 +157,10 @@ function imageUrl(index = 0, lazy = false) {
   } else {
     return store.url + '/no-img.png';
   }
+}
+
+function toggleFullscreen() {
+  // store.toggleFullscreen(document.getElementById('mainJobImage'));
 }
 
 

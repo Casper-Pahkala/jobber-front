@@ -25,4 +25,10 @@ if (store.auth_token) {
 body, html {
   min-width: 370px;
 }
+
+.dialog-close-btn {
+  position: absolute !important;
+  top: 5px;
+  right: 5px;
+}
 </style>

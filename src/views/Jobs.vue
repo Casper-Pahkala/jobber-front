@@ -15,11 +15,16 @@
             density="compact"
             variant="solo"
             label="Hae"
-            append-inner-icon="mdi-magnify"
             single-line
             hide-details
             @click:append-inner="submit()"
-          ></v-text-field>
+          >
+            <template v-slot:append-inner>
+              <div class="search-btn">
+
+              </div>
+            </template>
+          </v-text-field>
 
           </v-col>
           <v-col
@@ -30,6 +35,7 @@
             @click="showAddJob = true"
             class="col-4 add-button"
             v-if="store.user"
+            prepend-icon="mdi-plus"
           >
             Lisää työ
           </v-btn>
@@ -76,7 +82,7 @@
 
                   <div class="job-info">
                     <div class="job-info-item">{{ store.formatDate(job.date) }}</div>
-                    <div class="job-info-item">{{ job.distance }}</div>
+                    <div class="job-info-item">{{ job.address }}</div>
                     <div class="job-info-item">{{ job.estimated_time }}h</div>
                     <div class="job-info-item">{{ job.full_salary }}€</div>
                   </div>
@@ -93,10 +99,6 @@
           :total-visible="7"
           @update:modelValue="pageChange()"
         ></v-pagination>
-
-        <div class="pagination-info-container">
-          Näytetään tulokset {{ firstItem() }} - {{ lastItem() }} / {{ store.jobParams.totalCount }}
-        </div>
       </div>
 
   </div>
@@ -122,7 +124,7 @@ const loading = ref(false);
 loading.value = true;
 
 store.jobParams.page = query.p ?? 1;
-store.jobParams.limit = query.l ?? 5;
+store.jobParams.limit = query.l ?? 10;
 
 const totalPages = computed(() => {
   return Math.ceil(store.jobParams.totalCount / store.jobParams.limit);
@@ -295,5 +297,9 @@ function lastItem() {
   align-items: center;
   width: 100%;
   height: 70vh;
+}
+
+.search-btn {
+  background-color: #ccc;
 }
 </style>
