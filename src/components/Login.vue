@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="store.loginDialogShowing" max-width="500">
+  <v-dialog v-model="store.loginDialogShowing" max-width="500" persistent>
   <v-card>
     <v-card-title class="headline pa-4">
       Kirjaudu sisään
@@ -76,12 +76,15 @@ const email = ref(null);
 const password = ref(null);
 const isValidUser = ref(true);
 
+// store.loading = true;
+// store.loadingBackground = true;
 function login() {
   let payload = {
     email: email.value,
     password: password.value,
   };
   store.loading = true;
+  store.loadingBackground = true;
   store.login(payload).then((response) => {
     if (response.status != 'error' && response.token) {
       store.loginDialogShowing = false;
@@ -89,7 +92,7 @@ function login() {
       setTimeout(() => {
         store.getUser().then(() => {
           store.loading = false;
-
+          store.loadingBackground = false;
           store.snackbarText = 'Kirjauduit sisään';
           store.snackbarColor = 'green-darken-2';
           store.snackbar = true;
@@ -104,8 +107,13 @@ function login() {
       }, 10);
     } else {
       store.loading = false;
+      store.loadingBackground = false;
       isValidUser.value = false;
     }
+  }).catch(() => {
+    store.loading = false;
+    store.loadingBackground = false;
+    store.errorToast('Kirjautuminen epäonnistui');
   });
 }
 

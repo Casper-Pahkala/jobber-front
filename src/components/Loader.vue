@@ -1,15 +1,13 @@
 <template>
-  <div
-    class="loading-overlay" v-if="store.loading"
-    :class="!store.loadingBackground ?? 'dark-background'"
+  <v-dialog
+    v-model="store.loading"
+    :class="{ 'dark-background': store.loadingBackground}"
+    persistent
   >
-    <!-- <v-progress-circular
-      indeterminate
-      color="primary"
-    ></v-progress-circular> -->
-
-    <span class="loader" :style="!store.loadingBackground ?? 'color: #fff'"></span>
-  </div>
+    <div class="loading-overlay">
+      <span class="loader" :style="store.loadingBackground ? 'border-color: #fff' : ''"></span> 
+    </div>
+  </v-dialog>
 </template>
 
 <script setup>
