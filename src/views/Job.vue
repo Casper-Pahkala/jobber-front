@@ -178,7 +178,7 @@ function contact() {
 
 function imageUrl(index = 0, lazy = false) {
   if (job.value.pictures && job.value.pictures > 0) {
-    return store.url + '/job-image/' + job.value.hashed_id + '/image_' + index +(lazy ? '_low' : '');
+    return store.url + '/job-image/' + job.value.hashed_id + '/image_' + index +(lazy ? '_low.jpg' : '.jpg');
 
   } else {
     return store.url + '/no-img.png';

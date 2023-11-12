@@ -30,7 +30,9 @@ export const useAppStore = defineStore('app', {
       limit: 5,
       totalCount: 0
     },
-    updateMainComponent: 0
+    updateMainComponent: 0,
+    recentMessages: [],
+    unseenMessages: []
   }),
   actions: {
     connectToWebsocket() {
@@ -241,6 +243,7 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/users/my-messages.json`).then((response) => {
           let data = response.data;
+          this.recentMessages = data.messages.filter(m => m.seen == null);
           resolve(data);
         })
         .catch((error) => {
@@ -363,6 +366,35 @@ export const useAppStore = defineStore('app', {
         .catch((error) => {
           this.loading = false;
           this.loadingBackground = false;
+          reject(error);
+        })
+      })
+    },
+    preloadImage(url) {
+      const img = new Image();
+      img.src = url;
+    },
+    openChat(message) {
+      this.currentJobId = message.job_hashed_id;
+      this.currentChatUserId = message.other_user_id;
+      this.chatOpen = true;
+    },
+    getUnseenMessages() {
+       return new Promise((resolve, reject) => {
+        this.axios.get(this.url + `/api/users/recent-messages.json`).then((response) => {
+          let data = response.data;
+
+          const unseenMessages = data.messages;
+          let fixedList = [];
+          unseenMessages.forEach(m => {
+            if (!fixedList.find(l => l.other_user_id === m.other_user_id && l.job_hashed_id === m.job_hashed_id)) {
+              fixedList.push(m);
+            }
+          })
+          this.unseenMessages = fixedList;
+          resolve(data);
+        })
+        .catch((error) => {
           reject(error);
         })
       })

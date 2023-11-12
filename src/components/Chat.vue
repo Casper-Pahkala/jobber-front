@@ -69,7 +69,7 @@
               <v-card
                 v-if="job"
                 class="job-container"
-                :elevation="isHovering && !job.is_deleted ? 12 : 8"
+                :elevation="isHovering && !job.is_deleted ? 8 : 6"
                 color="grey-lighten-3"
                 v-bind="props"
                 @click="openJob()"
