@@ -4,4 +4,6 @@
 </template>
 
 <script setup>
+
+window.scrollTo(0, 0);
 </script>

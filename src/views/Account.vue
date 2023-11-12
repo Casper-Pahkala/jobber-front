@@ -48,6 +48,198 @@
         </div>
       </v-container>
 
+      <v-container class="profile-container" v-if="store.user">
+
+        <v-row
+          class="info-wrapper"
+        >
+          <v-col
+            cols="3"
+            class="title"
+          >
+          <h4>
+            Nimi
+          </h4>
+          </v-col>
+
+          <v-col
+            cols="6"
+            class="content"
+          >
+          <template v-if="!editingName">
+              {{ fullName }}
+            </template>
+
+            <template v-else>
+              <v-row style="max-width: 440px;">
+                <v-col cols="6">
+                  <v-text-field
+                    variant="outlined"
+                    style="max-width: 200px;"
+                    density="compact"
+                    v-model="userFirstName"
+                  >
+                  </v-text-field>
+                </v-col>
+
+                <v-col cols="6">
+                  <v-text-field
+                    variant="outlined"
+                    style="max-width: 200px;"
+                    density="compact"
+                    v-model="userLastName"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
+
+
+              <v-btn
+                variant="outlined"
+                class="text-none"
+                @click="cancelNameEditing()"
+              >
+                Peruuta
+              </v-btn>
+
+              <v-btn
+                variant="outlined"
+                class="text-none ml-5"
+                color="primary"
+                @click="editName()"
+              >
+                Tallenna
+              </v-btn>
+            </template>
+          </v-col>
+
+          <v-col
+            cols="3"
+            class="actions"
+            v-if="!editingName"
+          >
+            <v-btn
+              variant="outlined"
+              class="text-none"
+              color="primary"
+              @click="editingName = true"
+            >
+              Muokkaa
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-divider></v-divider>
+
+        <v-row
+          class="info-wrapper"
+        >
+          <v-col
+            cols="3"
+            class="title"
+          >
+          <h4>
+            Sähköposti
+          </h4>
+          </v-col>
+
+
+          <v-col
+            cols="6"
+            class="content"
+          >
+            <template v-if="!editingEmail">
+              {{ store.user.email }}
+            </template>
+
+            <template v-else>
+              <v-form ref="form" v-model="valid">
+                <v-text-field
+                  variant="outlined"
+                  style="max-width: 400px;"
+                  density="compact"
+                  v-model="userEmail"
+                  :rules="emailRules"
+                  required
+                  type="email"
+                  name="email"
+                >
+                </v-text-field>
+
+                <v-btn
+                  variant="outlined"
+                  class="text-none"
+                  @click="cancelEmailEditing()"
+                >
+                  Peruuta
+                </v-btn>
+
+                <v-btn
+                  variant="outlined"
+                  class="text-none ml-5"
+                  color="primary"
+                  @click="editEmail()"
+                  :disabled="!valid"
+                >
+                  Tallenna
+                </v-btn>
+              </v-form>
+            </template>
+          </v-col>
+
+          <v-col
+            cols="3"
+            class="actions"
+          >
+            <v-btn
+              variant="outlined"
+              class="text-none"
+              color="primary"
+              @click="editingEmail = true"
+              v-if="!editingEmail"
+            >
+              Muokkaa
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-divider></v-divider>
+
+        <v-row
+          class="info-wrapper"
+        >
+          <v-col
+            cols="3"
+            class="title"
+          >
+          <h4>
+            Poista käyttäjä
+          </h4>
+          </v-col>
+
+          <v-col
+            cols="6"
+            class="content"
+          >
+          Kaikki tietosi poistetaan tietokannastamme, eikä tätä voi peruuttaa
+          </v-col>
+
+          <v-col
+            cols="3"
+            class="actions"
+          >
+            <v-btn
+              variant="outlined"
+              class="text-none"
+              color="error"
+              @click="deleteUser"
+            >
+              Poista käyttäjä
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+
     </div>
   </div>
   <input
@@ -97,6 +289,7 @@
 import { ref, computed } from 'vue';
 import { useAppStore } from '@/store/app';
 
+window.scrollTo(0, 0);
 const store = useAppStore();
 const fileInput = ref(null);
 const profileImageDialog = ref(false);
@@ -105,12 +298,27 @@ const newProfileImageResult = ref(null);
 const newProfileImage = ref(null);
 const profileImageUpdated = ref(0);
 
+const editingEmail = ref(false);
+const editingName = ref(false);
+
+const userEmail = ref('');
+const userFirstName = ref('');
+const userLastName = ref('');
+
 const fullName = computed(() => {
   if (!store.user) {
     return '';
   }
   return store.user.first_name + ' ' + store.user.last_name;
 });
+
+const valid = ref(true);
+
+const emailRules = [
+  v => !!v || 'Syötä sähköposti',
+  v => /.+@.+\..+/.test(v) || 'Syötä kelpaava sähköposti',
+  v => v != store.user.email || 'Syötä uusi sähköposti'
+];
 
 const joinedAt = computed(() => {
   if (!store.user) {
@@ -119,6 +327,9 @@ const joinedAt = computed(() => {
   return 'Käyttäjä luotu ' + store.formatDate(store.user.created_at);
 });
 if (store.user) {
+  userEmail.value = store.user.email;
+  userFirstName.value = store.user.first_name;
+  userLastName.value = store.user.last_name;
   // router.replace({ path: '/' })
   // store.tab = '';
   // fullName.value = ;
@@ -221,6 +432,52 @@ function confirmProfileImage() {
 
 store.tab = 'account';
 
+function cancelEmailEditing() {
+  editingEmail.value = false;
+  userEmail.value = store.user.email;
+}
+
+function cancelNameEditing() {
+  editingName.value = false;
+  userFirstName.value = store.user.first_name;
+  userLastName.value = store.user.last_name;
+}
+
+function deleteUser() {
+  let confirm = window.confirm('Haluatko varmasti poistaa käyttäjäsi?');
+
+  if (confirm) {
+    store.deleteUser();
+  }
+}
+
+function editEmail() {
+  let payload = {
+    email: userEmail.value,
+    type: 'email'
+  };
+  store.editUser(payload).then(() => {
+    editingEmail.value = false;
+    setTimeout(() => {
+      store.getUser();
+    }, 100);
+  });
+}
+
+function editName() {
+  let payload = {
+    first_name: userFirstName.value,
+    last_name: userLastName.value,
+    type: 'name'
+  };
+
+  store.editUser(payload).then(() => {
+    editingName.value = false;
+    setTimeout(() => {
+      store.getUser();
+    }, 100);
+  });
+}
 </script>
 
 <style scoped>
@@ -303,4 +560,18 @@ store.tab = 'account';
     border-radius: 50%;
   }
 
+  .profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .info-wrapper {
+    display: flex;
+    padding: 20px 10px;
+  }
+
+.info-wrapper .actions {
+  direction: rtl;
+}
 </style>

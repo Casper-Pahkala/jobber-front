@@ -7,7 +7,7 @@
       <v-card
       min-width="300"
       >
-        <div class="chat">
+        <div class="chat" v-if="job">
           <div class="contact bar">
             <v-img
                 :src="jobUser && jobUser.has_profile_image ? `${store.url}/profile-image/${jobUser.id}` : `${store.url}/no-profile-img.png`"
@@ -67,34 +67,55 @@
 
             <v-hover v-slot="{ isHovering, props }">
               <v-card
+                v-if="job"
                 class="job-container"
-                :elevation="isHovering ? 8 : 6"
+                :elevation="isHovering && !job.is_deleted ? 8 : 6"
                 color="grey-lighten-3"
                 v-bind="props"
                 @click="openJob()"
+                :disabled="job.is_deleted"
               >
                 <v-card-item>
-                  <v-img
-                    v-if="job"
-                    :src="`${store.url}/job-image/${job.hashed_id}/image_0`"
-                    cover
-                    aspect-ratio="1"
-                    class="job-image"
-                  >
-                    <template v-slot:placeholder>
-                      <v-row
-                        class="fill-height ma-0"
-                        align="center"
-                        justify="center"
-                      >
-                        <v-progress-circular
-                          indeterminate
-                          color="grey-lighten-5"
-                        ></v-progress-circular>
-                      </v-row>
-                    </template>
-                  </v-img>
+                  <div class="job-container">
+                    <v-img
+
+                      :src="`${store.url}/job-image/${job.hashed_id}/image_0`"
+                      cover
+                      class="job-image"
+                    >
+                      <template v-slot:placeholder>
+                        <v-row
+                          class="fill-height ma-0"
+                          align="center"
+                          justify="center"
+                        >
+                          <v-progress-circular
+                            indeterminate
+                            color="grey-lighten-5"
+                          ></v-progress-circular>
+                        </v-row>
+                      </template>
+                    </v-img>
+
+                    <div class="job-content">
+                      <div class="job-main">
+                        <div class="job-title">
+                          {{ job.title }}
+                        </div>
+                        <div>
+                          {{ job.description }}
+                        </div>
+                      </div>
+
+                      <div class="job-info">
+                        <div class="job-info-item">{{ store.formatDate(job.date) }}</div>
+                      </div>
+                    </div>
+
+                  </div>
                 </v-card-item>
+                <div v-if="job.is_deleted" class="deleted-job">
+                </div>
               </v-card>
             </v-hover>
           </div>
@@ -112,8 +133,9 @@
                     class="message-input ml-2 mr-2 mb-2 mt-2"
                     elevation="12"
                     bg-color="grey-lighten-2"
+                    :disabled="job.is_deleted"
                   ></v-text-field>
-                  <v-btn @click="sendMessage" color="primary" dark fab small class="send-btn mr-1">
+                  <v-btn @click="sendMessage" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
                     <v-icon>mdi-send</v-icon>
                   </v-btn>
               </v-row>
@@ -237,7 +259,7 @@ function timeFromDate(date) {
 }
 
 function openJob() {
-  if (job.value) {
+  if (job.value && !job.value.is_deleted) {
     router.push('/jobs/' + job.value.hashed_id);
     store.chatOpen = false;
     store.tab = 'jobs';
@@ -410,7 +432,7 @@ body, html {
   overflow-y: auto;
   box-shadow: inset 0 2rem 2rem -2rem rgba(0, 0, 0, 0.05), inset 0 -2rem 2rem -2rem rgba(0, 0, 0, 0.05);
   flex: 8;
-  margin-top: 105px;
+  margin-top: 73px;
 }
 .chat .messages .date {
   font-size: 0.8rem;
@@ -593,7 +615,7 @@ body, html {
 
 .job-container {
   position: fixed;
-  height: 100px;
+  height: 70px;
   top: 90px;
   left: 10px;
   right: 10px;
@@ -602,7 +624,57 @@ body, html {
 
 .job-image {
   /* height: 100%; */
-  width: 80px;
+  width: 70px;
+  flex: auto !important;
+}
+
+.job-container {
+  display: flex;
+}
+
+.job-content {
+  padding: 0px 10px;
+  width: calc(100% - 70px);
+  display: flex;
+}
+
+.job-title {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.job-info {
+  width: 30%;
+}
+
+.job-main {
+  width: 70%;
+}
+
+.job-info-item {
+    direction: rtl;
+  }
+
+.deleted-job {
+  cursor: default;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #00000040;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+}
+
+.deleted-job::after {
+  content: "Poistettu";
+  color: #000;
+  font-size: 20px;
+  font-weight: 600;
+  transform: rotate(10deg);
 }
 </style>
 <style>

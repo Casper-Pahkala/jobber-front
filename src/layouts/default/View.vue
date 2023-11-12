@@ -3,7 +3,7 @@
     <router-view style="min-height: calc(100vh - 64px)"/>
 
     <v-footer
-      class="footer bg-indigo-lighten-1 text-center d-flex flex-column mt-10"
+      class="footer bg-grey-darken-4 text-center d-flex flex-column mt-10"
     >
       <div>
         <v-btn
