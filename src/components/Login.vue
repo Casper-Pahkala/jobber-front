@@ -76,8 +76,6 @@ const email = ref(null);
 const password = ref(null);
 const isValidUser = ref(true);
 
-// store.loading = true;
-// store.loadingBackground = true;
 function login() {
   let payload = {
     email: email.value,
@@ -103,6 +101,9 @@ function login() {
             router.replace({ path: '/' + store.redirect.url })
             store.tab = store.redirect.tab;
           }
+
+          // store.preloadImage(`${store.url}/profile-image/${store.user.id}`);
+          store.preloadImage(`${store.url}/profile-image/${store.user.id}.jpg`);
         });
       }, 10);
     } else {

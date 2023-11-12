@@ -14,6 +14,7 @@ store.initializeAxios();
 store.auth_token = window.auth_token;
 if (store.auth_token) {
   store.getUser().then((response) => {
+    
   })
 }
 

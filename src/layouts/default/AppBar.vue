@@ -5,7 +5,7 @@
       <template v-if="store.user">
         <v-list-item
           v-if="store.user.has_image"
-          :prepend-avatar="`${store.url}/profile-image/${store.user.id}`"
+          :prepend-avatar="`${store.url}/profile-image/${store.user.id}.jpg`"
           :title="store.user.first_name + ' ' + store.user.last_name"
           :subtitle="store.user.email"
           class="drawer-item pb-4 pt-2"
@@ -88,8 +88,8 @@
       v-model="store.tab"
     >
       <template v-if="currentTabs === 'main'">
-        <v-tab @click="changeTab('jobs')" value="jobs">Työt</v-tab>
-        <v-tab @click="changeTab('workers')" value="workers">Työntekijät</v-tab>
+        <v-tab @click="changeTab('jobs')" value="jobs">Avoimet työpaikat</v-tab>
+        <v-tab @click="changeTab('workers')" value="workers">Henkilöt ja palvelut</v-tab>
       </template>
 
       <template v-else-if="currentTabs === 'account'">

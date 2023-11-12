@@ -12,7 +12,7 @@
           <div class="profile-image-container">
             <v-img
                 v-if="store.user.has_image"
-                :src="`${store.url}/profile-image/${store.user.id}?${Date.now()}`"
+                :src="`${store.url}/profile-image/${store.user.id}.jpg`"
                 cover
                 class="profile-image"
                 :key="profileImageUpdated"

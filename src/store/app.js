@@ -354,6 +354,10 @@ export const useAppStore = defineStore('app', {
           reject(error);
         })
       })
+    },
+    preloadImage(url) {
+      const img = new Image();
+      img.src = url;
     }
   },
 })
