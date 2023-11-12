@@ -30,7 +30,8 @@ export const useAppStore = defineStore('app', {
       limit: 5,
       totalCount: 0
     },
-    updateMainComponent: 0
+    updateMainComponent: 0,
+    recentMessages: []
   }),
   actions: {
     connectToWebsocket() {
@@ -229,6 +230,7 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/users/my-messages.json`).then((response) => {
           let data = response.data;
+          this.recentMessages = data.messages;
           resolve(data);
         })
         .catch((error) => {
@@ -358,6 +360,11 @@ export const useAppStore = defineStore('app', {
     preloadImage(url) {
       const img = new Image();
       img.src = url;
+    },
+    openChat(message) {
+      this.currentJobId = message.job_hashed_id;
+      this.currentChatUserId = message.other_user_id;
+      this.chatOpen = true;
     }
   },
 })

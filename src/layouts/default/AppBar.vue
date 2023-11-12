@@ -52,7 +52,7 @@
 
       <!-- <v-list-item prepend-icon="mdi-home" title="Koti" @click="changeTab('')" :active="false"></v-list-item> -->
       <v-list-item prepend-icon="mdi-briefcase" title="Työt" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
-      <v-list-item prepend-icon="mdi-account-group" title="Työntekijät" @click="changeTab('workers')" :active="false" class="drawer-item"></v-list-item>
+      <v-list-item prepend-icon="mdi-account-group" title="Henkilöt ja palvelut" @click="changeTab('workers')" :active="false" class="drawer-item"></v-list-item>
       <!-- <v-divider v-if="!store.user"></v-divider>
       <v-list-item v-if="!store.user" prepend-icon="mdi-login" title="Kirjaudu sisään" @click="store.loginDialogShowing = true" :active="false" class="drawer-item"></v-list-item>
       <v-list-item v-if="!store.user" prepend-icon="mdi-plus" title="Luo käyttäjä" @click="store.registerDialogShowing = true" :active="false" class="drawer-item"></v-list-item> -->
@@ -100,11 +100,79 @@
     </v-tabs>
     <template v-slot:append>
       <template v-if="store.user">
-        <v-btn icon="mdi-heart"></v-btn>
+        <v-menu
+          v-model="messagesMenu"
+          class="mr-1"
+          :close-on-content-click="false"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn
+              icon="mdi-message-text"
+              v-bind="props"
+            >
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title
+             style="font-size: 18px;"
+            >
+              Uudet viestit
+            </v-card-title>            
+            <v-divider></v-divider>
+            <v-list
+             v-if="recentMessages.length > 0"
+              class="recent-messages"
+            >
+              <v-list-item
+                v-for="(item, index) in recentMessages"
+                :key="index"
+                :value="index"
+                class="pt-4 pb-4"
+                @click="openRecentMessage(item)"
+              >
+                <template v-slot:prepend>
+                  <v-avatar size="50px">
+                  <v-img
+                    alt="Avatar"
+                    :src="`${store.url}/profile-image/${item.other_user_id}.jpg`"
+                  ></v-img>
+                  </v-avatar>
+                </template>
 
-        <!-- <v-btn icon="mdi-magnify"></v-btn> -->
+                <v-list-item-title>{{ item.other_full_name }}</v-list-item-title>
+                <v-list-item-subtitle style="opacity: 1;" class="pt-1">{{ item.job_title }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="pt-1">{{ item.message }}</v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
 
-        <v-btn icon="mdi-dots-vertical"></v-btn>
+            <div v-else class="no-messages-text">
+
+              Ei viestejä
+            </div>
+          </v-card>
+        </v-menu>
+        <v-menu
+          :close-on-content-click="false"
+          v-model="accountMenu"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn
+              icon="mdi-account"
+              v-bind="props"
+            >
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in accountItems"
+              :key="index"
+              :value="index"
+              @click="item.onClick()"
+            >
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
 
       <template v-else>
@@ -131,13 +199,16 @@ const store = useAppStore();
 const drawer = ref(false);
 const router = useRouter();
 const route = useRoute();
-
 const currentTabs = ref('');
+const messagesMenu = ref(false);
+const accountMenu = ref(false);
 
 let currentTab = route.name || '';
 store.tab = currentTab;
 updateTabs(currentTab);
 const changeTab = (tab) => {
+  messagesMenu.value = false;
+  accountMenu.value = false;
   updateTabs(tab);
   setTimeout(() => {
     drawer.value = false;
@@ -177,6 +248,30 @@ function updateTabs(tab) {
     currentTabs.value = '';
   }
 }
+
+function openRecentMessage(message) {
+  messagesMenu.value = false;
+  store.openChat(message);
+}
+
+const accountItems = [
+  {
+    title: 'Tili',
+    onClick: () => changeTab('account')
+  },
+  {
+    title: 'Viestit',
+    onClick: () => changeTab('messages')
+  },
+  {
+    title: 'Omat listaukset',
+    onClick: () => changeTab('my-listings')
+  } 
+];
+
+const recentMessages = computed(() => {
+  return store.recentMessages;
+});
 </script>
 
 <style scoped>
@@ -192,5 +287,18 @@ function updateTabs(tab) {
     width: 100%;
     height: 45px;
     font-size: 15px;
+  }
+
+  .recent-messages {
+    width: 400px;
+    max-height: 500px;
+  }
+
+  .no-messages-text {
+    width: 300px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>

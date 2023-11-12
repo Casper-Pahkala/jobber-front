@@ -104,6 +104,8 @@ function login() {
 
           // store.preloadImage(`${store.url}/profile-image/${store.user.id}`);
           store.preloadImage(`${store.url}/profile-image/${store.user.id}.jpg`);
+
+          store.getAllMessages();
         });
       }, 10);
     } else {

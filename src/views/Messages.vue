@@ -5,7 +5,7 @@
           <v-card
             v-for="(message, index) in messages"
             :key="index"
-            @click="openChat(message)"
+            @click="store.openChat(message)"
             class="message-container"
             elevation="10"
           >
@@ -107,12 +107,6 @@ if (store.user) {
   // store.tab = '';
   // store.redirect = { url: 'messages', tab: 'messages'};
   store.loginDialogShowing = true;
-}
-
-function openChat(message) {
-  store.currentJobId = message.job_hashed_id;
-  store.currentChatUserId = message.other_user_id;
-  store.chatOpen = true;
 }
 
 function timeFromDate (date) {
