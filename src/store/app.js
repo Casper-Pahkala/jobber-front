@@ -118,24 +118,36 @@ export const useAppStore = defineStore('app', {
     },
     addJob(payload) {
       return new Promise((resolve, reject) => {
+        this.loading = true;
+        this.loadingBackground = true;
         const formData = new FormData();
         for (let i = 0; i < payload.images.length; i++) {
           formData.append('image[]', payload.images[i]);
         }
-        formData.append('title', payload.title);
-        formData.append('date', payload.date);
-        formData.append('duration', payload.duration);
-        formData.append('full_salary', payload.full_salary);
-        formData.append('description', payload.description);
-        formData.append('address', payload.address);
+        for (let key in payload) {
+          formData.append(key.toString(), payload[key]);
+        }
         this.axios.post(this.url + '/api/add-job.json', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           }
         }).then((response) => {
-          resolve(response);
+          let data = response.data;
+          this.loading = false;
+          this.loadingBackground = false;
+          if (data.status === 'success') {
+            this.successToast('Työ lisätty onnistuneesti');
+            this.updateMainComponent++;
+            resolve(data);
+          } else {
+            this.errorToast('Työn lisäyksessä tapahtui virhe');
+            reject();
+          }
         })
         .catch((error) => {
+          this.loading = false;
+          this.loadingBackground = false;
+          this.errorToast('Työn lisäyksessä tapahtui virhe');
           reject(error);
         })
       })
@@ -354,6 +366,77 @@ export const useAppStore = defineStore('app', {
           reject(error);
         })
       })
-    }
+    },
+    deleteListing(payload) {
+      this.loading = true;
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/delete-listing.json`, payload).then((response) => {
+          this.loading = false;
+          let data = response.data;
+          if (data.status !== 'success') {
+            this.errorToast('Listauksen poistossa tapahtui virhe: ' + data.message);
+            reject(data.message);
+            return;
+          }
+          this.successToast('Listaus poistettu');
+          resolve(data);
+        })
+        .catch((error) => {
+          this.errorToast('Listauksen poistossa tapahtui virhe');
+          this.loading = false;
+          reject(error);
+        })
+      })
+    },
+    editUser(payload) {
+      this.loading = true;
+      this.loadingBackground = true;
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/users/edit.json`, payload).then((response) => {
+          let data = response.data;
+          this.loading = false;
+          this.loadingBackground = false;
+          if (data.status !== 'success') {
+            this.errorToast('Nimen muokkauksessa tapahtui virhe: ' + data.message);
+            reject(data.message)
+            return;
+          }
+          this.successToast('Nimi päivitetty onnistuneesti');
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.loadingBackground = false;
+          this.errorToast('Nimen muokkauksessa tapahtui virhe');
+          reject(error);
+        })
+      })
+    },
+    deleteUser(payload) {
+      this.loading = true;
+      this.loadingBackground = true;
+
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/users/delete-user.json`, payload).then((response) => {
+          let data = response.data;
+
+          this.loading = false;
+          this.loadingBackground = false;
+
+          if (data.status !== 'success') {
+            this.errorToast('Käyttäjän poistossa tapahtui virhe: ' + data.message);
+            reject(data.message);
+            return;
+          }
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.loadingBackground = false;
+          this.errorToast('Käyttäjän poistossa tapahtui virhe');
+          reject(error);
+        })
+      })
+    },
   },
 })

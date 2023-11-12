@@ -1,13 +1,28 @@
 <template>
   <div class="main-wrapper">
       <div class="main-content">
-        <div id="jobs-container">
-        <template v-for="listing in myListings" :key="listing.id">
+        <div id="jobs-container" v-if="myListings.length != 0 && store.user && !loading">
+          <v-chip-group
+            mandatory
+            selected-class="text-primary"
+            column
+            style="width: 100%;"
+            v-model="listingsType"
+          >
+            <v-chip
+            >
+            Aktiiviset
+            </v-chip>
+            <v-chip
+            >
+            Poistetut
+            </v-chip>
+          </v-chip-group>
+        <template v-for="listing in filteredListings" :key="listing.id">
           <v-hover v-slot="{ isHovering, props }">
             <v-card
-              @click="handleJobClick(listing)"
               class="job"
-              :elevation="isHovering ? 8 : 4"
+              :elevation="isHovering ? 4 : 4"
               v-bind="props"
             >
               <v-img
@@ -41,6 +56,43 @@
                     <div class="job-info-item">{{ listing.estimated_time }}h</div>
                     <div class="job-info-item">{{ listing.full_salary }}€</div>
                   </div>
+              </div>
+
+              <div
+                class="action-btns"
+              >
+                <v-btn
+                  color="primary"
+                  class="show-btn"
+                  @click="handleJobClick(listing)"
+                >
+                  Näytä
+                </v-btn>
+
+                <v-menu>
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" icon="mdi-dots-vertical" class="ml-5 more-btn" color="grey-lighten-3"></v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item
+                    title="Muokkaa"
+                    class="menu-action-btn"
+                    @click="editListing(listing)"
+                    >
+                    </v-list-item>
+
+                    <v-list-item
+                        @click="deleteListing(listing)"
+                      class="menu-action-btn"
+                      title="Poista listaus"
+                    >
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+
+              <div v-if="listing.is_deleted" class="deleted">
               </div>
             </v-card >
           </v-hover>
@@ -77,17 +129,29 @@
 <script setup>
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { list } from 'postcss';
 
+window.scrollTo(0, 0);
 const router = useRouter();
 const store = useAppStore();
 const myListings = ref([]);
+
+const filteredListings = computed(() => {
+  if (listingsType.value == 0) {
+    return myListings.value.filter(l => !l.is_deleted);
+  } else {
+    return myListings.value.filter(l => l.is_deleted);
+  }
+})
 const loading = ref(false);
+const listingsType = ref(0);
 loading.value = true;
 
 if (store.user) {
   store.getMyListings().then((response) => {
-    myListings.value = response.messages ?? [];
+    let listings = response.listings ?? [];
+    myListings.value = listings;
     loading.value = false;
   }).catch(error => {
     loading.value = false;
@@ -101,15 +165,54 @@ function toJobs() {
   store.tab = 'jobs';
   router.push('/jobs');
 }
+
+function imageUrl(job, lazy) {
+  if (job.pictures && job.pictures > 0) {
+    return store.url + '/job-image/' + job.hashed_id + '/image_0' +(lazy ? '_low' : '');
+  } else {
+    return store.url + '/no-img.png'
+  }
+}
+
+function handleJobClick(job) {
+  router.push('/jobs/' + job.hashed_id);
+}
+
+function editListing(listing) {
+
+}
+
+function deleteListing(listing) {
+  let confirm = window.confirm('Haluatko varmasti poistaa listauksen ' + listing.title + '?');
+
+  if (confirm) {
+    const payload = {
+      job_id: listing.hashed_id
+    };
+    store.deleteListing(payload).then(res => {
+      listing.is_deleted = true;
+    })
+  }
+}
+
 </script>
 <style scoped>
-    #jobs-container {
-      margin-top: 60px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding-bottom: 100px;
+.main-content {
+  display: flex;
+  justify-content: center;
+}
+.action-btns {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+#jobs-container {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 100px;
+    width: 1000px;
   }
   .top-layout {
     margin-top: 60px;
@@ -125,10 +228,9 @@ function toJobs() {
       width: 500px;
   }
   .job {
-    cursor: pointer;
+    cursor: default;
     border-radius: 6px;
     width: 100%;
-    max-width: 1000px;
     height: 180px;
     display: flex;
     position: relative;
@@ -204,46 +306,32 @@ function toJobs() {
   height: 70vh;
 }
 
-.search-btn {
-  background-color: #ccc;
+.more-btn {
+  height: 40px;
+  width: 40px;
 }
 
-.loading-container {
+.menu-action-btn {
+  cursor: pointer;
+}
+
+.deleted {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #00000040;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 70vh;
 }
 
-.no-messages-text {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-direction: column;
-  gap: 20px;
+.deleted::after {
+  content: "Poistettu";
+  color: #000;
+  font-size: 24px;
+  font-weight: 600;
+  transform: rotate(17deg);
 }
-
-.job-image {
-    width: 80px;
-    height: 80px;
-    max-width: 80px;
-    border-radius: 50%;
-  }
-
-  .job-image.empty {
-    background-color: #efefef;
-    position: relative;
-    overflow: hidden;
-  }
-  .job-image.empty .empty-icon {
-    font-size: 100px;
-    color: #838383;
-    position: absolute;
-    left: 50%;
-    top: 60%;
-    transform: translate(-50%, -50%);
-  }
 </style>

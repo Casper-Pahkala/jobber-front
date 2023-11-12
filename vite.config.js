@@ -47,4 +47,12 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  rollupOptions: {
+    output: {
+      manualChunks: () => 'everything.js', // this funnels all modules into one chunk
+      entryFileNames: 'index.js', // outputs a single js file
+      chunkFileNames: 'index.js', // needed if your project is split across chunks
+      assetFileNames: 'index.[ext]' // outputs a single css file if your assets are .css files
+    }
+  }
 })

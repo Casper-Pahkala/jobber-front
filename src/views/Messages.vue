@@ -91,6 +91,7 @@ import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import moment from 'moment';
 
+window.scrollTo(0, 0);
 const router = useRouter();
 const store = useAppStore();
 const messages = ref([]);
@@ -186,13 +187,24 @@ function toJobs() {
   }
 
   .deleted {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #00000040;
-  }
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #00000040;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.deleted::after {
+  content: "";
+  color: #000;
+  font-size: 24px;
+  font-weight: 600;
+  transform: rotate(10deg);
+}
 
   .loader {
   width: 80px;
