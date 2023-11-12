@@ -7,7 +7,7 @@
             :key="index"
             @click="store.openChat(message)"
             class="message-container"
-            elevation="10"
+            elevation="4"
           >
             <div class="message-wrapper">
               <v-img

@@ -68,7 +68,7 @@
             <v-hover v-slot="{ isHovering, props }">
               <v-card
                 class="job-container"
-                :elevation="isHovering ? 12 : 8"
+                :elevation="isHovering ? 8 : 6"
                 color="grey-lighten-3"
                 v-bind="props"
                 @click="openJob()"

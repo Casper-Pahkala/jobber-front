@@ -29,16 +29,28 @@
 </template>
 
 <script>
-  export default {
-    data: () => ({
-      icons: [
-        'mdi-facebook',
-        'mdi-twitter',
-        'mdi-linkedin',
-        'mdi-instagram',
-      ],
-    }),
+import { useAppStore } from '@/store/app'
+export default {
+  data: () => ({
+    icons: [
+      'mdi-facebook',
+      'mdi-twitter',
+      'mdi-linkedin',
+      'mdi-instagram',
+    ],
+  }),
+  mounted() {
+    console.log('updated');
+    const store = useAppStore();
+    if (store.user) {
+      store.getUnseenMessages();
+    }
+  },
+  methods: {
+
   }
+  
+}
 </script>
 
 <style>

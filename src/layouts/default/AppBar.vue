@@ -117,7 +117,11 @@
              style="font-size: 18px;"
             >
               Uudet viestit
-            </v-card-title>            
+            </v-card-title>
+            
+            <div class="show-all-messages" @click="changeTab('messages')">
+              Näytä kaikki
+            </div>
             <v-divider></v-divider>
             <v-list
              v-if="recentMessages.length > 0"
@@ -131,11 +135,12 @@
                 @click="openRecentMessage(item)"
               >
                 <template v-slot:prepend>
+                  <div class="not-seen"></div>
                   <v-avatar size="50px">
-                  <v-img
-                    alt="Avatar"
-                    :src="`${store.url}/profile-image/${item.other_user_id}.jpg`"
-                  ></v-img>
+                    <v-img
+                      alt="Avatar"
+                      :src="`${store.url}/profile-image/${item.other_user_id}.jpg`"
+                    ></v-img>
                   </v-avatar>
                 </template>
 
@@ -146,8 +151,7 @@
             </v-list>
 
             <div v-else class="no-messages-text">
-
-              Ei viestejä
+              Ei uusia viestejä
             </div>
           </v-card>
         </v-menu>
@@ -270,8 +274,10 @@ const accountItems = [
 ];
 
 const recentMessages = computed(() => {
-  return store.recentMessages;
+  return store.unseenMessages;
 });
+
+
 </script>
 
 <style scoped>
@@ -291,7 +297,7 @@ const recentMessages = computed(() => {
 
   .recent-messages {
     width: 400px;
-    max-height: 500px;
+    max-height: 300px;
   }
 
   .no-messages-text {
@@ -301,4 +307,45 @@ const recentMessages = computed(() => {
     align-items: center;
     justify-content: center;
   }
+
+
+  /* Custom scrollbar styles */
+  .recent-messages::-webkit-scrollbar {
+    width: 6px; /* Scrollbar width */
+    display: none;
+  }
+
+  .recent-messages::-webkit-scrollbar-track {
+    background: #fff; /* Track color */
+  }
+
+  .recent-messages::-webkit-scrollbar-thumb {
+    background: #888; /* Handle color */
+  }
+
+  .recent-messages::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Handle color on hover */
+  }
+
+  .recent-messages:hover::-webkit-scrollbar {
+    display: block;
+  }
+
+  .not-seen {
+    height: 5px;
+    width: 5px;
+    left: 6px;
+    position: absolute;
+    border-radius: 2.5px;
+    background-color: #3ea6ff;
+  }
+
+  .show-all-messages {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #1565C0;
+    cursor: pointer;
+  }
+
 </style>
