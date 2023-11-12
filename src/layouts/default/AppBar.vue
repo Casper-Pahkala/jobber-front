@@ -29,7 +29,7 @@
           prepend-icon="mdi-clipboard-account"
           title="Omat ilmoitukset"
           :active="false"
-          @click="changeTab('messages')"
+          @click="changeTab('my-listings')"
           class="drawer-item"
         >
         </v-list-item>
@@ -135,13 +135,16 @@ const route = useRoute();
 const currentTabs = ref('');
 
 let currentTab = route.name || '';
+const previousTab = ref(currentTab);
 store.tab = currentTab;
 updateTabs(currentTab);
 const changeTab = (tab) => {
+  if (previousTab.value == tab) return;
   updateTabs(tab);
+  previousTab.value = tab;
   setTimeout(() => {
-    drawer.value = false;
     store.tab = tab;
+    drawer.value = false;
     router.push(`/${tab}`);
   }, 10);
 
@@ -159,7 +162,8 @@ function logOut() {
 function updateTabs(tab) {
   const mainTabs = [
     'jobs',
-    'workers'
+    'workers',
+    'job'
   ];
 
   const accountTabs = [
@@ -177,6 +181,17 @@ function updateTabs(tab) {
     currentTabs.value = '';
   }
 }
+
+const currentRoute = computed(() => {
+  return route.name;
+})
+
+watch(currentRoute, async (newVal, oldVal) => {
+  updateTabs(newVal);
+  setTimeout(() => {
+    store.tab = newVal;
+  }, 10);
+});
 </script>
 
 <style scoped>

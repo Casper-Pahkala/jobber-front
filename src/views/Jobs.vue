@@ -81,10 +81,10 @@
                   </div>
 
                   <div class="job-info">
-                    <div class="job-info-item">{{ store.formatDate(job.date) }}</div>
+                    <div class="job-info-item">{{ job.date ? store.formatDate(job.date) : '' }}</div>
                     <div class="job-info-item">{{ job.address }}</div>
-                    <div class="job-info-item">{{ job.estimated_time }}h</div>
-                    <div class="job-info-item">{{ job.full_salary }}€</div>
+                    <div class="job-info-item">{{ job.estimated_time ? job.estimated_time + 'h' : '' }}</div>
+                    <div class="job-info-item">{{ job.full_salary ? job.full_salary + '€' : '' }}</div>
                   </div>
               </div>
             </v-card >
@@ -116,6 +116,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
 import AddJobComponent from'@/components/AddJob.vue';
 
+window.scrollTo(0, 0);
 const router = useRouter();
 const route = useRoute();
 const query = route.query;

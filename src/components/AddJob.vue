@@ -1,7 +1,7 @@
 <template>
 
 <v-dialog
-    width="600px"
+    max-width="700px"
     persistent
   >
     <v-card>
@@ -24,8 +24,7 @@
                   >
                     <v-card
                       elevation="8"
-                      width="140"
-                      height="140"
+                      width="180"
                     >
                       <v-img
                         :src="image ? image : '#'"
@@ -47,13 +46,14 @@
                   </v-col>
                   <canvas id="imageCanvas" style="display: none;"></canvas>
                   <v-col
+                    v-if="selectedFileResults.length <= 5"
                     class="d-flex child-flex"
                     cols="4"
                   >
                     <v-card
                       elevation="8"
-                      width="140"
-                      height="140"
+                      width="180"
+                      height="180"
                     >
                         <input
                           type="file"
@@ -88,6 +88,8 @@
           <v-window-item value="two">
             <v-form @submit.prevent="addjob" ref="jobForm">
               <v-container>
+                <h4 class="pl-1">Mikä on työn otsikko? *</h4>
+                <span class="pl-1">Esim. Lastenhoitaja tai Nurmikonleikkaaja</span>
                 <v-text-field
                   v-model="jobTitle"
                   label="Työn otsikko"
@@ -96,7 +98,23 @@
                 ></v-text-field>
               </v-container>
               <v-container>
-                <v-dialog v-model="dateDialogShowing" max-width="400">
+                <h4 class="pl-1">Milloin työt alkavat? *</h4>
+                <v-chip-group
+                  mandatory
+                  selected-class="text-primary"
+                  column
+                  v-model="dateType"
+                >
+                  <v-chip
+                    v-for="(dateType, index) in dateTypes"
+                    :key="index"
+                  >
+                    {{ dateType }}
+                  </v-chip>
+
+                </v-chip-group>
+
+                <v-dialog v-model="dateDialogShowing" max-width="400" v-if="dateType == 1">
                   <template v-slot:activator="{ on }">
                     <v-text-field
                       v-model="formattedDate"
@@ -129,6 +147,8 @@
               </v-container>
 
               <v-container>
+                <h4 class="pl-1">Mikä on kohde alueesi? *</h4>
+                <span class="pl-1">Esim. Suomi tai Helsinki, Suomi</span>
                 <v-autocomplete
                   label="Alue"
                   :items="suggestions"
@@ -143,31 +163,103 @@
               </v-container>
 
               <v-container>
-                <v-row>
-                  <v-col
-                   cols="4"
+                <h4 class="pl-1">Mikä on työsopimuksen tyyppi?</h4>
+                <v-chip-group
+                  mandatory
+                  selected-class="text-primary"
+                  column
+                  v-model="contractType"
+                >
+                  <v-chip
+                    v-for="(contractType, index) in contractTypes"
+                    :key="index"
                   >
-                    <v-text-field
-                    label="kesto"
-                    suffix="h"
-                    type="number"
-                    v-model="jobEstimatedTime"
-                    @update:model-value="estimatedTimeUpdated"
-                    min="0"
-                    :rules="numberRules"
-                    >
-                    </v-text-field>
-                  </v-col>
+                    {{ contractType }}
+                  </v-chip>
+                </v-chip-group>
 
+                <template
+                v-if="contractType == 0"
+                >
+                <h4 class="pl-1">Mikä on työn kesto?</h4>
+                <span class="pl-1">Jätä tyhjäksi jos ei tiedossa</span>
+                <!-- <v-chip-group
+                  mandatory
+                  selected-class="text-primary"
+                  column
+                  v-model="jobDurationKnown"
+                >
+                  <v-chip
+                  >
+                    Kyllä
+                  </v-chip>
+                  <v-chip
+                  >
+                    Ei
+                  </v-chip>
+                </v-chip-group> -->
+
+                <v-text-field
+                  label="kesto"
+                  suffix="h"
+                  type="number"
+                  v-model="jobEstimatedTime"
+                  @update:model-value="estimatedTimeUpdated"
+                  min="0"
+                  :rules="numberRules"
+                >
+                </v-text-field>
+
+                <h4 class="pl-1">Mikä on palkan tyyppi?</h4>
+                <span class="pl-1">Jätä määrä tyhjäksi jos ei tiedossa</span>
+                <v-chip-group
+                  mandatory
+                  selected-class="text-primary"
+                  column
+                  v-model="jobSalaryType"
+                >
+                  <v-chip
+                    v-for="(salaryType, index) in salaryTypes"
+                    :key="index"
+                  >
+                    {{ salaryType }}
+                  </v-chip>
+                </v-chip-group>
+
+                <!-- <v-text-field
+                  v-if="jobSalaryType == 0"
+                  label="Tuntipalkka"
+                  suffix="€"
+                  type="number"
+                  v-model="jobSalary"
+                  min="0"
+                  :rules="numberRules"
+                >
+                </v-text-field> -->
+
+                <v-text-field
+                  :label="salaryTypes[jobSalaryType]"
+                  :suffix="jobSalaryType == 0 ? '€/h' : '€'"
+                  type="number"
+                  v-model="jobSalary"
+                  min="0"
+                  :rules="numberRules"
+                >
+                </v-text-field>
+                </template>
+
+
+                <v-row
+                v-else
+                >
                   <v-col
-                   cols="4"
+                    cols="4"
                   >
                     <v-text-field
-                      label="Tuntipalkka"
-                      suffix="€"
+                      label="Tunteja viikossa"
+                      suffix="h"
                       type="number"
-                      @update:model-value="calculateFullSalary"
-                      v-model="jobHourlySalary"
+                      v-model="hoursPerWeek"
                       min="0"
                       :rules="numberRules"
                     >
@@ -175,23 +267,36 @@
                   </v-col>
 
                   <v-col
-                   cols="4"
+                    cols="4"
                   >
                     <v-text-field
-                    label="Kokonaispalkka"
-                    suffix="€"
-                    type="number"
-                    @update:model-value="calculateHourlySalary"
-                    v-model="jobFullSalary"
-                    min="0"
-                    :rules="numberRules"
+                      label="Palkan alaraja / kk"
+                      suffix="€"
+                      type="number"
+                      v-model="salaryPerMonthMin"
+                      min="0"
+                      :rules="numberRules"
+                    >
+                    </v-text-field>
+                  </v-col>
+
+                  <v-col
+                    cols="4"
+                  >
+                    <v-text-field
+                      label="Palkan yläraja / kk"
+                      suffix="€"
+                      type="number"
+                      v-model="salaryPerMonthMax"
+                      min="0"
+                      :rules="numberRules"
                     >
                     </v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
               <v-container>
-                <v-textarea label="Lisätiedot" :rules="descriptionRules" required v-model="jobDescription"></v-textarea>
+                <v-textarea label="Kuvaus" :rules="descriptionRules" required v-model="jobDescription"></v-textarea>
               </v-container>
               <v-card-actions>
                 <v-col class="d-flex justify-space-between">
@@ -230,7 +335,6 @@ const jobTitle = ref(null);
 const jobEstimatedTime = ref(null);
 const jobHourlySalary = ref(null);
 const jobFullSalary = ref(null);
-const jobs = ref([]);
 const jobForm = ref(null);
 const jobDescription = ref(null);
 const jobTab = ref('one');
@@ -239,7 +343,16 @@ const jobAddress = ref(null);
 const jobAddressSearch = ref(null);
 const jobAddressSuggestions = ref([]);
 const addressSuggestionsLoading = ref(false);
-
+const dateType = ref(0);
+const contractType = ref(0);
+const dateTypes = ['Sopimuksen mukaan', 'Tarkka päivämäärä'];
+const contractTypes = ['Keikkatyö', 'Vakituinen', 'Toistaiseksi voimassa oleva'];
+const salaryTypes = ['Tuntipalkka', 'Urakkapalkka'];
+const hoursPerWeek = ref(40);
+const salaryPerMonthMin = ref(2000);
+const salaryPerMonthMax = ref(3000);
+const jobSalaryType = ref(0);
+const jobSalary = ref(salaryTypes[0]);
 const suggestions = computed(() => {
   let s = [...jobAddressSuggestions.value];
   // if (jobAddressSearch.value) {
@@ -272,14 +385,17 @@ const numberRules = [
   value => {
     let errorMessage = 'Syötä arvo';
     let valid = false;
+
+    valid = true;
     if (value) {
       valid = true;
     }
     if (!parseFloat(value)) {
-      valid = false;
+      // valid = false;
     }
     if (parseFloat(value) <= 0) {
-      errorMessage = 'Arvo ei saa olla 0';
+      valid = false;
+      errorMessage = 'Anna arvo isompi kuin 0';
     }
 
     return valid ? true : errorMessage
@@ -358,42 +474,34 @@ function handleFileChange(event) {
   }
 }
 
-store.fetchJobs().then((response) => {
-  let data = response.data;
-  if (!data.error) {
-    jobs.value = data.jobs;
-  }
-})
-
 function addjob() {
   jobForm.value.validate().then((response) => {
     if (response.valid) {
       const payload = {
         title: jobTitle.value,
-        date: moment(date.value).format('YYYY-MM-DD HH:mm:ss'),
-        duration: jobEstimatedTime.value,
-        full_salary: jobFullSalary.value,
         description: jobDescription.value,
         address: jobAddress.value,
         image_count: selectedFiles.value.length,
         images: selectedFiles.value
       };
+
+      if (jobEstimatedTime.value) {
+        payload.duration = jobEstimatedTime.value;
+      }
+
+      if (moment(date.value).isValid()) {
+        payload.date = moment(date.value).format('YYYY-MM-DD HH:mm:ss');
+      }
+
+      if (jobFullSalary.value) {
+        payload.full_salary = jobFullSalary.value;
+      }
       store.loading = true;
       store.addJob(payload).then((response) => {
-        let data = response.data;
-        store.loading = false;
-        if (data.status === 'success') {
-          close();
-          store.snackbarText = 'Työ lisätty onnistuneesti';
-          store.snackbarColor = 'green-darken-2';
-          store.snackbar = true;
+        close();
+      })
+      .catch(() => {
 
-          store.fetchJobs();
-        } else {
-          store.snackbarText = 'Työn lisäyksessä tapahtui virhe';
-          store.snackbarColor = 'red-darken-2';
-          store.snackbar = true;
-        }
       });
     }
   })
@@ -470,5 +578,12 @@ function getAddressSuggestions() {
   top: 10px;
   right: 10px;
   z-index: 100;
+}
+
+span {
+  font-size: 14px;
+}
+h4 {
+  font-size: 16px;
 }
 </style>
