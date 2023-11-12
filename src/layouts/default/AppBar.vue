@@ -274,6 +274,10 @@ const accountItems = [
   {
     title: 'Omat listaukset',
     onClick: () => changeTab('my-listings')
+  },
+  {
+    title: 'Kirjaudu ulos',
+    onClick: () => logOut(),
   }
 ];
 
