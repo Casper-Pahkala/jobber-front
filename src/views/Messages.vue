@@ -88,19 +88,19 @@
 <script setup>
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import moment from 'moment';
 
 window.scrollTo(0, 0);
 const router = useRouter();
 const store = useAppStore();
-const messages = ref([]);
+const messages = computed(() => {
+  return store.latestMessages;
+});
 const loading = ref(false);
 loading.value = true;
-
 if (store.user) {
-  store.getAllMessages().then((response) => {
-    messages.value = response.messages;
+  store.getAllMessages().then(() => {
     loading.value = false;
   })
 } else {

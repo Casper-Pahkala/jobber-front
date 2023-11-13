@@ -156,6 +156,7 @@ function toRegister() {
 
 .submit-btn {
   width: 100%;
+  height: 50px;
 }
 
 .terms {

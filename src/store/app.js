@@ -21,7 +21,6 @@ export const useAppStore = defineStore('app', {
     chatOpen: false,
     websocketStatus: 'Not connected',
     websocket: null,
-    currentMessages: [],
     currentJobId: null,
     currentChatUserId: null,
     redirect: null,
@@ -32,7 +31,7 @@ export const useAppStore = defineStore('app', {
     },
     updateMainComponent: 0,
     recentMessages: [],
-    unseenMessages: []
+    allMessages: []
   }),
   actions: {
     connectToWebsocket() {
@@ -57,16 +56,20 @@ export const useAppStore = defineStore('app', {
 
       this.websocket.addEventListener('message', (event) => {
         let data = JSON.parse(event.data);
-        console.log('WS_MESSAGE', data);
         if (data.action == 'CHAT_MESSAGE') {
-          let timeData = {
-            is_date_seperator: true,
-            time: 'Tänään'
-          };
-          if (moment(data.time).isSame(moment(), 'day') && !this.currentMessages.find(m => m.time === timeData.time)) {
-            this.currentMessages.push(timeData);
+          if (data.message.job_hashed_id === this.currentJobId && data.message.received) {
+            console.log('in chat to receive');
+            this.getMessages(this.currentJobId, this.currentChatUserId);
+          } else {
+            this.getAllMessages();
           }
-          this.currentMessages.push(data);
+        } else if (data.action === 'CHAT_SEEN') {
+          let correctMessages = this.allMessages.filter(m => m.job_hashed_id === data.job_id && m.other_user_id === data.other_user_id);
+          correctMessages.sort((a, b) => {
+            return moment(a).isAfter(b) ? 1 : -1;
+          });
+          console.log(data);
+          correctMessages[correctMessages.length - 1].seen = data.seen;
         }
 
       });
@@ -232,6 +235,12 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/messages/${jobId}/${userId}.json`).then((response) => {
           let data = response.data;
+          data.messages.forEach(item => {
+              if (!this.allMessages.find(m => m.id === item.id)) {
+                console.log('täs', item);
+                this.allMessages.push(item);
+              }
+          });
           resolve(data);
         })
         .catch((error) => {
@@ -244,6 +253,7 @@ export const useAppStore = defineStore('app', {
         this.axios.get(this.url + `/api/users/my-messages.json`).then((response) => {
           let data = response.data;
           this.recentMessages = data.messages.filter(m => m.seen == null);
+          this.allMessages = data.messages;
           resolve(data);
         })
         .catch((error) => {
@@ -314,7 +324,6 @@ export const useAppStore = defineStore('app', {
       })
     },
     toggleFullscreen(element) {
-      console.log(element);
       if (document.fullscreenElement) {
         return document.exitFullscreen() // exit fullscreen on next click
       }
@@ -378,26 +387,8 @@ export const useAppStore = defineStore('app', {
       this.currentJobId = message.job_hashed_id;
       this.currentChatUserId = message.other_user_id;
       this.chatOpen = true;
-    },
-    getUnseenMessages() {
-       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + `/api/users/recent-messages.json`).then((response) => {
-          let data = response.data;
 
-          const unseenMessages = data.messages;
-          let fixedList = [];
-          unseenMessages.forEach(m => {
-            if (!fixedList.find(l => l.other_user_id === m.other_user_id && l.job_hashed_id === m.job_hashed_id)) {
-              fixedList.push(m);
-            }
-          })
-          this.unseenMessages = fixedList;
-          resolve(data);
-        })
-        .catch((error) => {
-          reject(error);
-        })
-      })
+      this.allMessages.find(m => m.id === message.id).seen = moment();
     },
     deleteListing(payload) {
       this.loading = true;
@@ -471,4 +462,60 @@ export const useAppStore = defineStore('app', {
       })
     },
   },
+  getters: {
+    latestMessages() {
+      let latestMessages = [];
+      this.allMessages.forEach(m => {
+        let addedMessage = latestMessages.find(mes => mes.job_hashed_id === m.job_hashed_id && mes.other_user_id === m.other_user_id);
+        if (!addedMessage) {
+          latestMessages.push(m);
+        }
+      })
+      return latestMessages;
+    },
+    currentChatMessages() {
+      console.log(this.currentJobId, this.currentChatUserId);
+      let currentMessages = this.allMessages.filter(m => m.job_hashed_id === this.currentJobId && m.other_user_id === this.currentChatUserId);
+      currentMessages.sort((a, b) => {
+        return moment(a.time).isAfter(b.time) ? 1 : -1;
+      });
+      let usedDates = [];
+      let toUpdate = [];
+      currentMessages.forEach(m => {
+
+        let date = moment(m.time).format('YYYY-MM-DD');
+        if (!usedDates.includes(date)) {
+          let timeData = {
+            is_date_seperator: true,
+            time: moment(m.time).format('dddd DD.MM.YYYY')
+          };
+
+          if (moment(m.time).isSame(moment(), 'day')) {
+            timeData.time = 'Tänään';
+          } else if (moment(m.time).isSame(moment().clone().subtract(1, 'days'), 'day')) {
+            timeData.time = 'Eilen';
+          }
+
+          toUpdate.push({
+            afterId: m.id,
+            data: timeData
+          });
+
+          usedDates.push(date);
+        }
+      });
+
+      toUpdate.forEach(p => {
+        let index = currentMessages.findIndex(m => m.id === p.afterId);
+        currentMessages.splice(index, 0, p.data);
+      });
+      return currentMessages;
+    },
+    unseenMessages() {
+      return this.latestMessages.filter(m => !m.seen && m.received);
+    },
+    allUnseenMessages() {
+      return this.allMessages.filter(m => !m.seen && m.received);
+    }
+  }
 })

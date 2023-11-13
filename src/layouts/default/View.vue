@@ -40,16 +40,14 @@ export default {
     ],
   }),
   mounted() {
-    console.log('updated');
     const store = useAppStore();
     if (store.user) {
-      store.getUnseenMessages();
     }
   },
   methods: {
 
   }
-  
+
 }
 </script>
 

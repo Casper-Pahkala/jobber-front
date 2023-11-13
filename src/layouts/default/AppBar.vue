@@ -88,8 +88,8 @@
       v-model="store.tab"
     >
       <template v-if="currentTabs === 'main'">
-        <v-tab @click="changeTab('jobs')" value="jobs">Avoimet työpaikat</v-tab>
-        <v-tab @click="changeTab('workers')" value="workers">Henkilöt ja palvelut</v-tab>
+        <v-tab @click="changeTab('jobs')" value="jobs" class="text-none">Avoimet työpaikat</v-tab>
+        <v-tab @click="changeTab('workers')" value="workers" class="text-none">Henkilöt ja palvelut</v-tab>
       </template>
 
       <template v-else-if="currentTabs === 'account'">
@@ -106,17 +106,26 @@
           :close-on-content-click="false"
         >
           <template v-slot:activator="{ props }">
-            <v-btn
-              icon="mdi-message-text"
-              v-bind="props"
-            >
-            </v-btn>
+            <div class="unseen-wrapper">
+              <v-btn
+                icon="mdi-message-text"
+                v-bind="props"
+              >
+              </v-btn>
+              <div
+                class="unseen-count"
+                v-if="recentMessages.length > 0"
+              >
+                {{ allUnseenMessages.length }}
+              </div>
+            </div>
+
           </template>
           <v-card>
             <v-card-title
              style="font-size: 18px;"
             >
-              Uudet viestit
+              Lukemattomat viestit
             </v-card-title>
 
             <div class="show-all-messages" @click="changeTab('messages')">
@@ -151,7 +160,7 @@
             </v-list>
 
             <div v-else class="no-messages-text">
-              Ei uusia viestejä
+              Tyhjää täynnä
             </div>
           </v-card>
         </v-menu>
@@ -285,6 +294,10 @@ const recentMessages = computed(() => {
   return store.unseenMessages;
 });
 
+const allUnseenMessages = computed(() => {
+  return store.allUnseenMessages;
+})
+
 
 const currentRoute = computed(() => {
   return route.name;
@@ -314,12 +327,12 @@ watch(currentRoute, async (newVal, oldVal) => {
   }
 
   .recent-messages {
-    width: 400px;
+    width: 350px;
     max-height: 300px;
   }
 
   .no-messages-text {
-    width: 300px;
+    width: 350px;
     height: 60px;
     display: flex;
     align-items: center;
@@ -364,6 +377,26 @@ watch(currentRoute, async (newVal, oldVal) => {
     top: 10px;
     color: #1565C0;
     cursor: pointer;
+  }
+
+  .unseen-count {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #3ea6ff;
+    font-size: 13px;
+    border-radius: 50%;
+    width: 20px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  .unseen-wrapper {
+    position: relative;
   }
 
 </style>

@@ -53,6 +53,9 @@
                   {{ timeFromDate(message.time) }}
                 </div>
                 {{ message.message }}
+                <div v-if="(index == messages.length - 1) && !message.received" class="status">
+                  {{ getMessageStatus(message) }}
+                </div>
               </div>
 
               <div v-else class="date">
@@ -147,7 +150,7 @@
           class="close-btn"
           flat
           icon="mdi-close"
-          @click="store.chatOpen = false"
+          @click="close()"
         >
         </v-btn>
       </v-card>
@@ -169,7 +172,7 @@ const chatOpen = computed(() => {
 const messageActive = ref(false);
 const jobUserFullName = ref(null);
 const messages = computed(() => {
-  return store.currentMessages;
+  return store.currentChatMessages;
 });
 const job = ref(null);
 const message = ref('');
@@ -186,6 +189,7 @@ function sendMessage() {
     receiver_id: store.currentChatUserId
   }
   store.sendMessage(payload).then(() => {
+
   }).catch(() => {
 
   })
@@ -210,38 +214,9 @@ watch(messages, async (newVal, oldVal) => {
 function init() {
   store.currentMessages = [];
   store.getMessages(store.currentJobId, store.currentChatUserId).then((response) => {
-    store.currentMessages = response.messages;
     jobUserFullName.value = response.user.name;
     jobUser.value = response.user;
     job.value = response.job;
-    let usedDates = [];
-    let toUpdate = [];
-    store.currentMessages.forEach((m, index) => {
-      let date = moment(m.time).format('YYYY-MM-DD');
-      if (!usedDates.includes(date)) {
-        let timeData = {
-          is_date_seperator: true,
-          time: moment(m.time).format('dddd DD.MM.YYYY')
-        };
-
-        if (moment(m.time).isSame(moment(), 'day')) {
-          timeData.time = 'Tänään';
-        } else if (moment(m.time).isSame(moment().clone().subtract(1, 'days'), 'day')) {
-          timeData.time = 'Eilen';
-        }
-
-        toUpdate.push({
-          afterId: m.id,
-          data: timeData
-        });
-
-        usedDates.push(date);
-      }
-    })
-    toUpdate.forEach(p => {
-      let index = store.currentMessages.findIndex(m => m.id === p.afterId);
-      store.currentMessages.splice(index, 0, p.data);
-    })
     scrollToBottom();
   })
 }
@@ -264,6 +239,20 @@ function openJob() {
     store.chatOpen = false;
     store.tab = 'jobs';
   }
+}
+
+function getMessageStatus(message) {
+  if (message.seen) {
+    return 'Nähty';
+  }
+  return 'Toimitettu';
+}
+
+function close() {
+  store.chatOpen = false;
+  store.currentChatUserId = null;
+  store.currentJobId = null;
+  store.currentChatMessages = [];
 }
 </script>
 
@@ -454,6 +443,17 @@ body, html {
   width: fit-content;
   position: absolute;
   top: -20px;
+}
+
+.chat .messages .status {
+  font-size: 0.8rem;
+  color: #999;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  position: absolute;
+  bottom: -20px;
+  right: 0;
 }
 
 .chat .messages .message {
