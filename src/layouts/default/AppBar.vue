@@ -63,7 +63,7 @@
 
       <v-list-item prepend-icon="mdi-information" title="Tietoa meistä" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
 
-      <v-list-item prepend-icon="mdi-shield" title="Tietosuojaseloste" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
+      <v-list-item prepend-icon="mdi-shield" title="Tietosuojakäytäntö" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
 
       <v-list-item prepend-icon="mdi-comment" title="Anna palautetta" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
 
@@ -88,7 +88,7 @@
       v-model="store.tab"
     >
       <template v-if="currentTabs === 'main'">
-        <v-tab @click="changeTab('jobs')" value="jobs" class="text-none tab">Avoimet työpaikat</v-tab>
+        <v-tab @click="changeTab('jobs')" value="jobs" class="text-none tab">Avoimet työt</v-tab>
         <v-tab @click="changeTab('workers')" value="workers" class="text-none tab">Henkilöt ja palvelut</v-tab>
       </template>
 
@@ -183,6 +183,7 @@
               :key="index"
               :value="index"
               @click="item.onClick()"
+              :append-icon="item.icon ?? ''"
             >
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
@@ -276,19 +277,23 @@ function openRecentMessage(message) {
 const accountItems = [
   {
     title: 'Tili',
-    onClick: () => changeTab('account')
+    onClick: () => changeTab('account'),
+    // icon: 'mdi-account'
   },
   {
     title: 'Viestit',
-    onClick: () => changeTab('messages')
+    onClick: () => changeTab('messages'),
+    // icon: 'mdi-message-text'
   },
   {
     title: 'Omat listaukset',
-    onClick: () => changeTab('my-listings')
+    onClick: () => changeTab('my-listings'),
+    // icon: 'mdi-clipboard-account'
   },
   {
     title: 'Kirjaudu ulos',
     onClick: () => logOut(),
+    icon: 'mdi-logout'
   }
 ];
 
@@ -402,8 +407,16 @@ watch(currentRoute, async (newVal, oldVal) => {
   }
 
   .tab {
-    letter-spacing: 0.03rem;
-    font-size: 16px;
+    letter-spacing: 0.001rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #515151;
   }
 
+</style>
+
+<style>
+  .v-slide-group-item--active {
+    color: #000 !important;
+  }
 </style>

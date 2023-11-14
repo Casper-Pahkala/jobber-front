@@ -1,11 +1,36 @@
 <template>
   <v-main>
-    <router-view style="min-height: calc(100vh - 64px)"/>
+    <div style="min-height: calc(100vh - 64px)">
+      <router-view/>
+    </div>
 
     <v-footer
-      class="footer bg-grey-darken-4 text-center d-flex flex-column mt-10"
+      class="footer bg-grey-darken-4 text-center d-flex flex-column pt-10"
     >
-      <div>
+
+      <h4 class="title">Käytäntömme</h4>
+
+      <div class="policy">
+        <a class="footer-link">
+          Tietosuojakäytäntö
+        </a>
+
+        <div class="divider"></div>
+
+        <a class="footer-link">
+          Ehdot
+        </a>
+
+        <div class="divider"></div>
+
+        <a class="footer-link">
+          Ohje ja tuki
+        </a>
+      </div>
+
+      <h4 class="title mt-5">Sosiaalinen media</h4>
+
+      <div class="pb-10">
         <v-btn
           v-for="icon in icons"
           :key="icon"
@@ -13,16 +38,6 @@
           :icon="icon"
           variant="text"
         ></v-btn>
-      </div>
-
-      <div class="pt-0">
-        Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-      </div>
-
-      <v-divider></v-divider>
-
-      <div>
-        {{ new Date().getFullYear() }} — <strong>Jobber</strong>
       </div>
     </v-footer>
   </v-main>
@@ -51,7 +66,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
   .main-content {
     min-height: calc(100vh - 64px);
@@ -61,5 +76,30 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .policy {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    color: #aeaeae;
+  }
+
+  .divider {
+    width: 1px;
+    height: 20px;
+    background-color: #aeaeae;
+  }
+  .footer-link {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .footer-link:hover {
+    color: #fff;
+  }
+
+  .title {
+    font-weight: 500;
+    font-size: 18px;
   }
 </style>
