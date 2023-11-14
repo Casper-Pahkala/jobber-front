@@ -12,7 +12,7 @@
           <div class="profile-image-container">
             <v-img
                 v-if="store.user.has_image"
-                :src="`${store.url}/profile-image/${store.user.id}.jpg`"
+                :src="store.user.profileImageUrl"
                 cover
                 class="profile-image"
                 :key="profileImageUpdated"
@@ -421,6 +421,10 @@ function confirmProfileImage() {
     profileImageDialog.value = false;
     store.loading = false;
     store.loadingBackground = false;
+
+    let url = new URL(store.user.profileImageUrl);
+    url.searchParams.set('t', new Date());
+    store.user.profileImageUrl = url.toString();
     setTimeout(() => {
       profileImageUpdated.value++;
     }, 500);

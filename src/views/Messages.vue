@@ -11,7 +11,7 @@
           >
             <div class="message-wrapper">
               <v-img
-                :src="`${store.url}/job-image/${message.job_hashed_id}/image_0`"
+                :src="`${store.url}/profile-image/${message.other_user_id}.jpg`"
                 cover
                 class="job-image"
               >

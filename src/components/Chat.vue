@@ -33,9 +33,9 @@
               <div class="name">
                 {{ jobUserFullName }}
               </div>
-              <div class="seen">
+              <!-- <div class="seen">
                 {{ '11:41' }}
-              </div>
+              </div> -->
             </div>
 
           </div>
@@ -82,7 +82,7 @@
                   <div class="job-container">
                     <v-img
 
-                      :src="`${store.url}/job-image/${job.hashed_id}/image_0`"
+                      :src="`${store.url}/job-image/${job.hashed_id}/image_0_low`"
                       cover
                       class="job-image"
                     >
@@ -179,14 +179,23 @@ const message = ref('');
 const otherTyping = ref(false);
 const chatContainer = ref(null);
 const jobUser = ref(null);
+
+const jobId = computed(() => {
+  return store.chat.jobId
+});
+
+const chatUserId = computed(() => {
+  return store.chat.userId
+});
+
 function sendMessage() {
   if (message.value.trim() === '' || message.value.trim().length === 0) {
     return;
   }
   let payload = {
-    job_id: store.currentJobId,
+    job_id: jobId.value,
     message: message.value,
-    receiver_id: store.currentChatUserId
+    receiver_id: chatUserId.value
   }
   store.sendMessage(payload).then(() => {
 
@@ -204,6 +213,10 @@ watch(chatOpen, async (newVal, oldVal) => {
       store.chatOpen = false;
       store.loginDialogShowing = true;
     }
+  } else {
+    store.chatOpen = false;
+    store.chat.jobId = null;
+    store.chat.userId = null;
   }
 });
 
@@ -212,8 +225,7 @@ watch(messages, async (newVal, oldVal) => {
 }, { deep: true });
 
 function init() {
-  store.currentMessages = [];
-  store.getMessages(store.currentJobId, store.currentChatUserId).then((response) => {
+  store.getMessages(jobId.value, chatUserId.value).then((response) => {
     jobUserFullName.value = response.user.name;
     jobUser.value = response.user;
     job.value = response.job;
@@ -237,7 +249,7 @@ function openJob() {
   if (job.value && !job.value.is_deleted) {
     router.push('/jobs/' + job.value.hashed_id);
     store.chatOpen = false;
-    store.tab = 'jobs';
+    store.tab = 'job';
   }
 }
 
@@ -250,9 +262,6 @@ function getMessageStatus(message) {
 
 function close() {
   store.chatOpen = false;
-  store.currentChatUserId = null;
-  store.currentJobId = null;
-  store.currentChatMessages = [];
 }
 </script>
 
@@ -620,6 +629,8 @@ body, html {
   left: 10px;
   right: 10px;
   cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .job-image {
@@ -633,14 +644,14 @@ body, html {
 }
 
 .job-content {
-  padding: 0px 10px;
+  padding: 5px 10px;
   width: calc(100% - 70px);
   display: flex;
 }
 
 .job-title {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .job-info {

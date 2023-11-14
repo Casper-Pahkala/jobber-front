@@ -21,8 +21,6 @@ export const useAppStore = defineStore('app', {
     chatOpen: false,
     websocketStatus: 'Not connected',
     websocket: null,
-    currentJobId: null,
-    currentChatUserId: null,
     redirect: null,
     jobParams: {
       page: 1,
@@ -31,7 +29,16 @@ export const useAppStore = defineStore('app', {
     },
     updateMainComponent: 0,
     recentMessages: [],
-    allMessages: []
+    allMessages: [],
+    preloadedUnseenMessageImages: [],
+    displayedJob: {
+      id: null,
+      userId: null
+    },
+    chat: {
+      jobId: null,
+      userId: null
+    }
   }),
   actions: {
     connectToWebsocket() {
@@ -56,20 +63,16 @@ export const useAppStore = defineStore('app', {
 
       this.websocket.addEventListener('message', (event) => {
         let data = JSON.parse(event.data);
+        console.log(data);
         if (data.action == 'CHAT_MESSAGE') {
-          if (data.message.job_hashed_id === this.currentJobId && data.message.received) {
+          if (data.message.job_hashed_id === this.chat.jobId && data.message.received && this.chat.jobId && this.chat.userId && this.chat.userId === data.message.other_user_id) {
             console.log('in chat to receive');
-            this.getMessages(this.currentJobId, this.currentChatUserId);
+            this.getMessages(this.chat.jobId, this.chat.userId);
           } else {
-            this.getAllMessages();
+            this.allMessages.unshift(data.message);
           }
         } else if (data.action === 'CHAT_SEEN') {
-          let correctMessages = this.allMessages.filter(m => m.job_hashed_id === data.job_id && m.other_user_id === data.other_user_id);
-          correctMessages.sort((a, b) => {
-            return moment(a).isAfter(b) ? 1 : -1;
-          });
-          console.log(data);
-          correctMessages[correctMessages.length - 1].seen = data.seen;
+          this.getAllMessages();
         }
 
       });
@@ -223,6 +226,7 @@ export const useAppStore = defineStore('app', {
         this.axios.get(this.url + `/api/users.json`).then((response) => {
           let data = response.data;
           this.user = data.user;
+          this.user.profileImageUrl = `${this.url}/profile-image/${this.user.id}.jpg`;
           this.connectToWebsocket();
           resolve(response);
         })
@@ -237,7 +241,6 @@ export const useAppStore = defineStore('app', {
           let data = response.data;
           data.messages.forEach(item => {
               if (!this.allMessages.find(m => m.id === item.id)) {
-                console.log('täs', item);
                 this.allMessages.push(item);
               }
           });
@@ -253,7 +256,8 @@ export const useAppStore = defineStore('app', {
         this.axios.get(this.url + `/api/users/my-messages.json`).then((response) => {
           let data = response.data;
           this.recentMessages = data.messages.filter(m => m.seen == null);
-          this.allMessages = data.messages;
+          let messages = data.messages;
+          this.allMessages = messages;
           resolve(data);
         })
         .catch((error) => {
@@ -384,11 +388,9 @@ export const useAppStore = defineStore('app', {
       img.src = url;
     },
     openChat(message) {
-      this.currentJobId = message.job_hashed_id;
-      this.currentChatUserId = message.other_user_id;
+      this.chat.jobId = message.job_hashed_id;
+      this.chat.userId = message.other_user_id;
       this.chatOpen = true;
-
-      this.allMessages.find(m => m.id === message.id).seen = moment();
     },
     deleteListing(payload) {
       this.loading = true;
@@ -470,12 +472,17 @@ export const useAppStore = defineStore('app', {
         if (!addedMessage) {
           latestMessages.push(m);
         }
+      });
+      latestMessages.sort((a, b) => {
+        return moment(a.time).isAfter(b.time) ? 1 : -1;
+      });
+      latestMessages.sort((x, y) => {
+        return (x === y)? 0 : x.deleted ? 1 : -1;
       })
       return latestMessages;
     },
     currentChatMessages() {
-      console.log(this.currentJobId, this.currentChatUserId);
-      let currentMessages = this.allMessages.filter(m => m.job_hashed_id === this.currentJobId && m.other_user_id === this.currentChatUserId);
+      let currentMessages = this.allMessages.filter(m => m.job_hashed_id === this.chat.jobId && m.other_user_id === this.chat.userId);
       currentMessages.sort((a, b) => {
         return moment(a.time).isAfter(b.time) ? 1 : -1;
       });
@@ -515,7 +522,15 @@ export const useAppStore = defineStore('app', {
       return this.latestMessages.filter(m => !m.seen && m.received);
     },
     allUnseenMessages() {
-      return this.allMessages.filter(m => !m.seen && m.received);
+      let unseenMessages = this.allMessages.filter(m => !m.seen && m.received)
+
+      unseenMessages.forEach(m => {
+        if (!this.preloadedUnseenMessageImages.includes(m.other_user_id)) {
+          this.preloadedUnseenMessageImages.push(m.other_user_id);
+          this.preloadImage(`${this.url}/profile-image/${m.other_user_id}.jpg`)
+        }
+      })
+      return unseenMessages;
     }
   }
 })

@@ -144,15 +144,14 @@ const isMyJob = computed(() => {
 });
 
 const imageIndex = ref(0);
+store.displayedJob.id = route.params.id;
 
-store.currentJobId = route.params.id;
-
-store.fetchJob(store.currentJobId).then((response) => {
+store.fetchJob(store.displayedJob.id).then((response) => {
   let data = response.data;
   if (!data.error) {
     job.value = data.job;
     jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
-    store.currentChatUserId = data.job.user.hashed_id;
+    store.displayedJob.userId = data.job.user.hashed_id;
   }
   store.loading = false;
 })
@@ -172,8 +171,12 @@ function toJobs() {
 window.scrollTo(0, 0);
 
 function contact() {
+  store.chat.jobId = store.displayedJob.id;
+  store.chat.userId = store.displayedJob.userId;
   // router.push({ path: '/chat/' + route.params.id });
   store.chatOpen = true;
+
+
 }
 
 function imageUrl(index = 0, lazy = false) {

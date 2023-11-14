@@ -5,7 +5,7 @@
       <template v-if="store.user">
         <v-list-item
           v-if="store.user.has_image"
-          :prepend-avatar="`${store.url}/profile-image/${store.user.id}.jpg`"
+          :prepend-avatar="store.user.profileImageUrl"
           :title="store.user.first_name + ' ' + store.user.last_name"
           :subtitle="store.user.email"
           class="drawer-item pb-4 pt-2"
@@ -88,14 +88,14 @@
       v-model="store.tab"
     >
       <template v-if="currentTabs === 'main'">
-        <v-tab @click="changeTab('jobs')" value="jobs" class="text-none">Avoimet työpaikat</v-tab>
-        <v-tab @click="changeTab('workers')" value="workers" class="text-none">Henkilöt ja palvelut</v-tab>
+        <v-tab @click="changeTab('jobs')" value="jobs" class="text-none tab">Avoimet työpaikat</v-tab>
+        <v-tab @click="changeTab('workers')" value="workers" class="text-none tab">Henkilöt ja palvelut</v-tab>
       </template>
 
       <template v-else-if="currentTabs === 'account'">
-        <v-tab @click="changeTab('account')" value="account">Profiili</v-tab>
-        <v-tab @click="changeTab('messages')" value="messages">Viestit</v-tab>
-        <v-tab @click="changeTab('my-listings')" value="my-listings">Omat listaukset</v-tab>
+        <v-tab @click="changeTab('account')" value="account" class="text-none tab">Profiili</v-tab>
+        <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">Viestit</v-tab>
+        <v-tab @click="changeTab('my-listings')" value="my-listings" class="text-none tab">Omat listaukset</v-tab>
       </template>
     </v-tabs>
     <template v-slot:append>
@@ -175,7 +175,9 @@
             >
             </v-btn>
           </template>
-          <v-list>
+          <v-list
+          min-width="180px"
+          >
             <v-list-item
               v-for="(item, index) in accountItems"
               :key="index"
@@ -217,22 +219,22 @@ const messagesMenu = ref(false);
 const accountMenu = ref(false);
 
 let currentTab = route.name || '';
-const previousTab = ref(currentTab);
 store.tab = currentTab;
 updateTabs(currentTab);
-const changeTab = (tab) => {
+function changeTab(tab) {
   messagesMenu.value = false;
   accountMenu.value = false;
-  if (previousTab.value == tab) return;
+  // if (store.tab == tab) return;
   updateTabs(tab);
-  previousTab.value = tab;
   setTimeout(() => {
     store.tab = tab;
     drawer.value = false;
     router.push(`/${tab}`);
   }, 10);
-
-};
+  setTimeout(() => {
+    store.updateMainComponent++;
+  }, 100);
+}
 
 function logOut() {
   store.logOut().then((response) => {
@@ -397,6 +399,11 @@ watch(currentRoute, async (newVal, oldVal) => {
 
   .unseen-wrapper {
     position: relative;
+  }
+
+  .tab {
+    letter-spacing: 0.03rem;
+    font-size: 16px;
   }
 
 </style>
