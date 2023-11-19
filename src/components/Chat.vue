@@ -81,8 +81,7 @@
                 <v-card-item>
                   <div class="job-container">
                     <v-img
-
-                      :src="`${store.url}/job-image/${job.hashed_id}/image_0_low`"
+                      :src="`${store.url}/job-image/${job.job_images[0].name}`"
                       cover
                       class="job-image"
                     >

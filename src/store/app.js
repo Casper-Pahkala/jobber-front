@@ -38,6 +38,9 @@ export const useAppStore = defineStore('app', {
     chat: {
       jobId: null,
       userId: null
+    },
+    addJobForm: {
+      images: [],
     }
   }),
   actions: {
@@ -107,7 +110,7 @@ export const useAppStore = defineStore('app', {
     },
     fetchJobs() {
       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + '/api/get-jobs.json', {
+        this.axios.get(this.url + '/api/jobs.json', {
           params: {
             page: this.jobParams.page,
             limit: this.jobParams.limit,
@@ -128,24 +131,12 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.loading = true;
         this.loadingBackground = true;
-        const formData = new FormData();
-        for (let i = 0; i < payload.images.length; i++) {
-          formData.append('image[]', payload.images[i]);
-        }
-        for (let key in payload) {
-          formData.append(key.toString(), payload[key]);
-        }
-        this.axios.post(this.url + '/api/add-job.json', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        }).then((response) => {
+        this.axios.post(this.url + '/api/add-job.json', payload).then((response) => {
           let data = response.data;
           this.loading = false;
           this.loadingBackground = false;
           if (data.status === 'success') {
             this.successToast('Työ lisätty onnistuneesti');
-            this.updateMainComponent++;
             resolve(data);
           } else {
             this.errorToast('Työn lisäyksessä tapahtui virhe');
@@ -278,24 +269,6 @@ export const useAppStore = defineStore('app', {
     },
     formatDate(date, format = 'DD.MM.YYYY') {
       return moment(date).format(format);
-    },
-    uploadImage(payload) {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append('image', payload.image);
-        formData.append('job_id', payload.job_id);
-        this.axios.post(this.url + `/api/jobs/upload-image.json`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        }).then((response) => {
-          let data = response.data;
-          resolve(data);
-        })
-        .catch((error) => {
-          reject(error);
-        })
-      })
     },
     uploadProfileImage(payload) {
       return new Promise((resolve, reject) => {
@@ -461,6 +434,44 @@ export const useAppStore = defineStore('app', {
           this.errorToast('Käyttäjän poistossa tapahtui virhe');
           reject(error);
         })
+      })
+    },
+    uploadImage(payload) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append('image', payload);
+
+        let self = this;
+
+        const index = self.addJobForm.images.length;
+
+        self.addJobForm.images.push({
+          progress: 0
+        });
+
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = (event.loaded / event.total) * 100;
+            console.log(`Upload Progress: ${progress.toFixed(2)}%`);
+
+            self.addJobForm.images[index].progress = progress.toFixed(2);
+          }
+        });
+
+        xhr.open('POST', `${this.url}/api/jobs/upload-image.json`, true); // Replace with your actual endpoint
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              resolve(data.data);
+            } catch (e) {
+              console.error('Error parsing response:', e);
+              reject(e);
+            }
+          }
+        };
+        xhr.send(formData);
       })
     },
   },

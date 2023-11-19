@@ -38,7 +38,7 @@
             class="carousel mt-2"
           >
             <v-img
-              v-for="(a, index) in job.pictures"
+              v-for="(a, index) in job.job_images"
               :key="index"
               :src="imageUrl(index)"
               :lazy-src="imageUrl(index, true)"
@@ -67,28 +67,60 @@
             {{ job.title }}
           </h1>
           <v-divider></v-divider>
-          <p id="job-description">
-            {{ job.description }}
-          </p>
-          <v-divider></v-divider>
           <div class="job-info">
-            <v-icon icon="mdi-map-marker"></v-icon>
-            {{ job.address }}
+            <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
           </div>
           <div class="job-info">
+            <v-icon icon="mdi-map-marker"></v-icon>
+            <template  v-if="job.area">
+              {{ job.area }}
+            </template>
+            <template v-else>
+              Ei tiedossa
+            </template>
+          </div>
+          <div class="job-info" >
             <v-icon icon="mdi-calendar-range"></v-icon>
-            {{ store.formatDate(job.date) }}
+            <template v-if="job.date">
+              {{ store.formatDate(job.date) }}
+            </template>
+
+            <template v-else>
+              Sopimuksen mukaan
+            </template>
           </div>
           <div class="job-info">
             <v-icon icon="mdi-timer-outline"></v-icon>
-            {{ job.estimated_time }}h
+            <template v-if="job.hours" >
+              {{ job.hours }}h
+              {{ job.contract_type === 1 || job.contract_type === 2 ? '/ viikko' : '' }}
+            </template>
+            <template v-else>
+              Sopimuksen mukaan
+            </template>
           </div>
           <div class="job-info">
             <v-icon icon="mdi-cash"></v-icon>
-            {{ job.full_salary }}€
+            <template v-if="job.salary_type === 0">Tuntipalkka </template>
+
+            <template v-else-if="job.contract_type === 0">Urakkapalkka </template>
+
+            <template v-else>Kuukausipalkka </template>
+
+            <template v-if="job.salary">{{ job.salary }}€</template>
+
+            <template v-else>
+              Sopimuksen mukaan
+            </template>
           </div>
+          <v-divider class="mt-5"></v-divider>
+          <p id="job-description">
+            {{ job.description }}
+          </p>
         </v-container>
+
         <v-divider class="mt-5 mb-5"></v-divider>
+
         <div v-if="!isMyJob">
           <v-container>
             <div class="job-info">
@@ -180,8 +212,8 @@ function contact() {
 }
 
 function imageUrl(index = 0, lazy = false) {
-  if (job.value.pictures && job.value.pictures > 0) {
-    return store.url + '/job-image/' + job.value.hashed_id + '/image_' + index +(lazy ? '_low.jpg' : '.jpg');
+  if (job.value.job_images && job.value.job_images.length > 0) {
+    return store.url + '/job-image/' + job.value.job_images[index].name;
 
   } else {
     return store.url + '/no-img.png';
@@ -194,6 +226,17 @@ function toggleFullscreen() {
 
 function selectItem(index) {
   carousel.value.selectItem(index);
+}
+
+function contractType() {
+  console.log(job.value);
+  if (job.value.contract_type === 0) {
+    return 'Keikka työ';
+  } else if (job.value.contract_type === 1) {
+    return 'Vakituinen työsopimus';
+  } else {
+    return 'Toistaiseksi voimassa oleva työsopimus';
+  }
 }
 
 </script>
@@ -286,4 +329,9 @@ function selectItem(index) {
 .delimiter-image:hover {
   opacity: 1;
 }
+</style>
+<style>
+  .job-info .v-icon {
+    width: 40px;
+  }
 </style>

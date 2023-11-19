@@ -100,6 +100,15 @@
     </v-tabs>
     <template v-slot:append>
       <template v-if="store.user">
+        <v-btn
+          prepend-icon="mdi-plus"
+          class="mr-5"
+          style="height: 100%;"
+          @click="changeTab('add-job')"
+        >
+          Luo listaus
+        </v-btn>
+
         <v-menu
           v-model="messagesMenu"
           class="mr-1"
@@ -250,7 +259,8 @@ function updateTabs(tab) {
   const mainTabs = [
     'jobs',
     'workers',
-    'job'
+    'job',
+    'add-job'
   ];
 
   const accountTabs = [
@@ -316,6 +326,10 @@ watch(currentRoute, async (newVal, oldVal) => {
     store.tab = newVal;
   }, 10);
 });
+
+setTimeout(() => {
+  store.tab = currentTab;
+}, 1);
 </script>
 
 <style scoped>
