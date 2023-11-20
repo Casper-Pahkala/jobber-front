@@ -51,13 +51,13 @@ export const useAppStore = defineStore('app', {
         // OPEN 1 The connection is open and ready to communicate.
         // CLOSING 2 The connection is in the process of closing.
         // CLOSED 3 The connection is closed or couldn't be opened.
-
+      console.log('CONNECTING TO WS');
       if (this.websocket && this.websocket.readyState !== 3) {
         console.log('WebSocket connection is already open or in progress.');
         return;
       }
 
-      this.websocket = new WebSocket('ws://' + this.baseUrl + ':8000?token=' + this.auth_token);
+      this.websocket = new WebSocket('wss://' + this.baseUrl + ':8000?token=' + this.auth_token);
 
       this.websocket.addEventListener('open', () => {
         this.websocketStatus = 'Connected';
