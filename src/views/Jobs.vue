@@ -7,7 +7,6 @@
           justify="center"
         >
           <v-col
-            cols="8"
           >
 
           <v-text-field
@@ -27,7 +26,7 @@
           </v-text-field>
 
           </v-col>
-          <v-col
+          <!-- <v-col
             cols="4"
           >
           <v-btn
@@ -39,7 +38,7 @@
           >
             Lisää työ
           </v-btn>
-          </v-col>
+          </v-col> -->
         </v-row>
       </div>
       <div v-if="loading" class="loading-container">
@@ -155,8 +154,8 @@ function handleJobClick(job) {
 }
 
 function imageUrl(job, lazy) {
-  if (job.pictures && job.pictures > 0) {
-    return store.url + '/job-image/' + job.hashed_id + '/image_0' +(lazy ? '_low' : '');
+  if (job.job_images && job.job_images.length > 0) {
+    return store.url + '/job-image/' + job.job_images[0].name;
   } else {
     return store.url + '/no-img.png'
   }

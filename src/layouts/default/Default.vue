@@ -54,4 +54,25 @@ const store = useAppStore();
   width: calc(100% - 18px);
 }
 
+
+/* Custom scrollbar for entire app */
+::-webkit-scrollbar {
+    width: 8px; /* width of the entire scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #fff; /* color of the tracking area */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 14px;
+    /* border: 1px solid #fff; */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* color of the scroll thumb on hover */
+}
+
+
 </style>

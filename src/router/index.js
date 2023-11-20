@@ -73,6 +73,17 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/add-job',
+    component: () => import('@/layouts/default/Default.vue'),
+    children: [
+      {
+        path: '',
+        name: 'add-job',
+        component: () => import('@/views/AddJob.vue'),
+      },
+    ],
+  },
 ]
 
 const router = createRouter({
