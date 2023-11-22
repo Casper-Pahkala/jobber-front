@@ -1,6 +1,4 @@
 <template>
-  <div class="main-wrapper">
-      <div class="main-content">
         <v-container v-if="messages.length > 0">
           <v-card
             v-for="(message, index) in messages"
@@ -81,8 +79,6 @@
             Kirjaudu
           </v-btn>
         </div>
-      </div>
-  </div>
 </template>
 
 <script setup>

@@ -10,7 +10,7 @@
           :subtitle="store.user.email"
           class="drawer-item pb-4 pt-2"
           :active="false"
-          @click="changeTab('account')"
+          @click="changeTab('profile')"
         >
         </v-list-item>
 
@@ -29,7 +29,7 @@
           prepend-icon="mdi-clipboard-account"
           title="Omat ilmoitukset"
           :active="false"
-          @click="changeTab('my-listings')"
+          @click="changeTab('listings')"
           class="drawer-item"
         >
         </v-list-item>
@@ -87,16 +87,16 @@
       class="d-none d-sm-flex"
       v-model="store.tab"
     >
-      <template v-if="currentTabs === 'main'">
+      <!-- <template v-if="currentTabs === 'main'"> -->
         <v-tab @click="changeTab('jobs')" value="jobs" class="text-none tab">Avoimet työt</v-tab>
         <v-tab @click="changeTab('workers')" value="workers" class="text-none tab">Henkilöt ja palvelut</v-tab>
-      </template>
+      <!-- </template> -->
 
-      <template v-else-if="currentTabs === 'account'">
+      <!-- <template v-else-if="currentTabs === 'account'">
         <v-tab @click="changeTab('account')" value="account" class="text-none tab">Profiili</v-tab>
         <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">Viestit</v-tab>
-        <v-tab @click="changeTab('my-listings')" value="my-listings" class="text-none tab">Omat listaukset</v-tab>
-      </template>
+        <v-tab @click="changeTab('listings')" value="listings" class="text-none tab">Omat listaukset</v-tab>
+      </template> -->
     </v-tabs>
     <template v-slot:append>
       <template v-if="store.user">
@@ -230,17 +230,32 @@ const accountMenu = ref(false);
 
 let currentTab = route.name || '';
 store.tab = currentTab;
-updateTabs(currentTab);
+
+const accountTabs = [
+  'profile',
+  'messages',
+  'listings'
+];
+
 function changeTab(tab) {
   messagesMenu.value = false;
   accountMenu.value = false;
-  // if (store.tab == tab) return;
-  updateTabs(tab);
+  drawer.value = false;
+
+  if (accountTabs.includes(tab)) {
+    store.tab = 'account';
+    if (tab === 'profile') {
+      router.push('/account');
+    } else {
+      router.push('/account/' + tab);
+    }
+    return;
+  }
   setTimeout(() => {
-    store.tab = tab;
-    drawer.value = false;
     router.push(`/${tab}`);
+    store.tab = tab;
   }, 10);
+
   setTimeout(() => {
     store.updateMainComponent++;
   }, 100);
@@ -255,30 +270,6 @@ function logOut() {
     });
 }
 
-function updateTabs(tab) {
-  const mainTabs = [
-    'jobs',
-    'workers',
-    'job',
-    'add-job'
-  ];
-
-  const accountTabs = [
-    'account',
-    'messages',
-    'my-listings'
-  ];
-
-
-  if (mainTabs.includes(tab)) {
-    currentTabs.value = 'main';
-  } else if (accountTabs.includes(tab)) {
-    currentTabs.value = 'account';
-  } else {
-    currentTabs.value = '';
-  }
-}
-
 function openRecentMessage(message) {
   messagesMenu.value = false;
   store.openChat(message);
@@ -287,7 +278,7 @@ function openRecentMessage(message) {
 const accountItems = [
   {
     title: 'Tili',
-    onClick: () => changeTab('account'),
+    onClick: () => changeTab('profile'),
     // icon: 'mdi-account'
   },
   {
@@ -297,7 +288,7 @@ const accountItems = [
   },
   {
     title: 'Omat listaukset',
-    onClick: () => changeTab('my-listings'),
+    onClick: () => changeTab('listings'),
     // icon: 'mdi-clipboard-account'
   },
   {
@@ -316,16 +307,7 @@ const allUnseenMessages = computed(() => {
 })
 
 
-const currentRoute = computed(() => {
-  return route.name;
-})
 
-watch(currentRoute, async (newVal, oldVal) => {
-  updateTabs(newVal);
-  setTimeout(() => {
-    store.tab = newVal;
-  }, 10);
-});
 
 setTimeout(() => {
   store.tab = currentTab;
