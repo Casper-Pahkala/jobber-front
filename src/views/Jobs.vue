@@ -192,7 +192,6 @@ function lastItem() {
 }
 
 function jobDescription(job) {
-  console.log(job);
   let description = '';
   if (job.contract_type === 0) {
     description += 'Keikkatyö';

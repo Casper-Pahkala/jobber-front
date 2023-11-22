@@ -6,13 +6,18 @@
        v-if="store.user"
       >
         <v-tabs
-          class="d-none d-sm-flex mb-10"
+          class="d-none d-sm-flex mb-10 profile-tabs"
           v-model="accountTab"
         >
           <v-tab @click="changeTab('profile')" value="profile" class="text-none tab">Profiili</v-tab>
           <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">Viestit</v-tab>
           <v-tab @click="changeTab('listings')" value="listings" class="text-none tab">Omat listaukset</v-tab>
+
+          <div id="tabs-bottom">
+
+          </div>
         </v-tabs>
+
         <v-window v-model="accountTab">
           <v-window-item value="profile">
             <profile></profile>
@@ -87,5 +92,21 @@ watch(currentRoute, async (newVal, oldVal) => {
     width: 100%;
     /* padding-top: 40px; */
   }
+
+#tabs-bottom {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background-color: #acacac;
+  width: 100%;
+}
+
+.tab {
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+</style>
+
+<style>
 
 </style>

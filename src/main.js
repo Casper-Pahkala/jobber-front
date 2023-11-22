@@ -13,7 +13,8 @@ import { createApp } from 'vue'
 // Plugins
 import { registerPlugins } from '@/plugins'
 import VueTailwindDatepicker from "vue-tailwind-datepicker";
-import './style.css'
+import './style.css';
+import '@/styles/main.scss';
 const app = createApp(App)
 
 registerPlugins(app)

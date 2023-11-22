@@ -439,7 +439,7 @@ function timeFromDate (date) {
     letter-spacing: 0.001rem;
     font-size: 1rem;
     font-weight: 700;
-    color: #515151;
+    color: #373737;
   }
 
   .messages-count {
