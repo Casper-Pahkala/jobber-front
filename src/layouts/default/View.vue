@@ -32,12 +32,26 @@
 
       <div class="pb-10">
         <v-btn
-          v-for="icon in icons"
-          :key="icon"
           class="mx-4"
-          :icon="icon"
           variant="text"
-        ></v-btn>
+          href="https://www.instagram.com/rekrytorsuomi/"
+          target="_blank"
+          icon="mdi-instagram"
+        >
+        </v-btn>
+
+        <v-btn
+          class="mx-4"
+          variant="text"
+          icon
+          href="https://www.tiktok.com/@rekrytorsuomi"
+          target="_blank"
+        >
+          <img
+            style="filter: brightness(0) invert(1); width: 50%;"
+            src="/tiktok.svg"
+          >
+        </v-btn>
       </div>
     </v-footer>
   </v-main>
@@ -50,7 +64,6 @@ export default {
     icons: [
       'mdi-facebook',
       'mdi-twitter',
-      'mdi-linkedin',
       'mdi-instagram',
     ],
   }),

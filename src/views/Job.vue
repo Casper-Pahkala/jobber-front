@@ -101,14 +101,7 @@
           </div>
           <div class="job-info">
             <v-icon icon="mdi-cash"></v-icon>
-            <template v-if="job.salary_type === 0">Tuntipalkka </template>
-
-            <template v-else-if="job.contract_type === 0">Urakkapalkka </template>
-
-            <template v-else>Kuukausipalkka </template>
-
-            <template v-if="job.salary">{{ job.salary }}€</template>
-
+            <template v-if="job.salary">{{ jobSalary() }}</template>
             <template v-else>
               Sopimuksen mukaan
             </template>
@@ -237,6 +230,29 @@ function contractType() {
   } else {
     return 'Toistaiseksi voimassa oleva työsopimus';
   }
+}
+
+function jobSalary() {
+  let j = job.value;
+
+  if (j.salary) {
+    let prefix = '';
+    if (j.contract_type === 0) {
+      if (j.salary_type === 0) {
+        prefix = '€/h';
+      } else {
+        prefix = '€';
+      }
+    } else {
+      if (j.salary_type === 0) {
+        prefix = '€/h';
+      } else {
+        prefix = '€/kk';
+      }
+    }
+    return j.salary + ' ' + prefix;
+  }
+  return 'Sopimuksen mukaan';
 }
 
 </script>

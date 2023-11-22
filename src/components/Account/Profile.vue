@@ -9,6 +9,7 @@
                 cover
                 class="profile-image"
                 :key="profileImageUpdated"
+                @click.stop="openFileInput()"
               >
                 <template v-slot:placeholder>
                   <v-row
@@ -22,13 +23,20 @@
                     ></v-progress-circular>
                   </v-row>
                 </template>
+
               </v-img>
               <div v-if="!store.user.has_image" class="profile-image empty">
                 <v-icon class="empty-icon">
                   mdi-account
                 </v-icon>
               </div>
-              <div @click="openFileInput()" class="change-img-text">Vaihda kuva</div>
+
+              <v-icon
+                @click.stop="openFileInput()"
+                id="edit-profile-image-btn"
+              >
+                mdi-pencil
+              </v-icon>
           </div>
             <div class="user-info">
               <span class="fullname">
@@ -480,6 +488,18 @@ function editName() {
 
 <style scoped>
 
+#edit-profile-image-btn {
+  position: absolute;
+  height: 40px;
+  width: 40px;
+  background-color: #e7e7e7;
+  border-radius: 50%;
+  right: 0px;
+  bottom: 0px;
+  color: #646464;
+  cursor: pointer;
+}
+
   .fullname {
     font-weight: 600;
     font-size: 30px;
@@ -494,6 +514,7 @@ function editName() {
     height: 100px;
     border-radius: 50%;
     flex: none;
+    cursor: pointer;
   }
 
   .profile-image.empty {
@@ -527,6 +548,7 @@ function editName() {
     justify-content: center;
     flex-direction: column;
     gap: 10px;
+    position: relative;
   }
   .change-img-text:hover {
     text-decoration: underline;
