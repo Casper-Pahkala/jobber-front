@@ -1,6 +1,4 @@
 <template>
-  <div class="main-wrapper">
-      <div class="main-content">
         <div id="jobs-container" v-if="myListings.length != 0 && store.user && !loading">
           <v-chip-group
             mandatory
@@ -122,8 +120,6 @@
           Kirjaudu
         </v-btn>
       </div>
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -167,8 +163,8 @@ function toJobs() {
 }
 
 function imageUrl(job, lazy) {
-  if (job.pictures && job.pictures > 0) {
-    return store.url + '/job-image/' + job.hashed_id + '/image_0' +(lazy ? '_low' : '');
+  if (job.job_images && job.job_images.length > 0) {
+    return store.url + '/job-image/' + job.job_images[0].name;
   } else {
     return store.url + '/no-img.png'
   }
@@ -207,12 +203,12 @@ function deleteListing(listing) {
   right: 5px;
 }
 #jobs-container {
-    margin-top: 60px;
+    /* margin-top: 60px; */
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-bottom: 100px;
-    width: 1000px;
+    /* width: 1000px; */
   }
   .top-layout {
     margin-top: 60px;
