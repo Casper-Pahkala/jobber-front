@@ -43,7 +43,6 @@
                     icon="mdi-circle"
                     size="6"
                   >
-
                   </v-icon>
 
                   {{ timeFromDate(message.time) }}

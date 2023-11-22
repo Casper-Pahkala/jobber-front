@@ -51,7 +51,7 @@
             <v-card
               @click="handleJobClick(job)"
               class="job"
-              :elevation="isHovering ? 8 : 4"
+              :elevation="isHovering ? 6 : 3"
               v-bind="props"
             >
               <v-img
@@ -76,14 +76,14 @@
               <div class="job-content">
                   <div class="job-main">
                       <div class="job-title">{{ job.title }}</div>
-                      <div class="job-description">{{ job.description }}</div>
+                      <div class="job-description">{{ jobDescription(job) }}</div>
                   </div>
 
                   <div class="job-info">
-                    <div class="job-info-item">{{ job.date ? store.formatDate(job.date) : '' }}</div>
-                    <div class="job-info-item">{{ job.address }}</div>
-                    <div class="job-info-item">{{ job.estimated_time ? job.estimated_time + 'h' : '' }}</div>
-                    <div class="job-info-item">{{ job.full_salary ? job.full_salary + '€' : '' }}</div>
+                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                    <div class="job-info-item">{{ job.area }}</div>
+                    <!-- <div class="job-info-item">{{ job.estimated_time ? job.estimated_time + 'h' : '' }}</div>
+                    <div class="job-info-item">{{ job.full_salary ? job.full_salary + '€' : '' }}</div> -->
                   </div>
               </div>
             </v-card >
@@ -190,6 +190,52 @@ function firstItem() {
 function lastItem() {
   return store.jobParams.page * store.jobParams.limit;
 }
+
+function jobDescription(job) {
+  console.log(job);
+  let description = '';
+  if (job.contract_type === 0) {
+    description += 'Keikkatyö';
+
+    if (job.salary) {
+      if (job.salary_type === 0) {
+        // description += ' - Tuntipalkka';
+        description += ' - ' + job.salary + '€/h';
+      } else {
+        // description += ' - Urakkapalkka';
+        description += ' - ' + job.salary + '€';
+      }
+    }
+  } else if (job.contract_type === 1) {
+    description += 'Vakituinen työsuhde';
+
+    if (job.salary) {
+      if (job.salary_type === 0) {
+        // description += ' - Tuntipalkka';
+        description += ' - ' + job.salary + '€/h';
+      } else {
+        // description += ' - Kuukausipalkka';
+        description += ' - ' + job.salary + '€/kk';
+      }
+    }
+  } else {
+    description += 'Toistaiseksi voimassa oleva';
+
+    if (job.salary) {
+      if (job.salary_type === 0) {
+        // description += ' - Tuntipalkka';
+        description += ' - ' + job.salary + '€/h';
+      } else {
+        // description += ' - Kuukausipalkka';
+        description += ' - ' + job.salary + '- €/kk';
+      }
+    }
+  }
+
+
+
+  return description;
+}
 </script>
 
 <style scoped>
@@ -224,20 +270,20 @@ function lastItem() {
     border-radius: 6px;
     width: 100%;
     max-width: 1000px;
-    height: 180px;
+    height: 80px;
     display: flex;
     position: relative;
     margin: 10px;
   }
   .job-image {
-      width: 180px;
-      height: 180px;
+      width: 80px;
+      height: 80px;
       object-fit: cover;
       /* border-radius: 6px; */
   }
   .job-title {
       font-weight: 600;
-      font-size: 24px;
+      font-size: 20px;
   }
   .job-main {
       width: 70%;
@@ -248,7 +294,7 @@ function lastItem() {
       padding: 5px;
       padding-right: 10px;
       padding-left: 20px;
-      width: calc(100% - 150px);
+      width: calc(100% - 50px);
   }
   .job-info {
       width: 30%;
@@ -264,6 +310,7 @@ function lastItem() {
   }
   .job-info-item {
     direction: rtl;
+    font-size: 14px;
   }
 
   .dark-background {

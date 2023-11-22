@@ -164,7 +164,24 @@
 
                 <v-list-item-title>{{ item.other_full_name }}</v-list-item-title>
                 <v-list-item-subtitle style="opacity: 1;" class="pt-1">{{ item.job_title }}</v-list-item-subtitle>
-                <v-list-item-subtitle class="pt-1">{{ item.message }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="pt-1">
+                  <div class="latest-message">
+                    <div class="message">
+                      {{ item.message }}
+                    </div>
+
+                    <v-icon
+                      icon="mdi-circle"
+                      size="6"
+                    >
+                    </v-icon>
+
+                    {{ timeFromDate(item.time) }}
+                  </div>
+                </v-list-item-subtitle>
+                <div class="messages-count">
+                  {{ allMessagesCount(item) }}
+                </div>
               </v-list-item>
             </v-list>
 
@@ -219,6 +236,7 @@
 import { useAppStore } from '@/store/app'
 import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
+import moment from 'moment';
 
 const store = useAppStore();
 const drawer = ref(false);
@@ -306,12 +324,27 @@ const allUnseenMessages = computed(() => {
   return store.allUnseenMessages;
 })
 
+function allMessagesCount(message) {
+  return allUnseenMessages.value.filter(m => m.job_hashed_id === message.job_hashed_id && m.other_user_id === message.other_user_id).length;
+}
+
 
 
 
 setTimeout(() => {
   store.tab = currentTab;
 }, 1);
+
+
+function timeFromDate (date) {
+  if (moment(date).isSame(moment(), 'day')) {
+    return 'Tänään ' + moment(date).format('HH:mm');
+  } else if (moment(date).isSame(moment().clone().subtract(1, 'days'), 'day')) {
+    return 'Eilen ' + moment(date).format('HH:mm');
+  }
+  return moment(date).format('DD.MM HH:mm');
+}
+
 </script>
 
 <style scoped>
@@ -409,6 +442,34 @@ setTimeout(() => {
     color: #515151;
   }
 
+  .messages-count {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #3ea6ff;
+    transform: translateY(-50%);
+  }
+
+  .latest-message {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 16px;
+  }
+
+  .message {
+    /* max-width: 50%; */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 </style>
 
 <style>
