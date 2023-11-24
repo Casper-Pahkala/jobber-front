@@ -242,11 +242,10 @@ const store = useAppStore();
 const drawer = ref(false);
 const router = useRouter();
 const route = useRoute();
-const currentTabs = ref('');
 const messagesMenu = ref(false);
 const accountMenu = ref(false);
 
-let currentTab = route.name || '';
+let currentTab = route.name || 'jobs';
 store.tab = currentTab;
 
 const accountTabs = [
@@ -281,12 +280,6 @@ function changeTab(tab) {
 
 function logOut() {
   store.logOut();
-  // .then((response) => {
-    // changeTab('jobs');
-    // })
-    // .catch(e => {
-    //   changeTab('jobs');
-    // });
 }
 
 function openRecentMessage(message) {
@@ -328,9 +321,6 @@ const allUnseenMessages = computed(() => {
 function allMessagesCount(message) {
   return allUnseenMessages.value.filter(m => m.job_hashed_id === message.job_hashed_id && m.other_user_id === message.other_user_id).length;
 }
-
-
-
 
 setTimeout(() => {
   store.tab = currentTab;

@@ -68,7 +68,20 @@
                       :src="message.attachment_url"
                       class="attachment-image"
                       v-else
-                    ></v-img>
+                    >
+                      <template v-slot:placeholder>
+                        <v-row
+                          class="fill-height ma-0"
+                          align="center"
+                          justify="center"
+                        >
+                          <v-progress-circular
+                            indeterminate
+                            color="grey-lighten-5"
+                          ></v-progress-circular>
+                        </v-row>
+                      </template>
+                    </v-img>
                   </div>
                   <div v-else>
                     {{ getMessage(message) }}
@@ -223,7 +236,20 @@
         <v-img
           :src="largeImageUrl"
           class="large-image"
-        ></v-img>
+        >
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey-lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
 
         <v-btn
           class="close-btn"
