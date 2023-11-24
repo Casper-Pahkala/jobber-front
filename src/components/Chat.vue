@@ -526,7 +526,7 @@ function openChatAttachment(message) {
 </script>
 
 <style scoped>
-
+@import url("https://fonts.googleapis.com/css?family=Red+Hat+Display:400,500,900&display=swap");
 .main-wrapper {
     display: flex;
     justify-content: center;
@@ -565,7 +565,6 @@ function openChatAttachment(message) {
   padding: 10px;
 }
 
-@import url("https://fonts.googleapis.com/css?family=Red+Hat+Display:400,500,900&display=swap");
 body, html {
   font-family: Red hat Display, sans-serif;
   font-weight: 400;
