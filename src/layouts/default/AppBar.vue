@@ -363,7 +363,7 @@ function timeFromDate (date) {
   }
 
   .recent-messages {
-    width: 350px;
+    width: 450px;
     max-height: 300px;
   }
 
@@ -445,7 +445,7 @@ function timeFromDate (date) {
   .messages-count {
     position: absolute;
     right: 30px;
-    top: 50%;
+    top: 20px;
     border-radius: 50%;
     width: 24px;
     height: 24px;
@@ -454,7 +454,7 @@ function timeFromDate (date) {
     justify-content: center;
     color: #fff;
     background-color: #3ea6ff;
-    transform: translateY(-50%);
+    /* transform: translateY(-50%); */
   }
 
   .latest-message {
@@ -465,7 +465,7 @@ function timeFromDate (date) {
   }
 
   .message {
-    /* max-width: 50%; */
+    max-width: 50%;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
