@@ -58,9 +58,17 @@
                       v-if="store.getFileExtension(message.attachment_name) === 'pdf'"
                     >
                       <v-icon
+                        v-if="message.attachment_url && message.attachment_url.length > 0"
                       >
                         mdi-file-pdf-box
                       </v-icon>
+
+                      <v-progress-circular
+                        v-else
+                        indeterminate
+                        class="pdf-loader"
+                        color="grey-lighten-5"
+                      ></v-progress-circular>
                       {{ getMessage(message) }}
                     </template>
 
@@ -502,12 +510,14 @@ function openChatAttachment(message) {
   if (!message.attachment_id) {
     return;
   }
-
-  if (store.getFileExtension(message.attachment_name) === 'pdf') {
-    store.downloadFile(message.attachment_id);
-  } else {
-    showLargeImageDialog.value = true;
-    largeImageUrl.value = message.attachment_url;
+  if (message.attachment_url && message.attachment_url.length > 0) {
+    if (store.getFileExtension(message.attachment_name) === 'pdf') {
+      // store.downloadFile(message.attachment_id);
+      window.open(message.attachment_url, "_blank");
+    } else {
+      showLargeImageDialog.value = true;
+      largeImageUrl.value = message.attachment_url;
+    }
   }
 }
 </script>
@@ -974,6 +984,10 @@ body, html {
 #chat-large-image {
   max-width: 100vw;
   max-height: 100vh;
+}
+.pdf-loader {
+  width: 24px;
+  height: 24px;
 }
 </style>
 <style>

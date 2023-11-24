@@ -353,13 +353,7 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
-          // this.auth_token = null;
-          // this.user = null;
-
-          // this.loading = false;
-          // this.loadingBackground = false;
           window.location.href = '/';
-          // window.refresh
           resolve(data);
         })
         .catch((error) => {
@@ -606,12 +600,17 @@ export const useAppStore = defineStore('app', {
           },
         });
         const blob = await response.blob();
-        message.attachment_url = URL.createObjectURL(blob);
+        // Create a File object from the blob
+        const file = new File([blob], message.attachment_name, { type: blob.type });
+        console.log(file);
+        // Use the File object to create the object URL
+        message.attachment_url = URL.createObjectURL(file);
       } catch (error) {
         console.error('Error fetching image:', error);
         message.attachment_url = '';
       }
     }
+
   },
   getters: {
     latestMessages() {
@@ -638,7 +637,7 @@ export const useAppStore = defineStore('app', {
       let usedDates = [];
       let toUpdate = [];
       currentMessages.forEach(m => {
-        if (m.attachment_id && m.attachment_name && this.getFileExtension(m.attachment_name) !== 'pdf' && !m.attachment_url) {
+        if (m.attachment_id && m.attachment_name && !m.attachment_url) {
           m.attachment_url = '';
           this.getImageSrc(m.attachment_id, m);
         }
