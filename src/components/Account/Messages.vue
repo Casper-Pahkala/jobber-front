@@ -118,6 +118,8 @@ function toJobs() {
   store.tab = 'jobs';
   router.push('/jobs');
 }
+
+
 </script>
 <style scoped>
   .main-wrapper {

@@ -478,6 +478,42 @@ export const useAppStore = defineStore('app', {
         xhr.send(formData);
       })
     },
+    sendAttachment(payload) {
+      return new Promise((resolve, reject) => {
+        this.loading = true;
+        this.loadingBackground = true;
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+
+        for (let key in payload) {
+          formData.append(key, payload[key]);
+        }
+
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = (event.loaded / event.total) * 100;
+            console.log(`Upload Progress: ${progress.toFixed(2)}%`);
+          }
+        });
+
+        xhr.open('POST', `${this.url}/api/messages/send-attachment.json`, true); // Replace with your actual endpoint
+        xhr.onreadystatechange = function () {
+          this.loading = false;
+          this.loadingBackground = false;
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              resolve(data.data);
+            } catch (e) {
+              console.error('Error parsing response:', e);
+              this.errorToast('Error parsing response:' + e);
+              reject(e);
+            }
+          }
+        };
+        xhr.send(formData);
+      })
+    }
   },
   getters: {
     latestMessages() {
