@@ -280,12 +280,13 @@ function changeTab(tab) {
 }
 
 function logOut() {
-  store.logOut().then((response) => {
-    changeTab('jobs');
-    })
-    .catch(e => {
-      changeTab('jobs');
-    });
+  store.logOut();
+  // .then((response) => {
+    // changeTab('jobs');
+    // })
+    // .catch(e => {
+    //   changeTab('jobs');
+    // });
 }
 
 function openRecentMessage(message) {

@@ -47,12 +47,33 @@
               <div
                 v-if="!message.is_date_seperator"
                 class="message"
-                :class="message.received === 0 ? 'sent' : 'received'"
+                :class="{ sent: message.received === 0, received: message.received !== 0, 'pa-0': message.attachment_name && store.getFileExtension(message.attachment_name) !== 'pdf'}"
               >
                 <div class="time" :style="message.received === 0 ? 'right: 10px' : 'left: 10px'">
                   {{ timeFromDate(message.time) }}
                 </div>
-                {{ message.message }}
+                <div :class="{ attachment: message.attachment_id }" @click="openChatAttachment(message)">
+                  <div v-if="message.attachment_name">
+                    <template
+                      v-if="store.getFileExtension(message.attachment_name) === 'pdf'"
+                    >
+                      <v-icon
+                      >
+                        mdi-file-pdf-box
+                      </v-icon>
+                      {{ getMessage(message) }}
+                    </template>
+
+                    <v-img
+                      :src="message.attachment_url"
+                      class="attachment-image"
+                      v-else
+                    ></v-img>
+                  </div>
+                  <div v-else>
+                    {{ getMessage(message) }}
+                  </div>
+                </div>
                 <div v-if="(index == messages.length - 1) && !message.received" class="status">
                   {{ getMessageStatus(message) }}
                 </div>
@@ -137,7 +158,12 @@
                     bg-color="grey-lighten-2"
                     :disabled="job.is_deleted"
                   ></v-text-field>
-                  <v-btn @click="sendMessage" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
+
+                  <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
+                    <v-icon size="24px">mdi-paperclip</v-icon>
+                  </v-btn>
+
+                  <v-btn v-else @click="sendMessage" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
                     <v-icon>mdi-send</v-icon>
                   </v-btn>
               </v-row>
@@ -153,8 +179,61 @@
         >
         </v-btn>
       </v-card>
-  </v-dialog>
 
+      <input
+        type="file"
+        ref="fileInput"
+        @change="handleFileChange"
+        style="display: none;"
+      />
+
+      <v-dialog
+        v-model="confirmAttachmentDialog"
+        width="500"
+      >
+        <v-card>
+          <v-card-title>
+            Vahvista liite
+          </v-card-title>
+          <v-card-item>
+            <div @click="openAttachment" class="attachmentName">
+              {{ attachmentName }}
+            </div>
+          </v-card-item>
+
+          <v-card-actions>
+            <v-col class="d-flex justify-space-between">
+              <v-btn @click="confirmAttachmentDialog = false" class="text-none">Peruuta</v-btn>
+              <v-btn color="primary" @click="sendAttachment()" class="text-none">Lähetä</v-btn>
+            </v-col>
+          </v-card-actions>
+        </v-card>
+
+      </v-dialog>
+  </v-dialog>
+  <canvas id="imageAttachmentCanvas" style="display: none;"></canvas>
+
+  <v-dialog
+    v-model="showLargeImageDialog"
+    id="chat-large-image"
+  >
+    <v-card
+      style="background-color: #333;"
+    >
+        <v-img
+          :src="largeImageUrl"
+          class="large-image"
+        ></v-img>
+
+        <v-btn
+          class="close-btn"
+          flat
+          icon="mdi-close"
+          @click="showLargeImageDialog = false"
+        >
+        </v-btn>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -171,13 +250,26 @@ const chatOpen = computed(() => {
 const messageActive = ref(false);
 const jobUserFullName = ref(null);
 const messages = computed(() => {
-  return store.currentChatMessages;
+  let messages = store.currentChatMessages;
+  return messages;
 });
+
+
 const job = ref(null);
 const message = ref('');
 const otherTyping = ref(false);
 const chatContainer = ref(null);
 const jobUser = ref(null);
+
+const attachment = ref(null);
+const attachmentName = ref(null);
+const attachmentResult = ref(null);
+
+const confirmAttachmentDialog = ref(false);
+const fileInput = ref(null);
+
+const showLargeImageDialog = ref(false);
+const largeImageUrl = ref(null);
 
 const jobId = computed(() => {
   return store.chat.jobId
@@ -220,7 +312,9 @@ watch(chatOpen, async (newVal, oldVal) => {
 });
 
 watch(messages, async (newVal, oldVal) => {
-  scrollToBottom();
+  if (newVal.length != oldVal.length) {
+    scrollToBottom();
+  }
 }, { deep: true });
 
 function init() {
@@ -261,6 +355,134 @@ function getMessageStatus(message) {
 
 function close() {
   store.chatOpen = false;
+}
+
+function openFileInput() {
+  // Trigger the hidden file input
+  fileInput.value.click();
+}
+
+function handleFileChange(event) {
+  const selectedFile = event.target.files[0];
+  attachmentName.value = selectedFile.name;
+  // Check if a file is selected
+  if (selectedFile) {
+    // Check if the selected file is an image (you can adjust the accepted image types)
+    if ((selectedFile.type.startsWith('image/') && !selectedFile.type.startsWith('image/gif')) || selectedFile.type === 'application/pdf') {
+      attachment.value = null;
+      attachmentResult.value = null;
+      store.loading = true;
+      confirmAttachmentDialog.value = true;
+
+      if (selectedFile.type.startsWith('image/')) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = () => {
+            let targetWidth = 1080;
+            let targetHeight = 1080;
+
+            const imageCanvas = document.getElementById('imageAttachmentCanvas');
+            const canvasContext = imageCanvas.getContext('2d');
+
+            // Calculate the aspect ratio of the image
+            const imageAspectRatio = img.width / img.height;
+
+            // Calculate the target aspect ratio
+            const targetAspectRatio = targetWidth / targetHeight;
+
+            let drawWidth, drawHeight, xOffset, yOffset;
+
+            if (imageAspectRatio > targetAspectRatio) {
+              // Image is wider than the target aspect ratio, crop horizontally
+              drawHeight = targetHeight;
+              drawWidth = drawHeight * imageAspectRatio;
+              yOffset = 0;
+              xOffset = (drawWidth - targetWidth) / 2;
+            } else {
+              // Image is taller than the target aspect ratio, crop vertically
+              drawWidth = targetWidth;
+              drawHeight = drawWidth / imageAspectRatio;
+              xOffset = 0;
+              yOffset = (drawHeight - targetHeight) / 2;
+            }
+
+            // Set the canvas dimensions to the target size
+            imageCanvas.width = targetWidth;
+            imageCanvas.height = targetHeight;
+
+            // Draw the cropped and resized image
+            canvasContext.drawImage(img, -xOffset, -yOffset, drawWidth, drawHeight);
+
+            imageCanvas.toBlob((blob) => {
+              attachment.value = blob;
+              console.log(blob);
+              // attachmentResult.value = imageCanvas.toDataURL('image/jpeg', 0.8);
+              store.loading = false;
+            }, selectedFile.type, 0.8);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(selectedFile);
+      } else if (selectedFile.type === 'application/pdf') {
+
+        let reader = new FileReader();
+        reader.onload = function (e) {
+          // Create a Blob URL from the PDF and open it in a new tab
+          attachment.value = new Blob([reader.result], { type: 'application/pdf' });
+          store.loading = false;
+        };
+        reader.readAsArrayBuffer(selectedFile);
+      }
+
+
+
+    } else {
+      // Handle the case where the selected file is not an image
+      store.snackbarText = 'Valitse kuva tiedostotyyppi';
+      store.snackbarColor = 'red-darken-2';
+      store.snackbar = true;
+    }
+  }
+}
+
+function sendAttachment() {
+  const att = new File([attachment.value], attachmentName.value, { type: attachment.value.type });
+  let payload = {
+    attachment: att,
+    job_id: jobId.value,
+    receiver_id: chatUserId.value
+  }
+  store.sendAttachment(payload).then(() => {
+    confirmAttachmentDialog.value = false;
+  });
+}
+
+function openAttachment() {
+  const url = URL.createObjectURL(attachment.value);
+  window.open(url, '_blank');
+}
+
+function getMessage(message) {
+  if (message.message.length > 0) {
+    return message.message;
+  } else {
+    return message.attachment_name;
+  }
+}
+
+function openChatAttachment(message) {
+  largeImageUrl.value = '';
+  if (!message.attachment_id) {
+    return;
+  }
+
+  if (store.getFileExtension(message.attachment_name) === 'pdf') {
+    store.downloadFile(message.attachment_id);
+  } else {
+    showLargeImageDialog.value = true;
+    largeImageUrl.value = message.attachment_url;
+  }
 }
 </script>
 
@@ -685,6 +907,47 @@ body, html {
   font-size: 20px;
   font-weight: 600;
   transform: rotate(10deg);
+}
+
+.attachmentName {
+  cursor: pointer;
+}
+
+.attachmentName:hover {
+  text-decoration: underline;
+}
+
+.attachment {
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.attachment:hover {
+  text-decoration: underline;
+}
+
+.attachment-image {
+  width: 200px;
+  height: 200px;
+}
+
+.received .attachment-image {
+  border-radius: 1.125rem 1.125rem 1.125rem 0;
+}
+.sent .attachment-image {
+  border-radius: 1.125rem 1.125rem 0 1.125rem;
+}
+
+.large-image {
+  max-width: 100vw;
+  max-height: calc(100vh - 48px);
+  object-fit: contain;
+}
+
+#chat-large-image {
+  max-width: 100vw;
+  max-height: 100vh;
 }
 </style>
 <style>
