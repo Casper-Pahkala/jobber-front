@@ -47,12 +47,33 @@
               <div
                 v-if="!message.is_date_seperator"
                 class="message"
-                :class="message.received === 0 ? 'sent' : 'received'"
+                :class="{ sent: message.received === 0, received: message.received !== 0, 'pa-0': message.attachment_name && store.getFileExtension(message.attachment_name) !== 'pdf'}"
               >
                 <div class="time" :style="message.received === 0 ? 'right: 10px' : 'left: 10px'">
                   {{ timeFromDate(message.time) }}
                 </div>
-                {{ message.message }}
+                <div :class="{ attachment: message.attachment_id }" @click="openChatAttachment(message)">
+                  <div v-if="message.attachment_name">
+                    <template
+                      v-if="store.getFileExtension(message.attachment_name) === 'pdf'"
+                    >
+                      <v-icon
+                      >
+                        mdi-file-pdf-box
+                      </v-icon>
+                      {{ getMessage(message) }}
+                    </template>
+
+                    <v-img
+                      :src="message.attachment_url"
+                      class="attachment-image"
+                      v-else
+                    ></v-img>
+                  </div>
+                  <div v-else>
+                    {{ getMessage(message) }}
+                  </div>
+                </div>
                 <div v-if="(index == messages.length - 1) && !message.received" class="status">
                   {{ getMessageStatus(message) }}
                 </div>
@@ -139,7 +160,7 @@
                   ></v-text-field>
 
                   <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
-                    <v-icon>mdi-attachment</v-icon>
+                    <v-icon size="24px">mdi-paperclip</v-icon>
                   </v-btn>
 
                   <v-btn v-else @click="sendMessage" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
@@ -191,6 +212,28 @@
       </v-dialog>
   </v-dialog>
   <canvas id="imageAttachmentCanvas" style="display: none;"></canvas>
+
+  <v-dialog
+    v-model="showLargeImageDialog"
+    id="chat-large-image"
+  >
+    <v-card
+      style="background-color: #333;"
+    >
+        <v-img
+          :src="largeImageUrl"
+          class="large-image"
+        ></v-img>
+
+        <v-btn
+          class="close-btn"
+          flat
+          icon="mdi-close"
+          @click="showLargeImageDialog = false"
+        >
+        </v-btn>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -207,8 +250,11 @@ const chatOpen = computed(() => {
 const messageActive = ref(false);
 const jobUserFullName = ref(null);
 const messages = computed(() => {
-  return store.currentChatMessages;
+  let messages = store.currentChatMessages;
+  return messages;
 });
+
+
 const job = ref(null);
 const message = ref('');
 const otherTyping = ref(false);
@@ -221,6 +267,9 @@ const attachmentResult = ref(null);
 
 const confirmAttachmentDialog = ref(false);
 const fileInput = ref(null);
+
+const showLargeImageDialog = ref(false);
+const largeImageUrl = ref(null);
 
 const jobId = computed(() => {
   return store.chat.jobId
@@ -263,7 +312,9 @@ watch(chatOpen, async (newVal, oldVal) => {
 });
 
 watch(messages, async (newVal, oldVal) => {
-  scrollToBottom();
+  if (newVal.length != oldVal.length) {
+    scrollToBottom();
+  }
 }, { deep: true });
 
 function init() {
@@ -402,12 +453,36 @@ function sendAttachment() {
     job_id: jobId.value,
     receiver_id: chatUserId.value
   }
-  store.sendAttachment(payload);
+  store.sendAttachment(payload).then(() => {
+    confirmAttachmentDialog.value = false;
+  });
 }
 
 function openAttachment() {
   const url = URL.createObjectURL(attachment.value);
   window.open(url, '_blank');
+}
+
+function getMessage(message) {
+  if (message.message.length > 0) {
+    return message.message;
+  } else {
+    return message.attachment_name;
+  }
+}
+
+function openChatAttachment(message) {
+  largeImageUrl.value = '';
+  if (!message.attachment_id) {
+    return;
+  }
+
+  if (store.getFileExtension(message.attachment_name) === 'pdf') {
+    store.downloadFile(message.attachment_id);
+  } else {
+    showLargeImageDialog.value = true;
+    largeImageUrl.value = message.attachment_url;
+  }
 }
 </script>
 
@@ -840,6 +915,39 @@ body, html {
 
 .attachmentName:hover {
   text-decoration: underline;
+}
+
+.attachment {
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.attachment:hover {
+  text-decoration: underline;
+}
+
+.attachment-image {
+  width: 200px;
+  height: 200px;
+}
+
+.received .attachment-image {
+  border-radius: 1.125rem 1.125rem 1.125rem 0;
+}
+.sent .attachment-image {
+  border-radius: 1.125rem 1.125rem 0 1.125rem;
+}
+
+.large-image {
+  max-width: 100vw;
+  max-height: calc(100vh - 48px);
+  object-fit: contain;
+}
+
+#chat-large-image {
+  max-width: 100vw;
+  max-height: 100vh;
 }
 </style>
 <style>

@@ -252,6 +252,13 @@ export const useAppStore = defineStore('app', {
           let data = response.data;
           this.recentMessages = data.messages.filter(m => m.seen == null);
           let messages = data.messages;
+
+          messages.forEach(m => {
+            if (m.attachment_id && m.attachment_name && this.getFileExtension(m.attachment_name) !== 'pdf') {
+              m.attachment_url = '';
+              // this.getImageSrc(m.attachment_id, m);
+            }
+          })
           this.allMessages = messages;
           resolve(data);
         })
@@ -346,11 +353,13 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
-          this.auth_token = null;
-          this.user = null;
+          // this.auth_token = null;
+          // this.user = null;
 
-          this.loading = false;
-          this.loadingBackground = false;
+          // this.loading = false;
+          // this.loadingBackground = false;
+          window.location.href = '/';
+          // window.refresh
           resolve(data);
         })
         .catch((error) => {
@@ -463,7 +472,11 @@ export const useAppStore = defineStore('app', {
           }
         });
 
-        xhr.open('POST', `${this.url}/api/jobs/upload-image.json`, true); // Replace with your actual endpoint
+        xhr.open('POST', `${this.url}/api/jobs/upload-image.json`, true);
+
+        const authToken = this.auth_token;
+        xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+
         xhr.onreadystatechange = function () {
           if (xhr.readyState == 4 && xhr.status == 200) {
             try {
@@ -496,23 +509,108 @@ export const useAppStore = defineStore('app', {
           }
         });
 
-        xhr.open('POST', `${this.url}/api/messages/send-attachment.json`, true); // Replace with your actual endpoint
-        xhr.onreadystatechange = function () {
-          this.loading = false;
-          this.loadingBackground = false;
-          if (xhr.readyState == 4 && xhr.status == 200) {
-            try {
-              const data = JSON.parse(xhr.responseText);
-              resolve(data.data);
-            } catch (e) {
-              console.error('Error parsing response:', e);
-              this.errorToast('Error parsing response:' + e);
-              reject(e);
+        xhr.open('POST', `${this.url}/api/messages/send-attachment.json`, true);
+
+        const authToken = this.auth_token;
+        xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState == 4) {
+            this.loading = false;
+            this.loadingBackground = false;
+
+            if (xhr.status == 200) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                console.log(data);
+
+                if (data.status !== 'success') {
+                  this.errorToast(data.message);
+                  reject();
+                  return;
+                }
+                resolve(data);
+              } catch (e) {
+                console.error('Error parsing response:', e);
+                this.errorToast('Error parsing response: ' + e.message);
+                reject(e);
+              }
+            } else {
+              const error = `Request failed with status: ${xhr.status}`;
+              console.error(error);
+              this.errorToast(error);
+              reject(new Error(error));
             }
           }
         };
+
+        xhr.onerror = () => {
+          const error = 'Network error occurred during the request.';
+          console.error(error);
+          this.loading = false;
+          this.loadingBackground = false;
+          this.errorToast(error);
+          reject(new Error(error));
+        };
+
+
         xhr.send(formData);
       })
+    },
+    async downloadFile(id) {
+      try {
+        const response = await this.axios.get(this.url + `/api/attachment/${id}`, {
+          responseType: 'blob', // Important: Set response type as 'blob'
+        });
+
+        // Create a Blob from the PDF Stream
+        const file = new Blob(
+          [response.data],
+          { type: 'application/octet-stream' } // Set the correct MIME type
+        );
+
+        // Build a URL from the file
+        const fileURL = URL.createObjectURL(file);
+
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = fileURL;
+        console.log(response.headers);
+        link.setAttribute('download', response.headers['filename']);
+        document.body.appendChild(link);
+
+        // Programmatically click the link to trigger the download
+        link.click();
+
+        // Remove the link after downloading
+        document.body.removeChild(link);
+
+        // Release the created object URL
+        URL.revokeObjectURL(fileURL);
+      } catch (error) {
+        console.error('Error during file download:', error);
+      }
+    },
+    getFileExtension(fileName) {
+      if (fileName.includes('.') && fileName.lastIndexOf('.') !== 0) {
+          return fileName.substring(fileName.lastIndexOf('.') + 1);
+      } else {
+          return '';
+      }
+    },
+    async getImageSrc(attachmentId, message) {
+      try {
+        const response = await fetch(`${this.url}/api/attachment/${attachmentId}.${this.getFileExtension(message.attachment_name)}`, {
+          headers: {
+            'Authorization': 'Bearer ' + this.auth_token,
+          },
+        });
+        const blob = await response.blob();
+        message.attachment_url = URL.createObjectURL(blob);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+        message.attachment_url = '';
+      }
     }
   },
   getters: {
@@ -540,7 +638,10 @@ export const useAppStore = defineStore('app', {
       let usedDates = [];
       let toUpdate = [];
       currentMessages.forEach(m => {
-
+        if (m.attachment_id && m.attachment_name && this.getFileExtension(m.attachment_name) !== 'pdf' && !m.attachment_url) {
+          m.attachment_url = '';
+          this.getImageSrc(m.attachment_id, m);
+        }
         let date = moment(m.time).format('YYYY-MM-DD');
         if (!usedDates.includes(date)) {
           let timeData = {
