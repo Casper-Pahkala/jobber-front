@@ -32,4 +32,9 @@ body, html {
   top: 5px;
   right: 5px;
 }
+
+.cursor-default {
+  cursor: default;
+  pointer-events: all;
+}
 </style>

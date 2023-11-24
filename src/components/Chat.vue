@@ -52,11 +52,12 @@
                 <div class="time" :style="message.received === 0 ? 'right: 10px' : 'left: 10px'">
                   {{ timeFromDate(message.time) }}
                 </div>
-                <div :class="{ attachment: message.attachment_id }" @click="openChatAttachment(message)">
+                <div :class="{ attachment: message.attachment_id, loaded: message.attachment_url && message.attachment_url.length > 0 }" @click="openChatAttachment(message)">
                   <div v-if="message.attachment_name">
                     <template
                       v-if="store.getFileExtension(message.attachment_name) === 'pdf'"
                     >
+
                       <v-icon
                         v-if="message.attachment_url && message.attachment_url.length > 0"
                       >
@@ -79,7 +80,7 @@
                     >
                       <template v-slot:placeholder>
                         <v-row
-                          class="fill-height ma-0"
+                          class="fill-height ma-0 cursor-default"
                           align="center"
                           justify="center"
                         >
@@ -129,7 +130,7 @@
                     >
                       <template v-slot:placeholder>
                         <v-row
-                          class="fill-height ma-0"
+                          class="fill-height ma-0 cursor-default"
                           align="center"
                           justify="center"
                         >
@@ -237,6 +238,8 @@
   <v-dialog
     v-model="showLargeImageDialog"
     id="chat-large-image"
+    fullscreen
+    width="100vw"
   >
     <v-card
       style="background-color: #333;"
@@ -954,12 +957,15 @@ body, html {
 }
 
 .attachment {
-  cursor: pointer;
   display: flex;
   gap: 10px;
 }
 
-.attachment:hover {
+.attachment.loaded {
+  cursor: pointer;
+}
+
+.attachment.loaded:hover {
   text-decoration: underline;
 }
 
@@ -977,13 +983,14 @@ body, html {
 
 .large-image {
   max-width: 100vw;
-  max-height: calc(100vh - 48px);
+  max-height: 100vh;
   object-fit: contain;
 }
 
 #chat-large-image {
   max-width: 100vw;
   max-height: 100vh;
+
 }
 .pdf-loader {
   width: 24px;
