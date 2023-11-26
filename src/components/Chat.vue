@@ -7,7 +7,7 @@
       <v-card
       min-width="300"
       >
-        <div class="chat" v-if="job">
+        <div class="chat">
           <div class="contact bar">
             <v-img
                 :src="jobUser && jobUser.has_profile_image ? `${store.url}/profile-image/${jobUser.id}` : `${store.url}/no-profile-img.png`"
@@ -159,7 +159,7 @@
 
                   </div>
                 </v-card-item>
-                <div v-if="job.is_deleted" class="deleted-job">
+                <div v-if="job && job.is_deleted" class="deleted-job">
                 </div>
               </v-card>
             </v-hover>
@@ -178,14 +178,14 @@
                     class="message-input ml-2 mr-2 mb-2 mt-2"
                     elevation="12"
                     bg-color="grey-lighten-2"
-                    :disabled="job.is_deleted"
+                    :disabled="!job || job.is_deleted"
                   ></v-text-field>
 
-                  <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
+                  <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="!job || job.is_deleted">
                     <v-icon size="24px">mdi-paperclip</v-icon>
                   </v-btn>
 
-                  <v-btn v-else @click="sendMessage" color="primary" dark fab small class="send-btn mr-1" :disabled="job.is_deleted">
+                  <v-btn v-else @click="sendMessage" color="primary" dark fab small class="send-btn mr-1" :disabled="!job || job.is_deleted">
                     <v-icon>mdi-send</v-icon>
                   </v-btn>
               </v-row>

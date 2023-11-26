@@ -51,7 +51,11 @@ function register() {
     } else {
       store.loading = false;
     }
-  });
+  }).catch(() => {
+    store.loading = false;
+    // store.loadingBackground = false;
+    store.errorToast('Käyttäjän luominen epäonnistui');
+  });;
 }
 
 </script>

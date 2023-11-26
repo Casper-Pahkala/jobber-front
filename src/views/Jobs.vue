@@ -41,9 +41,24 @@
           </v-col> -->
         </v-row>
       </div>
-      <div v-if="loading" class="loading-container">
-        <span class="loader"></span>
+      <div class="loading-container" v-if="loading || error">
+        <span v-if="loading" class="loader"></span>
+
+        <div v-if="!loading && error" class="error-container">
+          <span>Töiden haussa tapahtui virhe</span>
+
+          <v-btn
+            prepend-icon="mdi-refresh"
+            @click="getJobs()"
+          >
+          Päivitä työt
+
+          </v-btn>
+
+        </div>
       </div>
+
+
 
       <div id="jobs-container">
         <template v-for="job in jobs" :key="job.id">
@@ -121,6 +136,8 @@ const route = useRoute();
 const query = route.query;
 const store = useAppStore();
 const loading = ref(false);
+const error = ref(false);
+
 loading.value = true;
 
 store.jobParams.page = query.p ?? 1;
@@ -141,13 +158,7 @@ const params = computed(() => {
 })
 router.push({ query: params.value });
 
-store.fetchJobs().then((response) => {
-  let data = response.data;
-  if (!data.error) {
-    jobs.value = data.jobs;
-  }
-  loading.value = false;
-})
+
 
 function handleJobClick(job) {
   router.push('/jobs/' + job.hashed_id);
@@ -235,6 +246,25 @@ function jobDescription(job) {
 
   return description;
 }
+
+function getJobs() {
+  error.value = false;
+  loading.value = true;
+  store.fetchJobs().then((response) => {
+    let data = response.data;
+    if (!data.error) {
+      jobs.value = data.jobs;
+    }
+    loading.value = false;
+  }).catch(() => {
+    store.errorToast('Töiden haussa tapahtui virhe');
+    loading.value = false;
+    error.value = true;
+  })
+}
+
+getJobs();
+
 </script>
 
 <style scoped>
@@ -343,6 +373,14 @@ function jobDescription(job) {
   align-items: center;
   width: 100%;
   height: 70vh;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .search-btn {
