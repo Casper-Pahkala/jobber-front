@@ -230,14 +230,19 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/messages/${jobId}/${userId}.json`).then((response) => {
           let data = response.data;
-          data.messages.forEach(item => {
-              item.seen = true;
-              let m = this.allMessages.find(m => m.id === item.id);
-              if (!m) {
-                this.allMessages.push(item);
-              } else {
-                m.seen = true;
-              }
+
+          data.data.forEach(job => {
+            job.users.forEach(user => {
+              user.messages.forEach(m => {
+                item.seen = true;
+                let message = this.allMessages.find(_m => _m.id === m.id);
+                if (!message) {
+                  this.allMessages.push(m);
+                } else {
+                  message.seen = true;
+                }
+              })
+            })
           });
           resolve(data);
         })
