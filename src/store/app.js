@@ -5,6 +5,7 @@ import moment from 'moment';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    feedbackDialog: false,
     maintenanceDialog: false,
     tab: null,
     url: window.url,
@@ -651,6 +652,33 @@ export const useAppStore = defineStore('app', {
         }
       }
       return description;
+    },
+    sendFeedback(payload) {
+      this.loading = true;
+      this.loadingBackground = true;
+
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/feedback.json`, payload).then((response) => {
+          let data = response.data;
+          this.loading = false;
+          this.loadingBackground = false;
+          this.feedbackDialog = false;
+          if (data.status !== 'success') {
+            this.errorToast('Palautteen lähetyksessä tapahtui virhe: ' + data.message);
+            reject(data.message);
+            return;
+          }
+          this.successToast('Palaute lähetetty onnistuneesti!');
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.feedbackDialog = false;
+          this.loadingBackground = false;
+          this.errorToast('Palautteen lähetyksessä tapahtui virhe');
+          reject(error);
+        })
+      })
     }
 
 

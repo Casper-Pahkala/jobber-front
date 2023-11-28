@@ -60,15 +60,57 @@
     <v-card>
       <v-card-title class="headline">Sivusto Kehityksessä</v-card-title>
       <v-card-text>
-        Tervetuloa rekrytor.fi-sivustolle! Huomioithan, että sivusto on parhaillaan kehitysvaiheessa.
-        Kaikki data on väliaikaista ja suojaamatonta. Jatkamalla hyväksyt nämä ehdot.
+        Tervetuloa rekrytor.fi-sivustolle! Huomioithan, että sivusto on parhaillaan kehitysvaiheessa ja tarkastelet demo versiota.
+        Kaikki data on väliaikaista ja suojaamatonta.
       </v-card-text>
+
+      <v-card-text>
+        Jos sinulla on ehdotuksia, voit kertoa ne oikeasta alakulmasta.
+      </v-card-text>
+
+      <v-card-text>Jatkamalla hyväksyt nämä ehdot.</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="green darken-1" text @click="closeDialog()">Hyväksy</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-btn
+    id="feedback-btn"
+    icon="mdi-comment"
+    size="large"
+    @click="store.feedbackDialog = true"
+    color="primary"
+  >
+
+  </v-btn>
+
+  <v-dialog v-model="store.feedbackDialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Anna palautetta</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-textarea
+                  label="Palaute"
+                  v-model="feedback.message"
+                  required
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="store.feedbackDialog = false">Peruuta</v-btn>
+          <v-btn color="blue darken-1" text @click="submitFeedback">Lähetä</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </template>
 
 <script>
@@ -80,13 +122,22 @@ export default {
       'mdi-twitter',
       'mdi-instagram',
     ],
-    store: useAppStore()
+    store: useAppStore(),
+    feedback: {
+      message: ''
+    },
   }),
   mounted() {
   },
   methods: {
     closeDialog() {
       this.store.maintenanceDialog = false;
+    },
+    submitFeedback() {
+      // Handle the feedback submission here
+      console.log(this.feedback);
+      this.store.sendFeedback(this.feedback);
+      // this.store.feedbackDialog = false
     }
 
   },
@@ -134,5 +185,11 @@ export default {
   .title {
     font-weight: 500;
     font-size: 18px;
+  }
+
+  #feedback-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
   }
 </style>

@@ -19,7 +19,7 @@ if (store.auth_token) {
 }
 
 setTimeout(() => {
-  // store.maintenanceDialog = true;
+  store.maintenanceDialog = true;
 }, 1000);
 
 
