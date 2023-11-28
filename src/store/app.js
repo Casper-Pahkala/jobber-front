@@ -5,6 +5,7 @@ import moment from 'moment';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    allowed: true,
     feedbackDialog: false,
     maintenanceDialog: false,
     tab: null,

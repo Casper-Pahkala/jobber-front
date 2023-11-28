@@ -1,5 +1,27 @@
 <template>
-  <router-view />
+  <template v-if="store.allowed">
+    <router-view />
+  </template>
+
+  <template v-else>
+
+    <v-container id="main">
+      <v-card width="400px" class="pa-10" elevation="10">
+        <v-card-title>
+          Syötä salasana jatkaaksesi
+        </v-card-title>
+        <v-text-field
+          v-model="password"
+          label="Salasana"
+          type="password"
+          :error="passwordError"
+          @keyup.enter="checkPassword"
+        ></v-text-field>
+        <v-btn @click="checkPassword" color="primary" width="100%" height="50px">Jatka</v-btn>
+      </v-card>
+    </v-container>
+
+  </template>
 </template>
 
 <script setup>
@@ -22,8 +44,28 @@ setTimeout(() => {
   store.maintenanceDialog = true;
 }, 1000);
 
+const password = ref(null);
+const passwordError = ref(false);
+
+function checkPassword() {
+  if (password.value == 'cassu') {
+    store.allowed = true;
+  } else {
+    passwordError.value = true;
+  }
+}
 
 </script>
+
+<style scoped>
+  #main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
 
 <style>
 
