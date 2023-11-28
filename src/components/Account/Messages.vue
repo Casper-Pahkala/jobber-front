@@ -36,7 +36,7 @@
                 </div>
                 <div class="latest-message">
                   <div class="message">
-                    {{ message.message }}
+                    {{ latestMessage(message) }}
                   </div>
 
                   <v-icon
@@ -119,7 +119,15 @@ function toJobs() {
   router.push('/jobs');
 }
 
-
+function latestMessage(message) {
+  if (message.message.length > 0) {
+    return message.message;
+  } else if (store.getFileExtension(message.attachment_name) == 'pdf') {
+    return message.attachment_name;
+  } else {
+    return 'Kuva';
+  }
+}
 </script>
 <style scoped>
   .main-wrapper {

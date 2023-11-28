@@ -5,6 +5,7 @@ import moment from 'moment';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    maintenanceDialog: false,
     tab: null,
     url: window.url,
     baseUrl: window.baseUrl,
@@ -236,7 +237,7 @@ export const useAppStore = defineStore('app', {
                 this.allMessages.push(item);
               }
           });
-          resolve(data);
+          resolve(data.data);
         })
         .catch((error) => {
           reject(error);
