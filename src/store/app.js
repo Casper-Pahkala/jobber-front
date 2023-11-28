@@ -5,6 +5,7 @@ import moment from 'moment';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    maintenanceDialog: false,
     tab: null,
     url: window.url,
     baseUrl: window.baseUrl,
@@ -21,16 +22,27 @@ export const useAppStore = defineStore('app', {
     chatOpen: false,
     websocketStatus: 'Not connected',
     websocket: null,
-    currentMessages: [],
-    currentJobId: null,
-    currentChatUserId: null,
     redirect: null,
     jobParams: {
       page: 1,
       limit: 5,
       totalCount: 0
     },
-    updateMainComponent: 0
+    updateMainComponent: 0,
+    recentMessages: [],
+    allMessages: [],
+    preloadedUnseenMessageImages: [],
+    displayedJob: {
+      id: null,
+      userId: null
+    },
+    chat: {
+      jobId: null,
+      userId: null
+    },
+    addJobForm: {
+      images: [],
+    }
   }),
   actions: {
     connectToWebsocket() {
@@ -40,13 +52,13 @@ export const useAppStore = defineStore('app', {
         // OPEN 1 The connection is open and ready to communicate.
         // CLOSING 2 The connection is in the process of closing.
         // CLOSED 3 The connection is closed or couldn't be opened.
-
+      console.log('CONNECTING TO WS');
       if (this.websocket && this.websocket.readyState !== 3) {
         console.log('WebSocket connection is already open or in progress.');
         return;
       }
 
-      this.websocket = new WebSocket('ws://' + this.baseUrl + ':8000?token=' + this.auth_token);
+      this.websocket = new WebSocket('wss://' + this.baseUrl + ':8000?token=' + this.auth_token);
 
       this.websocket.addEventListener('open', () => {
         this.websocketStatus = 'Connected';
@@ -55,16 +67,16 @@ export const useAppStore = defineStore('app', {
 
       this.websocket.addEventListener('message', (event) => {
         let data = JSON.parse(event.data);
-        console.log('WS_MESSAGE', data);
+        console.log(data);
         if (data.action == 'CHAT_MESSAGE') {
-          let timeData = {
-            is_date_seperator: true,
-            time: 'Tänään'
-          };
-          if (moment(data.time).isSame(moment(), 'day') && !this.currentMessages.find(m => m.time === timeData.time)) {
-            this.currentMessages.push(timeData);
+          if (data.message.job_hashed_id === this.chat.jobId && data.message.received && this.chat.jobId && this.chat.userId && this.chat.userId === data.message.other_user_id) {
+            console.log('in chat to receive');
+            this.getMessages(this.chat.jobId, this.chat.userId);
+          } else {
+            this.allMessages.unshift(data.message);
           }
-          this.currentMessages.push(data);
+        } else if (data.action === 'CHAT_SEEN') {
+          this.getAllMessages();
         }
 
       });
@@ -99,7 +111,7 @@ export const useAppStore = defineStore('app', {
     },
     fetchJobs() {
       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + '/api/get-jobs.json', {
+        this.axios.get(this.url + '/api/jobs.json', {
           params: {
             page: this.jobParams.page,
             limit: this.jobParams.limit,
@@ -120,24 +132,12 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.loading = true;
         this.loadingBackground = true;
-        const formData = new FormData();
-        for (let i = 0; i < payload.images.length; i++) {
-          formData.append('image[]', payload.images[i]);
-        }
-        for (let key in payload) {
-          formData.append(key.toString(), payload[key]);
-        }
-        this.axios.post(this.url + '/api/add-job.json', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        }).then((response) => {
+        this.axios.post(this.url + '/api/add-job.json', payload).then((response) => {
           let data = response.data;
           this.loading = false;
           this.loadingBackground = false;
           if (data.status === 'success') {
             this.successToast('Työ lisätty onnistuneesti');
-            this.updateMainComponent++;
             resolve(data);
           } else {
             this.errorToast('Työn lisäyksessä tapahtui virhe');
@@ -218,6 +218,7 @@ export const useAppStore = defineStore('app', {
         this.axios.get(this.url + `/api/users.json`).then((response) => {
           let data = response.data;
           this.user = data.user;
+          this.user.profileImageUrl = `${this.url}/profile-image/${this.user.id}.jpg`;
           this.connectToWebsocket();
           resolve(response);
         })
@@ -226,10 +227,16 @@ export const useAppStore = defineStore('app', {
         })
       })
     },
-    getMessages(jobId, userId) {
+    getMessages(jobId = null, userId = null) {
       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + `/api/messages/${jobId}/${userId}.json`).then((response) => {
+        this.axios.get(this.url + `/api/messages/${jobId ?? ''}/${userId ?? ''}.json`).then((response) => {
           let data = response.data;
+          data.messages.forEach(item => {
+              let m = this.allMessages.find(m => m.id === item.id);
+              if (!m) {
+                this.allMessages.push(item);
+              }
+          });
           resolve(data);
         })
         .catch((error) => {
@@ -241,6 +248,16 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/users/my-messages.json`).then((response) => {
           let data = response.data;
+          this.recentMessages = data.messages.filter(m => m.seen == null);
+          let messages = data.messages;
+
+          messages.forEach(m => {
+            if (m.attachment_id && m.attachment_name && this.getFileExtension(m.attachment_name) !== 'pdf') {
+              m.attachment_url = '';
+              // this.getImageSrc(m.attachment_id, m);
+            }
+          })
+          this.allMessages = messages;
           resolve(data);
         })
         .catch((error) => {
@@ -261,24 +278,6 @@ export const useAppStore = defineStore('app', {
     },
     formatDate(date, format = 'DD.MM.YYYY') {
       return moment(date).format(format);
-    },
-    uploadImage(payload) {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append('image', payload.image);
-        formData.append('job_id', payload.job_id);
-        this.axios.post(this.url + `/api/jobs/upload-image.json`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        }).then((response) => {
-          let data = response.data;
-          resolve(data);
-        })
-        .catch((error) => {
-          reject(error);
-        })
-      })
     },
     uploadProfileImage(payload) {
       return new Promise((resolve, reject) => {
@@ -311,7 +310,6 @@ export const useAppStore = defineStore('app', {
       })
     },
     toggleFullscreen(element) {
-      console.log(element);
       if (document.fullscreenElement) {
         return document.exitFullscreen() // exit fullscreen on next click
       }
@@ -353,11 +351,7 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
-          this.auth_token = null;
-          this.user = null;
-
-          this.loading = false;
-          this.loadingBackground = false;
+          window.location.href = '/';
           resolve(data);
         })
         .catch((error) => {
@@ -366,6 +360,15 @@ export const useAppStore = defineStore('app', {
           reject(error);
         })
       })
+    },
+    preloadImage(url) {
+      const img = new Image();
+      img.src = url;
+    },
+    openChat(message) {
+      this.chat.jobId = message.job_hashed_id;
+      this.chat.userId = message.other_user_id;
+      this.chatOpen = true;
     },
     deleteListing(payload) {
       this.loading = true;
@@ -438,5 +441,297 @@ export const useAppStore = defineStore('app', {
         })
       })
     },
+    uploadImage(payload) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append('image', payload);
+
+        let self = this;
+
+        const index = self.addJobForm.images.length;
+
+        self.addJobForm.images.push({
+          progress: 0
+        });
+
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = (event.loaded / event.total) * 100;
+            console.log(`Upload Progress: ${progress.toFixed(2)}%`);
+
+            self.addJobForm.images[index].progress = progress.toFixed(2);
+          }
+        });
+
+        xhr.open('POST', `${this.url}/api/jobs/upload-image.json`, true);
+
+        const authToken = this.auth_token;
+        xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              resolve(data.data);
+            } catch (e) {
+              console.error('Error parsing response:', e);
+              reject(e);
+            }
+          }
+        };
+        xhr.send(formData);
+      })
+    },
+    sendAttachment(payload) {
+      return new Promise((resolve, reject) => {
+        this.loading = true;
+        this.loadingBackground = true;
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+
+        for (let key in payload) {
+          formData.append(key, payload[key]);
+        }
+
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = (event.loaded / event.total) * 100;
+            console.log(`Upload Progress: ${progress.toFixed(2)}%`);
+          }
+        });
+
+        xhr.open('POST', `${this.url}/api/messages/send-attachment.json`, true);
+
+        const authToken = this.auth_token;
+        xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState == 4) {
+            this.loading = false;
+            this.loadingBackground = false;
+
+            if (xhr.status == 200) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                console.log(data);
+
+                if (data.status !== 'success') {
+                  this.errorToast(data.message);
+                  reject();
+                  return;
+                }
+                resolve(data);
+              } catch (e) {
+                console.error('Error parsing response:', e);
+                this.errorToast('Error parsing response: ' + e.message);
+                reject(e);
+              }
+            } else {
+              const error = `Request failed with status: ${xhr.status}`;
+              console.error(error);
+              this.errorToast(error);
+              reject(new Error(error));
+            }
+          }
+        };
+
+        xhr.onerror = () => {
+          const error = 'Network error occurred during the request.';
+          console.error(error);
+          this.loading = false;
+          this.loadingBackground = false;
+          this.errorToast(error);
+          reject(new Error(error));
+        };
+
+
+        xhr.send(formData);
+      })
+    },
+    async downloadFile(id) {
+      try {
+        const response = await this.axios.get(this.url + `/api/attachment/${id}`, {
+          responseType: 'blob', // Important: Set response type as 'blob'
+        });
+
+        // Create a Blob from the PDF Stream
+        const file = new Blob(
+          [response.data],
+          { type: 'application/octet-stream' } // Set the correct MIME type
+        );
+
+        // Build a URL from the file
+        const fileURL = URL.createObjectURL(file);
+
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = fileURL;
+        console.log(response.headers);
+        link.setAttribute('download', response.headers['filename']);
+        document.body.appendChild(link);
+
+        // Programmatically click the link to trigger the download
+        link.click();
+
+        // Remove the link after downloading
+        document.body.removeChild(link);
+
+        // Release the created object URL
+        URL.revokeObjectURL(fileURL);
+      } catch (error) {
+        console.error('Error during file download:', error);
+      }
+    },
+    getFileExtension(fileName) {
+      if (fileName.includes('.') && fileName.lastIndexOf('.') !== 0) {
+          return fileName.substring(fileName.lastIndexOf('.') + 1);
+      } else {
+          return '';
+      }
+    },
+    async getImageSrc(attachmentId, message) {
+      try {
+        const response = await fetch(`${this.url}/api/attachment/${attachmentId}.${this.getFileExtension(message.attachment_name)}`, {
+          headers: {
+            'Authorization': 'Bearer ' + this.auth_token,
+          },
+        });
+        const blob = await response.blob();
+        // Create a File object from the blob
+        const file = new File([blob], message.attachment_name, { type: blob.type });
+        console.log(file);
+        // Use the File object to create the object URL
+        message.attachment_url = URL.createObjectURL(file);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+        message.attachment_url = '';
+      }
+    },
+    userInit() {
+      this.preloadImage(`${this.url}/profile-image/${this.user.id}.jpg`);
+    },
+    jobShortInfo(job) {
+      let description = '';
+      if (job.contract_type === 0) {
+        description += 'Keikkatyö';
+
+        if (job.salary) {
+          if (job.salary_type === 0) {
+            // description += ' - Tuntipalkka';
+            description += ' - ' + job.salary + '€/h';
+          } else {
+            // description += ' - Urakkapalkka';
+            description += ' - ' + job.salary + '€';
+          }
+        }
+      } else if (job.contract_type === 1) {
+        description += 'Vakituinen työsuhde';
+
+        if (job.salary) {
+          if (job.salary_type === 0) {
+            // description += ' - Tuntipalkka';
+            description += ' - ' + job.salary + '€/h';
+          } else {
+            // description += ' - Kuukausipalkka';
+            description += ' - ' + job.salary + '€/kk';
+          }
+        }
+      } else {
+        description += 'Toistaiseksi voimassa oleva';
+
+        if (job.salary) {
+          if (job.salary_type === 0) {
+            // description += ' - Tuntipalkka';
+            description += ' - ' + job.salary + '€/h';
+          } else {
+            // description += ' - Kuukausipalkka';
+            description += ' - ' + job.salary + '- €/kk';
+          }
+        }
+      }
+      return description;
+    }
+
+
   },
+  getters: {
+    latestMessages() {
+      let latestMessages = [];
+
+      let allMessages = this.allMessages;
+
+      allMessages.sort((a, b) => {
+        return moment(a.time).isAfter(b.time) ? -1 : 1;
+      });
+
+      allMessages.forEach(m => {
+        let addedMessage = latestMessages.find(mes => mes.job_hashed_id === m.job_hashed_id && mes.other_user_id === m.other_user_id);
+        if (!addedMessage) {
+          latestMessages.push(m);
+        }
+      });
+      latestMessages.sort((a, b) => {
+        return moment(a.time).isAfter(b.time) ? 1 : -1;
+      });
+      latestMessages.sort((x, y) => {
+        return (x === y)? 0 : x.deleted ? 1 : -1;
+      })
+      return latestMessages;
+    },
+    currentChatMessages() {
+      let currentMessages = this.allMessages.filter(m => m.job_hashed_id === this.chat.jobId && m.other_user_id === this.chat.userId);
+      currentMessages.sort((a, b) => {
+        return moment(a.time).isAfter(b.time) ? 1 : -1;
+      });
+      let usedDates = [];
+      let toUpdate = [];
+      currentMessages.forEach(m => {
+        if (m.attachment_id && m.attachment_name && !m.attachment_url) {
+          m.attachment_url = '';
+          this.getImageSrc(m.attachment_id, m);
+        }
+        let date = moment(m.time).format('YYYY-MM-DD');
+        if (!usedDates.includes(date)) {
+          let timeData = {
+            is_date_seperator: true,
+            time: moment(m.time).format('dddd DD.MM.YYYY')
+          };
+
+          if (moment(m.time).isSame(moment(), 'day')) {
+            timeData.time = 'Tänään';
+          } else if (moment(m.time).isSame(moment().clone().subtract(1, 'days'), 'day')) {
+            timeData.time = 'Eilen';
+          }
+
+          toUpdate.push({
+            afterId: m.id,
+            data: timeData
+          });
+
+          usedDates.push(date);
+        }
+      });
+
+      toUpdate.forEach(p => {
+        let index = currentMessages.findIndex(m => m.id === p.afterId);
+        currentMessages.splice(index, 0, p.data);
+      });
+      return currentMessages;
+    },
+    unseenMessages() {
+      return this.latestMessages.filter(m => !m.seen && m.received);
+    },
+    allUnseenMessages() {
+      let unseenMessages = this.allMessages.filter(m => !m.seen && m.received)
+
+      unseenMessages.forEach(m => {
+        if (!this.preloadedUnseenMessageImages.includes(m.other_user_id)) {
+          this.preloadedUnseenMessageImages.push(m.other_user_id);
+          this.preloadImage(`${this.url}/profile-image/${m.other_user_id}.jpg`)
+        }
+      })
+      return unseenMessages;
+    }
+  }
 })

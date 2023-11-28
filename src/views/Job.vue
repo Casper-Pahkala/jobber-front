@@ -38,7 +38,7 @@
             class="carousel mt-2"
           >
             <v-img
-              v-for="(a, index) in job.pictures"
+              v-for="(a, index) in job.job_images"
               :key="index"
               :src="imageUrl(index)"
               :lazy-src="imageUrl(index, true)"
@@ -67,28 +67,34 @@
             {{ job.title }}
           </h1>
           <v-divider></v-divider>
+          <div class="job-info">
+            <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
+          </div>
+          <div class="job-info" v-if="job.area">
+            <v-icon icon="mdi-map-marker"></v-icon>
+            {{ job.area }}
+          </div>
+          <div class="job-info" v-if="job.date">
+              <v-icon icon="mdi-calendar-range"></v-icon>
+              {{ store.formatDate(job.date) }}
+          </div>
+          <div class="job-info" v-if="job.hours" >
+              <v-icon icon="mdi-timer-outline"></v-icon>
+              {{ job.hours }}h
+              {{ job.contract_type === 1 || job.contract_type === 2 ? '/ viikko' : '' }}
+          </div>
+          <div class="job-info" v-if="job.salary">
+              <v-icon icon="mdi-cash"></v-icon>
+              {{ jobSalary() }}
+          </div>
+          <v-divider class="mt-5"></v-divider>
           <p id="job-description">
             {{ job.description }}
           </p>
-          <v-divider></v-divider>
-          <div class="job-info">
-            <v-icon icon="mdi-map-marker"></v-icon>
-            {{ job.address }}
-          </div>
-          <div class="job-info">
-            <v-icon icon="mdi-calendar-range"></v-icon>
-            {{ store.formatDate(job.date) }}
-          </div>
-          <div class="job-info">
-            <v-icon icon="mdi-timer-outline"></v-icon>
-            {{ job.estimated_time }}h
-          </div>
-          <div class="job-info">
-            <v-icon icon="mdi-cash"></v-icon>
-            {{ job.full_salary }}€
-          </div>
         </v-container>
+
         <v-divider class="mt-5 mb-5"></v-divider>
+
         <div v-if="!isMyJob">
           <v-container>
             <div class="job-info">
@@ -144,15 +150,14 @@ const isMyJob = computed(() => {
 });
 
 const imageIndex = ref(0);
+store.displayedJob.id = route.params.id;
 
-store.currentJobId = route.params.id;
-
-store.fetchJob(store.currentJobId).then((response) => {
+store.fetchJob(store.displayedJob.id).then((response) => {
   let data = response.data;
   if (!data.error) {
     job.value = data.job;
     jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
-    store.currentChatUserId = data.job.user.hashed_id;
+    store.displayedJob.userId = data.job.user.hashed_id;
   }
   store.loading = false;
 })
@@ -172,13 +177,17 @@ function toJobs() {
 window.scrollTo(0, 0);
 
 function contact() {
+  store.chat.jobId = store.displayedJob.id;
+  store.chat.userId = store.displayedJob.userId;
   // router.push({ path: '/chat/' + route.params.id });
   store.chatOpen = true;
+
+
 }
 
 function imageUrl(index = 0, lazy = false) {
-  if (job.value.pictures && job.value.pictures > 0) {
-    return store.url + '/job-image/' + job.value.hashed_id + '/image_' + index +(lazy ? '_low' : '');
+  if (job.value.job_images && job.value.job_images.length > 0) {
+    return store.url + '/job-image/' + job.value.job_images[index].name;
 
   } else {
     return store.url + '/no-img.png';
@@ -191,6 +200,40 @@ function toggleFullscreen() {
 
 function selectItem(index) {
   carousel.value.selectItem(index);
+}
+
+function contractType() {
+  console.log(job.value);
+  if (job.value.contract_type === 0) {
+    return 'Keikka työ';
+  } else if (job.value.contract_type === 1) {
+    return 'Vakituinen työsopimus';
+  } else {
+    return 'Toistaiseksi voimassa oleva työsopimus';
+  }
+}
+
+function jobSalary() {
+  let j = job.value;
+
+  if (j.salary) {
+    let prefix = '';
+    if (j.contract_type === 0) {
+      if (j.salary_type === 0) {
+        prefix = '€/h';
+      } else {
+        prefix = '€';
+      }
+    } else {
+      if (j.salary_type === 0) {
+        prefix = '€/h';
+      } else {
+        prefix = '€/kk';
+      }
+    }
+    return j.salary + ' ' + prefix;
+  }
+  return 'Sopimuksen mukaan';
 }
 
 </script>
@@ -283,4 +326,9 @@ function selectItem(index) {
 .delimiter-image:hover {
   opacity: 1;
 }
+</style>
+<style>
+  .job-info .v-icon {
+    width: 40px;
+  }
 </style>

@@ -49,27 +49,48 @@ const routes = [
         name: 'account',
         component: () => import('@/views/Account.vue'),
       },
-    ],
-  },
-  {
-    path: '/messages',
-    component: () => import('@/layouts/default/Default.vue'),
-    children: [
       {
-        path: '',
+        path: 'messages',
         name: 'messages',
-        component: () => import('@/views/Messages.vue'),
+        component: () => import('@/views/Account.vue'),
+      },
+      {
+        path: 'listings',
+        name: 'listings',
+        component: () => import('@/views/Account.vue'),
       },
     ],
   },
+  // {
+  //   path: '/messages',
+  //   component: () => import('@/layouts/default/Default.vue'),
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'messages',
+  //       component: () => import('@/views/Messages.vue'),
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: '/my-listings',
+  //   component: () => import('@/layouts/default/Default.vue'),
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'my-listings',
+  //       component: () => import('@/views/MyListings.vue'),
+  //     },
+  //   ],
+  // },
   {
-    path: '/my-listings',
+    path: '/add-job',
     component: () => import('@/layouts/default/Default.vue'),
     children: [
       {
         path: '',
-        name: 'my-listings',
-        component: () => import('@/views/MyListings.vue'),
+        name: 'add-job',
+        component: () => import('@/views/AddJob.vue'),
       },
     ],
   },

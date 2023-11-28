@@ -14,8 +14,13 @@ store.initializeAxios();
 store.auth_token = window.auth_token;
 if (store.auth_token) {
   store.getUser().then((response) => {
+    store.userInit();
   })
 }
+
+setTimeout(() => {
+  // store.maintenanceDialog = true;
+}, 1000);
 
 
 </script>
@@ -30,5 +35,10 @@ body, html {
   position: absolute !important;
   top: 5px;
   right: 5px;
+}
+
+.cursor-default {
+  cursor: default;
+  pointer-events: all;
 }
 </style>

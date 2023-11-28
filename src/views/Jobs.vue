@@ -7,7 +7,6 @@
           justify="center"
         >
           <v-col
-            cols="8"
           >
 
           <v-text-field
@@ -27,32 +26,28 @@
           </v-text-field>
 
           </v-col>
-          <v-col
-            cols="4"
-          >
-          <v-btn
-            color="primary"
-            @click="showAddJob = true"
-            class="col-4 add-button"
-            v-if="store.user"
-            prepend-icon="mdi-plus"
-          >
-            Lisää työ
-          </v-btn>
-          </v-col>
         </v-row>
       </div>
-      <div v-if="loading" class="loading-container">
-        <span class="loader"></span>
-      </div>
+      <div class="loading-container" v-if="loading || error">
+        <span v-if="loading" class="loader"></span>
 
+        <div v-if="!loading && error" class="error-container">
+          <span>Töiden haussa tapahtui virhe</span>
+          <v-btn
+            prepend-icon="mdi-refresh"
+            @click="getJobs()"
+          >
+            Päivitä työt
+          </v-btn>
+        </div>
+      </div>
       <div id="jobs-container">
         <template v-for="job in jobs" :key="job.id">
           <v-hover v-slot="{ isHovering, props }">
             <v-card
               @click="handleJobClick(job)"
               class="job"
-              :elevation="isHovering ? 8 : 4"
+              :elevation="isHovering ? 6 : 3"
               v-bind="props"
             >
               <v-img
@@ -77,14 +72,14 @@
               <div class="job-content">
                   <div class="job-main">
                       <div class="job-title">{{ job.title }}</div>
-                      <div class="job-description">{{ job.description }}</div>
+                      <div class="job-description">{{ store.jobShortInfo(job) }}</div>
                   </div>
 
                   <div class="job-info">
-                    <div class="job-info-item">{{ job.date ? store.formatDate(job.date) : '' }}</div>
-                    <div class="job-info-item">{{ job.address }}</div>
-                    <div class="job-info-item">{{ job.estimated_time ? job.estimated_time + 'h' : '' }}</div>
-                    <div class="job-info-item">{{ job.full_salary ? job.full_salary + '€' : '' }}</div>
+                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                    <div class="job-info-item">{{ job.area }}</div>
+                    <!-- <div class="job-info-item">{{ job.estimated_time ? job.estimated_time + 'h' : '' }}</div>
+                    <div class="job-info-item">{{ job.full_salary ? job.full_salary + '€' : '' }}</div> -->
                   </div>
               </div>
             </v-card >
@@ -122,6 +117,8 @@ const route = useRoute();
 const query = route.query;
 const store = useAppStore();
 const loading = ref(false);
+const error = ref(false);
+
 loading.value = true;
 
 store.jobParams.page = query.p ?? 1;
@@ -142,21 +139,15 @@ const params = computed(() => {
 })
 router.push({ query: params.value });
 
-store.fetchJobs().then((response) => {
-  let data = response.data;
-  if (!data.error) {
-    jobs.value = data.jobs;
-  }
-  loading.value = false;
-})
+
 
 function handleJobClick(job) {
   router.push('/jobs/' + job.hashed_id);
 }
 
 function imageUrl(job, lazy) {
-  if (job.pictures && job.pictures > 0) {
-    return store.url + '/job-image/' + job.hashed_id + '/image_0' +(lazy ? '_low' : '');
+  if (job.job_images && job.job_images.length > 0) {
+    return store.url + '/job-image/' + job.job_images[0].name;
   } else {
     return store.url + '/no-img.png'
   }
@@ -191,6 +182,25 @@ function firstItem() {
 function lastItem() {
   return store.jobParams.page * store.jobParams.limit;
 }
+
+function getJobs() {
+  error.value = false;
+  loading.value = true;
+  store.fetchJobs().then((response) => {
+    let data = response.data;
+    if (!data.error) {
+      jobs.value = data.jobs;
+    }
+    loading.value = false;
+  }).catch(() => {
+    store.errorToast('Töiden haussa tapahtui virhe');
+    loading.value = false;
+    error.value = true;
+  })
+}
+
+getJobs();
+
 </script>
 
 <style scoped>
@@ -225,20 +235,20 @@ function lastItem() {
     border-radius: 6px;
     width: 100%;
     max-width: 1000px;
-    height: 180px;
+    height: 80px;
     display: flex;
     position: relative;
     margin: 10px;
   }
   .job-image {
-      width: 180px;
-      height: 180px;
+      width: 80px;
+      height: 80px;
       object-fit: cover;
       /* border-radius: 6px; */
   }
   .job-title {
       font-weight: 600;
-      font-size: 24px;
+      font-size: 20px;
   }
   .job-main {
       width: 70%;
@@ -249,7 +259,7 @@ function lastItem() {
       padding: 5px;
       padding-right: 10px;
       padding-left: 20px;
-      width: calc(100% - 150px);
+      width: calc(100% - 50px);
   }
   .job-info {
       width: 30%;
@@ -265,6 +275,7 @@ function lastItem() {
   }
   .job-info-item {
     direction: rtl;
+    font-size: 14px;
   }
 
   .dark-background {
@@ -298,6 +309,14 @@ function lastItem() {
   align-items: center;
   width: 100%;
   height: 70vh;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .search-btn {

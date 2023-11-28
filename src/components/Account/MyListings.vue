@@ -1,6 +1,4 @@
 <template>
-  <div class="main-wrapper">
-      <div class="main-content">
         <div id="jobs-container" v-if="myListings.length != 0 && store.user && !loading">
           <v-chip-group
             mandatory
@@ -47,14 +45,11 @@
               <div class="job-content">
                   <div class="job-main">
                       <div class="job-title">{{ listing.title }}</div>
-                      <div class="job-description">{{ listing.description }}</div>
+                      <div class="job-description">{{ store.jobShortInfo(listing) }}</div>
                   </div>
 
                   <div class="job-info">
-                    <div class="job-info-item">{{ store.formatDate(listing.date) }}</div>
-                    <div class="job-info-item">{{ listing.address }}</div>
-                    <div class="job-info-item">{{ listing.estimated_time }}h</div>
-                    <div class="job-info-item">{{ listing.full_salary }}€</div>
+                    <div class="job-info-item">Julkaistu {{ store.formatDate(listing.created_at) }}</div>
                   </div>
               </div>
 
@@ -75,12 +70,12 @@
                   </template>
 
                   <v-list>
-                    <v-list-item
+                    <!-- <v-list-item
                     title="Muokkaa"
                     class="menu-action-btn"
                     @click="editListing(listing)"
                     >
-                    </v-list-item>
+                    </v-list-item> -->
 
                     <v-list-item
                         @click="deleteListing(listing)"
@@ -122,8 +117,6 @@
           Kirjaudu
         </v-btn>
       </div>
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -167,8 +160,8 @@ function toJobs() {
 }
 
 function imageUrl(job, lazy) {
-  if (job.pictures && job.pictures > 0) {
-    return store.url + '/job-image/' + job.hashed_id + '/image_0' +(lazy ? '_low' : '');
+  if (job.job_images && job.job_images.length > 0) {
+    return store.url + '/job-image/' + job.job_images[0].name;
   } else {
     return store.url + '/no-img.png'
   }
@@ -207,12 +200,12 @@ function deleteListing(listing) {
   right: 5px;
 }
 #jobs-container {
-    margin-top: 60px;
+    /* margin-top: 60px; */
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-bottom: 100px;
-    width: 1000px;
+    /* width: 1000px; */
   }
   .top-layout {
     margin-top: 60px;
@@ -231,14 +224,14 @@ function deleteListing(listing) {
     cursor: default;
     border-radius: 6px;
     width: 100%;
-    height: 180px;
+    height: 120px;
     display: flex;
     position: relative;
     margin: 10px;
   }
   .job-image {
-      width: 180px;
-      height: 180px;
+      width: 120px;
+      height: 120px;
       object-fit: cover;
       /* border-radius: 6px; */
   }
@@ -255,7 +248,7 @@ function deleteListing(listing) {
       padding: 5px;
       padding-right: 10px;
       padding-left: 20px;
-      width: calc(100% - 150px);
+      width: calc(100% - 90px);
   }
   .job-info {
       width: 30%;

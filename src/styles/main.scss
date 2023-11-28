@@ -1,0 +1,32 @@
+.profile-tabs {
+    .v-tab__slider {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: none !important;
+        border-top: 2px solid #acacac;
+        border-right: 2px solid #acacac;
+        border-left: 2px solid #acacac;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        z-index: 10;
+        box-sizing: border-box;
+        height: 100%;
+    }
+
+    .v-tab__slider::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0%;
+        height: 2px;
+        background: #ffffff;
+        width: 100%;
+        z-index: 0;
+    }
+
+    .v-ripple__container {
+        z-index: 10;
+    }
+}

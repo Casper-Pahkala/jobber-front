@@ -1,17 +1,15 @@
 <template>
-  <div class="main-wrapper">
-      <div class="main-content">
         <v-container v-if="messages.length > 0">
           <v-card
             v-for="(message, index) in messages"
             :key="index"
-            @click="openChat(message)"
+            @click="store.openChat(message)"
             class="message-container"
-            elevation="10"
+            elevation="4"
           >
             <div class="message-wrapper">
               <v-img
-                :src="`${store.url}/job-image/${message.job_hashed_id}/image_0`"
+                :src="`${store.url}/profile-image/${message.other_user_id}.jpg`"
                 cover
                 class="job-image"
               >
@@ -38,14 +36,13 @@
                 </div>
                 <div class="latest-message">
                   <div class="message">
-                    {{ message.message }}
+                    {{ latestMessage(message) }}
                   </div>
 
                   <v-icon
                     icon="mdi-circle"
                     size="6"
                   >
-
                   </v-icon>
 
                   {{ timeFromDate(message.time) }}
@@ -81,26 +78,24 @@
             Kirjaudu
           </v-btn>
         </div>
-      </div>
-  </div>
 </template>
 
 <script setup>
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import moment from 'moment';
 
 window.scrollTo(0, 0);
 const router = useRouter();
 const store = useAppStore();
-const messages = ref([]);
+const messages = computed(() => {
+  return store.latestMessages;
+});
 const loading = ref(false);
 loading.value = true;
-
 if (store.user) {
-  store.getAllMessages().then((response) => {
-    messages.value = response.messages;
+  store.getMessages().then(() => {
     loading.value = false;
   })
 } else {
@@ -108,12 +103,6 @@ if (store.user) {
   // store.tab = '';
   // store.redirect = { url: 'messages', tab: 'messages'};
   store.loginDialogShowing = true;
-}
-
-function openChat(message) {
-  store.currentJobId = message.job_hashed_id;
-  store.currentChatUserId = message.other_user_id;
-  store.chatOpen = true;
 }
 
 function timeFromDate (date) {
@@ -128,6 +117,16 @@ function timeFromDate (date) {
 function toJobs() {
   store.tab = 'jobs';
   router.push('/jobs');
+}
+
+function latestMessage(message) {
+  if (message.message.length > 0) {
+    return message.message;
+  } else if (store.getFileExtension(message.attachment_name) == 'pdf') {
+    return message.attachment_name;
+  } else {
+    return 'Kuva';
+  }
 }
 </script>
 <style scoped>
