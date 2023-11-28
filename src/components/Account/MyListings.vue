@@ -45,14 +45,11 @@
               <div class="job-content">
                   <div class="job-main">
                       <div class="job-title">{{ listing.title }}</div>
-                      <div class="job-description">{{ listing.description }}</div>
+                      <div class="job-description">{{ store.jobShortInfo(listing) }}</div>
                   </div>
 
                   <div class="job-info">
-                    <div class="job-info-item">{{ store.formatDate(listing.date) }}</div>
-                    <div class="job-info-item">{{ listing.address }}</div>
-                    <div class="job-info-item">{{ listing.estimated_time }}h</div>
-                    <div class="job-info-item">{{ listing.full_salary }}€</div>
+                    <div class="job-info-item">Julkaistu {{ store.formatDate(listing.created_at) }}</div>
                   </div>
               </div>
 
@@ -73,12 +70,12 @@
                   </template>
 
                   <v-list>
-                    <v-list-item
+                    <!-- <v-list-item
                     title="Muokkaa"
                     class="menu-action-btn"
                     @click="editListing(listing)"
                     >
-                    </v-list-item>
+                    </v-list-item> -->
 
                     <v-list-item
                         @click="deleteListing(listing)"
@@ -227,14 +224,14 @@ function deleteListing(listing) {
     cursor: default;
     border-radius: 6px;
     width: 100%;
-    height: 180px;
+    height: 120px;
     display: flex;
     position: relative;
     margin: 10px;
   }
   .job-image {
-      width: 180px;
-      height: 180px;
+      width: 120px;
+      height: 120px;
       object-fit: cover;
       /* border-radius: 6px; */
   }
@@ -251,7 +248,7 @@ function deleteListing(listing) {
       padding: 5px;
       padding-right: 10px;
       padding-left: 20px;
-      width: calc(100% - 150px);
+      width: calc(100% - 90px);
   }
   .job-info {
       width: 30%;

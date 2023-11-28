@@ -237,7 +237,7 @@ export const useAppStore = defineStore('app', {
                 this.allMessages.push(item);
               }
           });
-          resolve(data.data);
+          resolve(data);
         })
         .catch((error) => {
           reject(error);

@@ -515,6 +515,7 @@ function editName() {
     border-radius: 50%;
     flex: none;
     cursor: pointer;
+    border: 2px solid #ccc;
   }
 
   .profile-image.empty {
