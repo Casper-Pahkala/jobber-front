@@ -5,6 +5,7 @@ import moment from 'moment';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    maintenanceDialog: false,
     tab: null,
     url: window.url,
     baseUrl: window.baseUrl,
@@ -234,7 +235,7 @@ export const useAppStore = defineStore('app', {
           data.data.forEach(job => {
             job.users.forEach(user => {
               user.messages.forEach(m => {
-                item.seen = true;
+                m.seen = true;
                 let message = this.allMessages.find(_m => _m.id === m.id);
                 if (!message) {
                   this.allMessages.push(m);
@@ -244,7 +245,7 @@ export const useAppStore = defineStore('app', {
               })
             })
           });
-          resolve(data);
+          resolve(data.data);
         })
         .catch((error) => {
           reject(error);

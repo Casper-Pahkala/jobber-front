@@ -18,6 +18,10 @@ if (store.auth_token) {
   })
 }
 
+setTimeout(() => {
+  // store.maintenanceDialog = true;
+}, 1000);
+
 
 </script>
 

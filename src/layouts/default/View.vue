@@ -55,6 +55,20 @@
       </div>
     </v-footer>
   </v-main>
+
+  <v-dialog v-model="dialog" width="400px" persistent>
+    <v-card>
+      <v-card-title class="headline">Sivusto Kehityksessä</v-card-title>
+      <v-card-text>
+        Tervetuloa rekrytor.fi-sivustolle! Huomioithan, että sivusto on parhaillaan kehitysvaiheessa.
+        Kaikki data on väliaikaista ja suojaamatonta. Jatkamalla hyväksyt nämä ehdot.
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="green darken-1" text @click="closeDialog()">Hyväksy</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -66,14 +80,20 @@ export default {
       'mdi-twitter',
       'mdi-instagram',
     ],
+    store: useAppStore()
   }),
   mounted() {
-    const store = useAppStore();
-    if (store.user) {
-    }
   },
   methods: {
+    closeDialog() {
+      this.store.maintenanceDialog = false;
+    }
 
+  },
+  computed: {
+    dialog () {
+      return this.store.maintenanceDialog
+    }
   }
 
 }
