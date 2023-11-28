@@ -67,7 +67,7 @@
             {{ job.title }}
           </h1>
           <v-divider></v-divider>
-          <div class="job-info">
+          <div class="job-info" v-if="job">
             <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
           </div>
           <div class="job-info" v-if="job.area">
@@ -95,18 +95,28 @@
 
         <v-divider class="mt-5 mb-5"></v-divider>
 
-        <div v-if="!isMyJob">
+        <div>
           <v-container>
             <div class="job-info">
               <v-icon icon="mdi-account"></v-icon>
               {{ jobUserFullName }}
             </div>
             <v-btn
+              v-if="!isMyJob"
               class="mt-4"
               color="primary"
               @click="contact()"
             >
               Ota yhteyttä
+            </v-btn>
+
+            <v-btn
+              v-else
+              class="mt-4"
+              color="red"
+              @click="deleteListing()"
+            >
+              Poista listaus
             </v-btn>
           </v-container>
           <v-divider class="mt-5 mb-5"></v-divider>
@@ -236,6 +246,18 @@ function jobSalary() {
   return 'Sopimuksen mukaan';
 }
 
+function deleteListing() {
+  let confirm = window.confirm('Haluatko varmasti poistaa listauksen ' + job.value.title + '?');
+
+  if (confirm) {
+    const payload = {
+      job_id: job.value.hashed_id
+    };
+    store.deleteListing(payload).then(res => {
+      job.value.is_deleted = true;
+    })
+  }
+}
 </script>
 <style scoped>
   .main-wrapper {
@@ -252,7 +274,7 @@ function jobSalary() {
   }
 
   #job-title {
-    padding: 20px 0;
+    padding: 0 0 10px;
   }
   .job-info {
     padding: 20px 0 0 0;

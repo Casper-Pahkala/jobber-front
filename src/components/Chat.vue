@@ -9,7 +9,22 @@
       >
         <div class="chat">
           <div class="contact bar">
-            <v-img
+
+            <template v-if="loading">
+              <v-skeleton-loader
+                class="profile-image"
+                type="image"
+              >
+
+              </v-skeleton-loader>
+
+              <v-skeleton-loader
+                type="list-item-two-line"
+              ></v-skeleton-loader>
+            </template>
+
+            <template v-else>
+              <v-img
                 :src="jobUser && jobUser.has_profile_image ? `${store.url}/profile-image/${jobUser.id}` : `${store.url}/no-profile-img.png`"
                 cover
                 class="profile-image"
@@ -27,16 +42,14 @@
                     ></v-progress-circular>
                   </v-row>
                 </template>
-            </v-img>
+              </v-img>
 
-            <div>
-              <div class="name">
-                {{ jobUserFullName }}
+              <div>
+                <div class="name">
+                  {{ jobUserFullName }}
+                </div>
               </div>
-              <!-- <div class="seen">
-                {{ '11:41' }}
-              </div> -->
-            </div>
+            </template>
 
           </div>
           <div class="messages" id="messages" ref="chatContainer">
@@ -113,49 +126,64 @@
 
             <v-hover v-slot="{ isHovering, props }">
               <v-card
-                v-if="job"
                 class="job-container"
                 :elevation="isHovering && !job.is_deleted ? 8 : 6"
                 color="grey-lighten-3"
                 v-bind="props"
                 @click="openJob()"
-                :disabled="job.is_deleted"
+                :disabled="!job || job.is_deleted || loading"
               >
+
                 <v-card-item>
                   <div class="job-container">
-                    <v-img
-                      :src="`${store.url}/job-image/${job.job_images[0].name}`"
-                      cover
-                      class="job-image"
-                    >
-                      <template v-slot:placeholder>
-                        <v-row
-                          class="fill-height ma-0 cursor-default"
-                          align="center"
-                          justify="center"
-                        >
-                          <v-progress-circular
-                            indeterminate
-                            color="grey-lighten-5"
-                          ></v-progress-circular>
-                        </v-row>
-                      </template>
-                    </v-img>
+                    <template v-if="loading">
+                      <v-skeleton-loader
+                        type="image"
+                        class="job-image"
+                      >
+                      </v-skeleton-loader>
 
-                    <div class="job-content">
-                      <div class="job-main">
-                        <div class="job-title">
-                          {{ job.title }}
+                      <v-skeleton-loader
+                        class="job-content"
+                        type="list-item-two-line"
+                      ></v-skeleton-loader>
+                    </template>
+
+                    <template v-else>
+                      <v-img
+                        :src="`${store.url}/job-image/${job.job_images[0].name}`"
+                        cover
+                        class="job-image"
+                      >
+                        <template v-slot:placeholder>
+                          <v-row
+                            class="fill-height ma-0 cursor-default"
+                            align="center"
+                            justify="center"
+                          >
+                            <v-progress-circular
+                              indeterminate
+                              color="grey-lighten-5"
+                            ></v-progress-circular>
+                          </v-row>
+                        </template>
+                      </v-img>
+
+                      <div class="job-content">
+                        <div class="job-main">
+                          <div class="job-title">
+                            {{ job.title }}
+                          </div>
+                          <div>
+                            {{ store.jobShortInfo(job) }}
+                          </div>
                         </div>
-                        <div>
-                          {{ store.jobShortInfo(job) }}
+
+                        <div class="job-info">
+                          <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at) }}</div>
                         </div>
                       </div>
-
-                      <div class="job-info">
-                        <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at) }}</div>
-                      </div>
-                    </div>
+                    </template>
 
                   </div>
                 </v-card-item>
@@ -308,6 +336,8 @@ const fileInput = ref(null);
 const showLargeImageDialog = ref(false);
 const largeImageUrl = ref(null);
 
+const loading = ref(true);
+
 const jobId = computed(() => {
   return store.chat.jobId
 });
@@ -355,10 +385,12 @@ watch(messages, async (newVal, oldVal) => {
 }, { deep: true });
 
 function init() {
+  loading.value = true;
   store.getMessages(jobId.value, chatUserId.value).then((response) => {
     jobUserFullName.value = response.user.name;
     jobUser.value = response.user;
     job.value = response.job;
+    loading.value = false;
     scrollToBottom();
   })
 }
@@ -589,6 +621,8 @@ body, html {
   border-radius: 50%;
   max-width: none;
   max-height: none;
+  overflow: hidden;
+  border: 1px solid #ccc;
 }
 .contact {
   position: relative;
@@ -895,7 +929,8 @@ body, html {
 .job-image {
   /* height: 100%; */
   width: 70px;
-  flex: auto !important;
+  overflow: hidden;
+  flex: none !important;
 }
 
 .job-container {

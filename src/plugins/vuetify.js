@@ -10,7 +10,6 @@ import 'vuetify/styles'
 
 // Composables
 import { createVuetify } from 'vuetify'
-import { VDatePicker } from 'vuetify/labs/VDatePicker'
 import DateFnsAdapter from '@date-io/date-fns'
 import enUS from 'date-fns/locale/en-US'
 import fi from 'date-fns/locale/fi'
@@ -32,8 +31,5 @@ export default createVuetify({
       en: enUS,
       fi: fi,
     },
-  },
-  components: {
-    VDatePicker,
   },
 })

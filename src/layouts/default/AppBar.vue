@@ -291,17 +291,17 @@ const accountItems = [
   {
     title: 'Tili',
     onClick: () => changeTab('profile'),
-    // icon: 'mdi-account'
+    icon: 'mdi-account'
   },
   {
     title: 'Viestit',
     onClick: () => changeTab('messages'),
-    // icon: 'mdi-message-text'
+    icon: 'mdi-message-text'
   },
   {
     title: 'Omat listaukset',
     onClick: () => changeTab('listings'),
-    // icon: 'mdi-clipboard-account'
+    icon: 'mdi-clipboard-account'
   },
   {
     title: 'Kirjaudu ulos',

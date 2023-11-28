@@ -27,7 +27,9 @@ export const useAppStore = defineStore('app', {
     jobParams: {
       page: 1,
       limit: 5,
-      totalCount: 0
+      totalCount: 0,
+      term: '',
+      contract_types: [ 0, 1, 2 ]
     },
     updateMainComponent: 0,
     recentMessages: [],
@@ -113,10 +115,7 @@ export const useAppStore = defineStore('app', {
     fetchJobs() {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + '/api/jobs.json', {
-          params: {
-            page: this.jobParams.page,
-            limit: this.jobParams.limit,
-          }
+          params: this.jobParams
         }).then((response) => {
           let data = response.data;
           this.jobParams.page = parseInt(data.page);
