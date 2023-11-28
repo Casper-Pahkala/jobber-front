@@ -70,41 +70,22 @@
           <div class="job-info">
             <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
           </div>
-          <div class="job-info">
+          <div class="job-info" v-if="job.area">
             <v-icon icon="mdi-map-marker"></v-icon>
-            <template  v-if="job.area">
-              {{ job.area }}
-            </template>
-            <template v-else>
-              Ei tiedossa
-            </template>
+            {{ job.area }}
           </div>
-          <div class="job-info" >
-            <v-icon icon="mdi-calendar-range"></v-icon>
-            <template v-if="job.date">
+          <div class="job-info" v-if="job.date">
+              <v-icon icon="mdi-calendar-range"></v-icon>
               {{ store.formatDate(job.date) }}
-            </template>
-
-            <template v-else>
-              Sopimuksen mukaan
-            </template>
           </div>
-          <div class="job-info">
-            <v-icon icon="mdi-timer-outline"></v-icon>
-            <template v-if="job.hours" >
+          <div class="job-info" v-if="job.hours" >
+              <v-icon icon="mdi-timer-outline"></v-icon>
               {{ job.hours }}h
               {{ job.contract_type === 1 || job.contract_type === 2 ? '/ viikko' : '' }}
-            </template>
-            <template v-else>
-              Sopimuksen mukaan
-            </template>
           </div>
-          <div class="job-info">
-            <v-icon icon="mdi-cash"></v-icon>
-            <template v-if="job.salary">{{ jobSalary() }}</template>
-            <template v-else>
-              Sopimuksen mukaan
-            </template>
+          <div class="job-info" v-if="job.salary">
+              <v-icon icon="mdi-cash"></v-icon>
+              {{ jobSalary() }}
           </div>
           <v-divider class="mt-5"></v-divider>
           <p id="job-description">

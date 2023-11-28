@@ -227,23 +227,15 @@ export const useAppStore = defineStore('app', {
         })
       })
     },
-    getMessages(jobId, userId) {
+    getMessages(jobId = null, userId = null) {
       return new Promise((resolve, reject) => {
-        this.axios.get(this.url + `/api/messages/${jobId}/${userId}.json`).then((response) => {
+        this.axios.get(this.url + `/api/messages/${jobId ?? ''}/${userId ?? ''}.json`).then((response) => {
           let data = response.data;
-
-          data.data.forEach(job => {
-            job.users.forEach(user => {
-              user.messages.forEach(m => {
-                m.seen = true;
-                let message = this.allMessages.find(_m => _m.id === m.id);
-                if (!message) {
-                  this.allMessages.push(m);
-                } else {
-                  message.seen = true;
-                }
-              })
-            })
+          data.messages.forEach(item => {
+              let m = this.allMessages.find(m => m.id === item.id);
+              if (!m) {
+                this.allMessages.push(item);
+              }
           });
           resolve(data.data);
         })
@@ -615,13 +607,65 @@ export const useAppStore = defineStore('app', {
         console.error('Error fetching image:', error);
         message.attachment_url = '';
       }
+    },
+    userInit() {
+      this.preloadImage(`${this.url}/profile-image/${this.user.id}.jpg`);
+    },
+    jobShortInfo(job) {
+      let description = '';
+      if (job.contract_type === 0) {
+        description += 'Keikkatyö';
+
+        if (job.salary) {
+          if (job.salary_type === 0) {
+            // description += ' - Tuntipalkka';
+            description += ' - ' + job.salary + '€/h';
+          } else {
+            // description += ' - Urakkapalkka';
+            description += ' - ' + job.salary + '€';
+          }
+        }
+      } else if (job.contract_type === 1) {
+        description += 'Vakituinen työsuhde';
+
+        if (job.salary) {
+          if (job.salary_type === 0) {
+            // description += ' - Tuntipalkka';
+            description += ' - ' + job.salary + '€/h';
+          } else {
+            // description += ' - Kuukausipalkka';
+            description += ' - ' + job.salary + '€/kk';
+          }
+        }
+      } else {
+        description += 'Toistaiseksi voimassa oleva';
+
+        if (job.salary) {
+          if (job.salary_type === 0) {
+            // description += ' - Tuntipalkka';
+            description += ' - ' + job.salary + '€/h';
+          } else {
+            // description += ' - Kuukausipalkka';
+            description += ' - ' + job.salary + '- €/kk';
+          }
+        }
+      }
+      return description;
     }
+
 
   },
   getters: {
     latestMessages() {
       let latestMessages = [];
-      this.allMessages.forEach(m => {
+
+      let allMessages = this.allMessages;
+
+      allMessages.sort((a, b) => {
+        return moment(a.time).isAfter(b.time) ? -1 : 1;
+      });
+
+      allMessages.forEach(m => {
         let addedMessage = latestMessages.find(mes => mes.job_hashed_id === m.job_hashed_id && mes.other_user_id === m.other_user_id);
         if (!addedMessage) {
           latestMessages.push(m);
