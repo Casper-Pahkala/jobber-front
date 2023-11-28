@@ -26,19 +26,6 @@
           </v-text-field>
 
           </v-col>
-          <!-- <v-col
-            cols="4"
-          >
-          <v-btn
-            color="primary"
-            @click="showAddJob = true"
-            class="col-4 add-button"
-            v-if="store.user"
-            prepend-icon="mdi-plus"
-          >
-            Lisää työ
-          </v-btn>
-          </v-col> -->
         </v-row>
       </div>
       <div class="loading-container" v-if="loading || error">
@@ -46,20 +33,14 @@
 
         <div v-if="!loading && error" class="error-container">
           <span>Töiden haussa tapahtui virhe</span>
-
           <v-btn
             prepend-icon="mdi-refresh"
             @click="getJobs()"
           >
-          Päivitä työt
-
+            Päivitä työt
           </v-btn>
-
         </div>
       </div>
-
-
-
       <div id="jobs-container">
         <template v-for="job in jobs" :key="job.id">
           <v-hover v-slot="{ isHovering, props }">
@@ -91,7 +72,7 @@
               <div class="job-content">
                   <div class="job-main">
                       <div class="job-title">{{ job.title }}</div>
-                      <div class="job-description">{{ jobDescription(job) }}</div>
+                      <div class="job-description">{{ store.jobShortInfo(job) }}</div>
                   </div>
 
                   <div class="job-info">
@@ -200,51 +181,6 @@ function firstItem() {
 
 function lastItem() {
   return store.jobParams.page * store.jobParams.limit;
-}
-
-function jobDescription(job) {
-  let description = '';
-  if (job.contract_type === 0) {
-    description += 'Keikkatyö';
-
-    if (job.salary) {
-      if (job.salary_type === 0) {
-        // description += ' - Tuntipalkka';
-        description += ' - ' + job.salary + '€/h';
-      } else {
-        // description += ' - Urakkapalkka';
-        description += ' - ' + job.salary + '€';
-      }
-    }
-  } else if (job.contract_type === 1) {
-    description += 'Vakituinen työsuhde';
-
-    if (job.salary) {
-      if (job.salary_type === 0) {
-        // description += ' - Tuntipalkka';
-        description += ' - ' + job.salary + '€/h';
-      } else {
-        // description += ' - Kuukausipalkka';
-        description += ' - ' + job.salary + '€/kk';
-      }
-    }
-  } else {
-    description += 'Toistaiseksi voimassa oleva';
-
-    if (job.salary) {
-      if (job.salary_type === 0) {
-        // description += ' - Tuntipalkka';
-        description += ' - ' + job.salary + '€/h';
-      } else {
-        // description += ' - Kuukausipalkka';
-        description += ' - ' + job.salary + '- €/kk';
-      }
-    }
-  }
-
-
-
-  return description;
 }
 
 function getJobs() {

@@ -148,12 +148,12 @@
                           {{ job.title }}
                         </div>
                         <div>
-                          {{ job.description }}
+                          {{ store.jobShortInfo(job) }}
                         </div>
                       </div>
 
                       <div class="job-info">
-                        <div class="job-info-item">{{ store.formatDate(job.date) }}</div>
+                        <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at) }}</div>
                       </div>
                     </div>
 

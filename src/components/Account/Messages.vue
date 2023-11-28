@@ -95,7 +95,7 @@ const messages = computed(() => {
 const loading = ref(false);
 loading.value = true;
 if (store.user) {
-  store.getAllMessages().then(() => {
+  store.getMessages().then(() => {
     loading.value = false;
   })
 } else {
