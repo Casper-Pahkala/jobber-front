@@ -611,6 +611,7 @@ export const useAppStore = defineStore('app', {
     },
     userInit() {
       this.preloadImage(`${this.url}/profile-image/${this.user.id}.jpg`);
+      this.getMessages();
     },
     jobShortInfo(job) {
       let description = '';
