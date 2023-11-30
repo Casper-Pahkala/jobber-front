@@ -65,7 +65,7 @@
 
       <v-list-item prepend-icon="mdi-shield" title="Tietosuojakäytäntö" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
 
-      <v-list-item prepend-icon="mdi-comment" title="Anna palautetta" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
+      <v-list-item prepend-icon="mdi-comment" title="Anna palautetta"  @click="openFeedback()" :active="false" class="drawer-item"></v-list-item>
 
       <template v-if="store.user">
         <v-divider class="mt-2 mb-2"></v-divider>
@@ -291,17 +291,17 @@ const accountItems = [
   {
     title: 'Tili',
     onClick: () => changeTab('profile'),
-    // icon: 'mdi-account'
+    icon: 'mdi-account'
   },
   {
     title: 'Viestit',
     onClick: () => changeTab('messages'),
-    // icon: 'mdi-message-text'
+    icon: 'mdi-message-text'
   },
   {
     title: 'Omat listaukset',
     onClick: () => changeTab('listings'),
-    // icon: 'mdi-clipboard-account'
+    icon: 'mdi-clipboard-account'
   },
   {
     title: 'Kirjaudu ulos',
@@ -336,6 +336,10 @@ function timeFromDate (date) {
   return moment(date).format('DD.MM HH:mm');
 }
 
+function openFeedback() {
+  store.feedbackDialog = true;
+  drawer.value = false;
+}
 </script>
 
 <style scoped>

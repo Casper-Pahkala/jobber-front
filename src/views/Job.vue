@@ -1,7 +1,7 @@
 <template>
   <div class="main-wrapper">
     <div class="main-content">
-      <template v-if="!job.is_deleted">
+      <template v-if="!job.is_deleted && !loading">
         <v-container>
           <v-btn flat rounded id="back-btn" @click="goBack">
             <v-icon icon="mdi-arrow-left"></v-icon>
@@ -67,7 +67,7 @@
             {{ job.title }}
           </h1>
           <v-divider></v-divider>
-          <div class="job-info">
+          <div class="job-info" v-if="job">
             <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
           </div>
           <div class="job-info" v-if="job.area">
@@ -95,25 +95,47 @@
 
         <v-divider class="mt-5 mb-5"></v-divider>
 
-        <div v-if="!isMyJob">
+        <div>
           <v-container>
-            <div class="job-info">
-              <v-icon icon="mdi-account"></v-icon>
-              {{ jobUserFullName }}
-            </div>
-            <v-btn
-              class="mt-4"
-              color="primary"
-              @click="contact()"
-            >
-              Ota yhteyttä
-            </v-btn>
+            <v-card class="pa-5" elevation="8">
+              <div>
+
+                <div style="display: flex; gap: 5px;">
+                  <v-icon icon="mdi-account"></v-icon>
+                  <h3>
+                    {{ jobUserFullName }}
+                  </h3>
+                </div>
+                <div class="mt-2">
+                  Käyttäjä luotu {{ store.formatDate(job.user.created_at) }}
+                </div>
+              </div>
+
+
+              <v-btn
+                v-if="!isMyJob"
+                class="mt-6"
+                color="primary"
+                @click="contact()"
+              >
+                Ota yhteyttä
+              </v-btn>
+
+              <v-btn
+                v-else
+                class="mt-4"
+                color="red"
+                @click="deleteListing()"
+              >
+                Poista listaus
+              </v-btn>
+            </v-card>
           </v-container>
           <v-divider class="mt-5 mb-5"></v-divider>
         </div>
       </template>
 
-      <template v-else>
+      <template v-else-if="!loading">
         <div class="listing-deleted">
           <div>
             Listaus poistettu
@@ -140,7 +162,7 @@ const router = useRouter();
 
 const store = useAppStore();
 const job = ref({});
-store.loading = true;
+const loading = ref(true);
 
 const carousel = ref(null);
 const mainJobImage = ref(null);
@@ -159,7 +181,7 @@ store.fetchJob(store.displayedJob.id).then((response) => {
     jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
     store.displayedJob.userId = data.job.user.hashed_id;
   }
-  store.loading = false;
+  loading.value = false;
 })
 
 function goBack() {
@@ -236,6 +258,18 @@ function jobSalary() {
   return 'Sopimuksen mukaan';
 }
 
+function deleteListing() {
+  let confirm = window.confirm('Haluatko varmasti poistaa listauksen ' + job.value.title + '?');
+
+  if (confirm) {
+    const payload = {
+      job_id: job.value.hashed_id
+    };
+    store.deleteListing(payload).then(res => {
+      job.value.is_deleted = true;
+    })
+  }
+}
 </script>
 <style scoped>
   .main-wrapper {
@@ -252,7 +286,7 @@ function jobSalary() {
   }
 
   #job-title {
-    padding: 20px 0;
+    padding: 0 0 10px;
   }
   .job-info {
     padding: 20px 0 0 0;

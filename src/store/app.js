@@ -5,6 +5,8 @@ import moment from 'moment';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    allowed: true,
+    feedbackDialog: false,
     maintenanceDialog: false,
     tab: null,
     url: window.url,
@@ -26,7 +28,9 @@ export const useAppStore = defineStore('app', {
     jobParams: {
       page: 1,
       limit: 5,
-      totalCount: 0
+      totalCount: 0,
+      term: '',
+      contract_types: [ 0, 1, 2 ]
     },
     updateMainComponent: 0,
     recentMessages: [],
@@ -112,10 +116,7 @@ export const useAppStore = defineStore('app', {
     fetchJobs() {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + '/api/jobs.json', {
-          params: {
-            page: this.jobParams.page,
-            limit: this.jobParams.limit,
-          }
+          params: this.jobParams
         }).then((response) => {
           let data = response.data;
           this.jobParams.page = parseInt(data.page);
@@ -610,6 +611,7 @@ export const useAppStore = defineStore('app', {
     },
     userInit() {
       this.preloadImage(`${this.url}/profile-image/${this.user.id}.jpg`);
+      this.getMessages();
     },
     jobShortInfo(job) {
       let description = '';
@@ -651,6 +653,33 @@ export const useAppStore = defineStore('app', {
         }
       }
       return description;
+    },
+    sendFeedback(payload) {
+      this.loading = true;
+      this.loadingBackground = true;
+
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/feedback.json`, payload).then((response) => {
+          let data = response.data;
+          this.loading = false;
+          this.loadingBackground = false;
+          this.feedbackDialog = false;
+          if (data.status !== 'success') {
+            this.errorToast('Palautteen lähetyksessä tapahtui virhe: ' + data.message);
+            reject(data.message);
+            return;
+          }
+          this.successToast('Palaute lähetetty onnistuneesti!');
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.feedbackDialog = false;
+          this.loadingBackground = false;
+          this.errorToast('Palautteen lähetyksessä tapahtui virhe');
+          reject(error);
+        })
+      })
     }
 
 

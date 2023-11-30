@@ -70,13 +70,6 @@
                   </template>
 
                   <v-list>
-                    <!-- <v-list-item
-                    title="Muokkaa"
-                    class="menu-action-btn"
-                    @click="editListing(listing)"
-                    >
-                    </v-list-item> -->
-
                     <v-list-item
                         @click="deleteListing(listing)"
                       class="menu-action-btn"
