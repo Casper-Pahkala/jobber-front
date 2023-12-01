@@ -148,6 +148,51 @@
           </v-btn>
         </div>
       </template>
+
+
+      <template v-if="loading">
+        <v-container>
+          <v-btn flat rounded id="back-btn" @click="goBack">
+            <v-icon icon="mdi-arrow-left"></v-icon>
+          </v-btn>
+
+          <v-container id="images-container">
+            <v-container
+              class="main-image-container"
+            >
+              <v-skeleton-loader
+                style="width: 100%; height: 100%;"
+                class="job-image"
+              ></v-skeleton-loader>
+            </v-container>
+            <div
+              class="carousel mt-2"
+            >
+            </div>
+        </v-container>
+
+          <v-skeleton-loader type="article"></v-skeleton-loader>
+
+          <v-divider class="mt-5"></v-divider>
+
+          <v-skeleton-loader type="list-item-three-line"></v-skeleton-loader>
+          <v-divider class="mt-5 mb-5"></v-divider>
+          <v-card class="pa-5" elevation="8">
+            <div>
+
+              <div style="display: flex; gap: 5px; align-items: center;">
+                <v-icon icon="mdi-account"></v-icon>
+                <v-skeleton-loader type="text" width="300px"></v-skeleton-loader>
+              </div>
+              <div class="mb-7">
+                <v-skeleton-loader type="text" width="300px" height="20px" style="margin-top: -10px;"></v-skeleton-loader>
+              </div>
+            </div>
+
+            <v-skeleton-loader width="200px" height="40px" class="mt-6"></v-skeleton-loader>
+          </v-card>
+        </v-container>
+      </template>
     </div>
   </div>
 

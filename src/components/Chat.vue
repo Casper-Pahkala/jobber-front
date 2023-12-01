@@ -151,7 +151,7 @@
 
                     <template v-else>
                       <v-img
-                        :src="`${store.url}/job-image/${job.job_images[0].name}`"
+                        :src="imageUrl(job)"
                         cover
                         class="job-image"
                       >
@@ -553,6 +553,14 @@ function openChatAttachment(message) {
       showLargeImageDialog.value = true;
       largeImageUrl.value = message.attachment_url;
     }
+  }
+}
+
+function imageUrl(job, lazy) {
+  if (job.job_images && job.job_images.length > 0) {
+    return store.url + '/job-image/' + job.job_images[0].name;
+  } else {
+    return store.url + '/no-img.png'
   }
 }
 </script>

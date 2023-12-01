@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import moment from 'moment';
+import Cookies from 'js-cookie';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -12,7 +13,7 @@ export const useAppStore = defineStore('app', {
     url: window.url,
     baseUrl: window.baseUrl,
     user: null,
-    auth_token: null,
+    auth_token: Cookies.get('auth_token') || null,
     loading: false,
     loadingBackground: false,
     loginDialogShowing: false,
@@ -184,6 +185,8 @@ export const useAppStore = defineStore('app', {
         this.axios.post(this.url + `/api/users/login.json`, payload).then((response) => {
           const data = response.data;
           this.auth_token = data.token;
+
+          Cookies.set('auth_token', data.token, { expires: 7 });
           resolve(response.data);
         })
         .catch((error) => {
