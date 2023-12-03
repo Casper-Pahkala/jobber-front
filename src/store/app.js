@@ -355,6 +355,7 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
+          Cookies.set('auth_token', null);
           window.location.href = '/';
           resolve(data);
         })

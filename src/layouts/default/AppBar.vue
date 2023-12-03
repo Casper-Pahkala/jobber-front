@@ -87,16 +87,8 @@
       class="d-none d-sm-flex"
       v-model="store.tab"
     >
-      <!-- <template v-if="currentTabs === 'main'"> -->
-        <v-tab @click="changeTab('jobs')" value="jobs" class="text-none tab">Avoimet työt</v-tab>
-        <v-tab @click="changeTab('workers')" value="workers" class="text-none tab">Henkilöt ja palvelut</v-tab>
-      <!-- </template> -->
-
-      <!-- <template v-else-if="currentTabs === 'account'">
-        <v-tab @click="changeTab('account')" value="account" class="text-none tab">Profiili</v-tab>
-        <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">Viestit</v-tab>
-        <v-tab @click="changeTab('listings')" value="listings" class="text-none tab">Omat listaukset</v-tab>
-      </template> -->
+      <v-tab @click="changeTab('jobs')" value="jobs" class="text-none tab">Avoimet työt</v-tab>
+      <v-tab @click="changeTab('workers')" value="workers" class="text-none tab">Henkilöt ja palvelut</v-tab>
     </v-tabs>
     <template v-slot:append>
       <template v-if="store.user">
