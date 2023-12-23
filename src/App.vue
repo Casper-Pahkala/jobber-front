@@ -70,6 +70,16 @@ function checkPassword() {
 
 <style>
 
+.area-chip {
+  padding: 2px 15px;
+  background-color: #e7e7e7;
+  border-radius: 30px;
+}
+
+.area-container {
+  display: flex;
+  gap: 5px;
+}
 body, html {
   min-width: 370px;
 }

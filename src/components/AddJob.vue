@@ -159,6 +159,8 @@
                   auto-select-first
                   clearable
                   :loading="addressSuggestionsLoading"
+                  multiple
+                  chips
                 ></v-autocomplete>
               </v-container>
 

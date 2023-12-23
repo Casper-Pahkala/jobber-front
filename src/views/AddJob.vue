@@ -105,6 +105,10 @@
                     auto-select-first
                     clearable
                     :loading="areaSuggestionsLoading"
+                    multiple
+                    chips
+                    closable-chips
+                    no-data-text="Aluetta ei löytynyt"
                   ></v-autocomplete>
                 </v-container>
 
@@ -231,6 +235,7 @@
                     type="number"
                     v-model="salary"
                     min="0"
+                    @change="sanitizeSalary()"
                     :rules="numberRules"
                   >
                   </v-text-field>
@@ -274,6 +279,7 @@
                       v-model="salary"
                       min="0"
                       :rules="numberRules"
+                      @change="sanitizeSalary()"
                     >
                     </v-text-field>
                   </template>
@@ -305,7 +311,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useAppStore } from '@/store/app';
 import moment from 'moment';
 import { useRouter } from 'vue-router';
@@ -323,7 +329,7 @@ const salaryTypes = ['Tuntipalkka', 'Urakkapalkka'];
 const salaryTypes2 = ['Tuntipalkka', 'Kuukausipalkka'];
 const title = ref('');
 
-const area = ref('');
+const area = ref([]);
 const areaSearchTerm = ref('');
 const areaSuggestionsLoading = ref(false);
 const areaSuggestions = ref([]);
@@ -363,6 +369,12 @@ const allImagesUploaded = computed(() => {
     return false;
   }
 })
+
+watch(area, async (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    areaSearchTerm.value = ''
+  }
+});
 
 function confirmDateSelection() {
   dateDialogShowing.value = false;
@@ -530,10 +542,15 @@ function addjob() {
   // })
 }
 
-
-if (!store.user) {
-  store.loginDialogShowing = true;
+function sanitizeSalary() {
+  var v = parseFloat(salary.value);
+  if (isNaN(v)) {
+    salary.value = '';
+  } else {
+    salary.value = v.toFixed(2);
+  }
 }
+
 </script>
 
 <style scoped>

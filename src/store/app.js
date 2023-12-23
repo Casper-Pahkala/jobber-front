@@ -120,6 +120,11 @@ export const useAppStore = defineStore('app', {
           params: this.jobParams
         }).then((response) => {
           let data = response.data;
+          if (!data.error) {
+            data.jobs.forEach(job => {
+              job.area = JSON.parse(job.area);
+            })
+          }
           this.jobParams.page = parseInt(data.page);
           this.jobParams.limit = parseInt(data.limit);
           this.jobParams.totalCount = parseInt(data.totalCount);

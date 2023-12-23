@@ -72,7 +72,15 @@
           </div>
           <div class="job-info" v-if="job.area">
             <v-icon icon="mdi-map-marker"></v-icon>
-            {{ job.area }}
+            <div class="area-container">
+              <div
+                v-for="(area, index) in job.area"
+                :key="index"
+                class="area-chip"
+              >
+                {{ area }}
+              </div>
+            </div>
           </div>
           <div class="job-info" v-if="job.date">
               <v-icon icon="mdi-calendar-range"></v-icon>
@@ -222,6 +230,8 @@ store.displayedJob.id = route.params.id;
 store.fetchJob(store.displayedJob.id).then((response) => {
   let data = response.data;
   if (!data.error) {
+
+    data.job.area = JSON.parse(data.job.area);
     job.value = data.job;
     jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
     store.displayedJob.userId = data.job.user.hashed_id;
@@ -335,6 +345,7 @@ function deleteListing() {
   }
   .job-info {
     padding: 20px 0 0 0;
+    display: flex;
   }
 
   #images-container {

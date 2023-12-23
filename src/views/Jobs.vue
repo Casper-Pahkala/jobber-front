@@ -94,43 +94,55 @@
     <template v-if="!loading">
       <template v-for="job in jobs" :key="job.id">
         <v-hover v-slot="{ isHovering, props }">
-          <v-card
-            @click="handleJobClick(job)"
-            class="job"
-            :elevation="isHovering ? 6 : 3"
-            v-bind="props"
-          >
-            <v-img
-              :src="imageUrl(job)"
-              :lazy-src="imageUrl(job, true)"
-              cover
-              class="job-image"
+          <router-link :to="'/jobs/' + job.hashed_id" class="job">
+            <v-card
+              @click="handleJobClick(job)"
+              class="job"
+              :elevation="isHovering ? 6 : 3"
+              v-bind="props"
             >
-              <template v-slot:placeholder>
-                <v-row
-                  class="fill-height ma-0"
-                  align="center"
-                  justify="center"
-                >
-                  <v-progress-circular
-                    indeterminate
-                    color="grey-lighten-5"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-img>
-            <div class="job-content">
-                <div class="job-main">
-                    <div class="job-title">{{ job.title }}</div>
-                    <div class="job-description">{{ store.jobShortInfo(job) }}</div>
-                </div>
+              <v-img
+                :src="imageUrl(job)"
+                :lazy-src="imageUrl(job, true)"
+                cover
+                class="job-image"
+              >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="grey-lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
+              </v-img>
+              <div class="job-content">
+                  <div class="job-main">
+                      <div class="job-title">{{ job.title }}</div>
+                      <div class="job-description">{{ store.jobShortInfo(job) }}</div>
+                  </div>
 
-                <div class="job-info">
-                  <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
-                  <div class="job-info-item">{{ job.area }}</div>
-                </div>
-            </div>
-          </v-card >
+                  <div class="job-info">
+                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                    <div class="job-info-item mt-2">
+                      <div class="area-container">
+                        <div
+                          v-for="(area, index) in job.area"
+                          :key="index"
+                          class="area-chip"
+                        >
+                          {{ area }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </v-card >
+          </router-link>
         </v-hover>
       </template>
     </template>
@@ -323,6 +335,7 @@ getJobs();
     display: flex;
     position: relative;
     margin: 10px;
+    text-decoration: none;
   }
   .job-image {
       width: 80px;
@@ -358,8 +371,9 @@ getJobs();
     float: right;
   }
   .job-info-item {
-    direction: rtl;
     font-size: 14px;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .dark-background {
