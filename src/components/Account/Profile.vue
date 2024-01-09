@@ -54,7 +54,8 @@
           class="info-wrapper"
         >
           <v-col
-            cols="3"
+            sm="12"
+            md="3"
             class="title"
           >
           <h4>
@@ -63,7 +64,8 @@
           </v-col>
 
           <v-col
-            cols="6"
+            sm="12"
+            md="6"
             class="content"
           >
           <template v-if="!editingName">
@@ -114,7 +116,8 @@
           </v-col>
 
           <v-col
-            cols="3"
+            sm="12"
+            md="3"
             class="actions"
             v-if="!editingName"
           >
@@ -135,7 +138,8 @@
           class="info-wrapper"
         >
           <v-col
-            cols="3"
+            sm="12"
+            md="3"
             class="title"
           >
           <h4>
@@ -145,7 +149,8 @@
 
 
           <v-col
-            cols="6"
+            sm="12"
+            md="6"
             class="content"
           >
             <template v-if="!editingEmail">
@@ -188,7 +193,8 @@
           </v-col>
 
           <v-col
-            cols="3"
+            sm="12"
+            md="3"
             class="actions"
           >
             <v-btn
@@ -209,7 +215,8 @@
           class="info-wrapper"
         >
           <v-col
-            cols="3"
+            sm="12"
+            md="3"
             class="title"
           >
           <h4>
@@ -218,14 +225,16 @@
           </v-col>
 
           <v-col
-            cols="6"
+            sm="12"
+            md="6"
             class="content"
           >
           Kaikki tietosi poistetaan tietokannastamme, eikä tätä voi peruuttaa
           </v-col>
 
           <v-col
-            cols="3"
+            sm="12"
+            md="3"
             class="actions"
           >
             <v-btn
@@ -586,5 +595,15 @@ function editName() {
 
 .info-wrapper .actions {
   direction: rtl;
+}
+
+@media (max-width: 960px) {
+  .info-wrapper {
+    flex-direction: column;
+  }
+
+  .info-wrapper .actions {
+    direction: ltr;
+  }
 }
 </style>

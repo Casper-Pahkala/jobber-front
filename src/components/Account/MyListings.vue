@@ -19,68 +19,73 @@
         <template v-for="listing in filteredListings" :key="listing.id">
           <v-hover v-slot="{ isHovering, props }">
             <v-card
-              class="job"
               :elevation="isHovering ? 4 : 4"
               v-bind="props"
             >
-              <v-img
-                :src="imageUrl(listing)"
-                :lazy-src="imageUrl(listing, true)"
-                cover
-                class="job-image"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-              <div class="job-content">
-                  <div class="job-main">
-                      <div class="job-title">{{ listing.title }}</div>
-                      <div class="job-description">{{ store.jobShortInfo(listing) }}</div>
-                  </div>
-
-                  <div class="job-info">
-                    <div class="job-info-item">Julkaistu {{ store.formatDate(listing.created_at) }}</div>
-                  </div>
-              </div>
-
               <div
-                class="action-btns"
+                class="job"
+                @click="handleJobClick(listing)"
               >
-                <v-btn
-                  color="primary"
-                  class="show-btn"
-                  @click="handleJobClick(listing)"
+
+                <v-img
+                  :src="imageUrl(listing)"
+                  :lazy-src="imageUrl(listing, true)"
+                  cover
+                  class="job-image"
                 >
-                  Näytä
-                </v-btn>
-
-                <v-menu>
-                  <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-dots-vertical" class="ml-5 more-btn" color="grey-lighten-3"></v-btn>
-                  </template>
-
-                  <v-list>
-                    <v-list-item
-                        @click="deleteListing(listing)"
-                      class="menu-action-btn"
-                      title="Poista listaus"
+                  <template v-slot:placeholder>
+                    <v-row
+                      class="fill-height ma-0"
+                      align="center"
+                      justify="center"
                     >
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </div>
+                      <v-progress-circular
+                        indeterminate
+                        color="grey-lighten-5"
+                      ></v-progress-circular>
+                    </v-row>
+                  </template>
+                </v-img>
+                <div class="job-content">
+                    <div class="job-main">
+                        <div class="job-title">{{ listing.title }}</div>
+                        <div class="job-description">{{ store.jobShortInfo(listing) }}</div>
+                    </div>
 
-              <div v-if="listing.is_deleted" class="deleted">
+                    <div class="job-info">
+                      <div class="job-info-item">Julkaistu {{ store.formatDate(listing.created_at) }}</div>
+                    </div>
+                </div>
+
+                <div
+                  class="action-btns"
+                >
+                  <!-- <v-btn
+                    color="primary"
+                    class="show-btn"
+                    @click="handleJobClick(listing)"
+                  >
+                    Näytä
+                  </v-btn> -->
+
+                  <v-menu>
+                    <template v-slot:activator="{ props }">
+                      <v-btn v-bind="props" icon="mdi-dots-vertical" class="more-btn" color="grey-lighten-3"></v-btn>
+                    </template>
+
+                    <v-list>
+                      <v-list-item
+                        @click.stop="deleteListing(listing)"
+                        class="menu-action-btn"
+                        title="Poista listaus"
+                      >
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </div>
+
+                <div v-if="listing.is_deleted" class="deleted">
+                </div>
               </div>
             </v-card >
           </v-hover>
@@ -220,7 +225,6 @@ function deleteListing(listing) {
     height: 120px;
     display: flex;
     position: relative;
-    margin: 10px;
   }
   .job-image {
       width: 120px;

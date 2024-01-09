@@ -1,6 +1,6 @@
 <template>
   <div class="top-layout">
-    <v-row
+    <!-- <v-row
       class="fill-height top-wrapper"
       align="center"
     >
@@ -76,7 +76,7 @@
       <v-col cols="12">
         <v-divider class="pb-5"></v-divider>
       </v-col>
-    </v-row>
+    </v-row> -->
   </div>
 
   <div class="loading-container" v-if="error">
