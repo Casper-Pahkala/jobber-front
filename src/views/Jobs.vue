@@ -1,181 +1,134 @@
 <template>
-  <div class="top-layout">
-    <!-- <v-row
-      class="fill-height top-wrapper"
-      align="center"
-    >
-      <v-col
-        cols="12"
+  <div class="content">
+
+    <div class="top-layout">
+      <!-- <v-row
+        class="fill-height top-wrapper"
+        align="center"
       >
-
-      <div
-        class="main-search-container"
-      >
-        <input id="main-search" placeholder="Hae" v-model="store.jobParams.term" @keyup.enter="getJobs">
-
-        <v-btn id="clear-btn" icon="mdi-close" size="35px" color="grey" v-if="store.jobParams.term.length > 0" @click="clearTerm()">
-
-        </v-btn>
-
-        <div class="search-btn bg-blue-darken-1" @click="getJobs">
-          <v-icon>
-            mdi-magnify
-          </v-icon>
-        </div>
-
-
-      </div>
-      </v-col>
-
-      <v-col cols="3" v-if="false">
-        <v-menu
-          :close-on-content-click="false"
+        <v-col
+          cols="12"
         >
-          <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" class="text-none filter-btn" prepend-icon="mdi-chevron-down">Työsuhteen tyyppi</v-btn>
-          </template>
-          <v-list select-strategy="classic">
-            <v-list-subheader>Työsuhteen tyyppi</v-list-subheader>
 
-            <v-list-item value="Keikkatyö" class="filter-item">
-              <template v-slot:prepend="{ isActive }">
-                <v-list-item-action start>
-                  <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-                </v-list-item-action>
-              </template>
+        <div
+          class="main-search-container"
+        >
+          <input id="main-search" placeholder="Hae" v-model="store.jobParams.term" @keyup.enter="getJobs">
 
-              <v-list-item-title>Keikkatyö</v-list-item-title>
-            </v-list-item>
+          <v-btn id="clear-btn" icon="mdi-close" size="35px" color="grey" v-if="store.jobParams.term.length > 0" @click="clearTerm()">
 
-            <v-list-item value="Vakituinen" class="filter-item">
-              <template v-slot:prepend="{ isActive }">
-                <v-list-item-action start>
-                  <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-                </v-list-item-action>
-              </template>
+          </v-btn>
 
-              <v-list-item-title>Vakituinen</v-list-item-title>
-            </v-list-item>
-
-            <v-list-item value="Toistaiseksi" class="filter-item">
-              <template v-slot:prepend="{ isActive }">
-                <v-list-item-action start>
-                  <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-                </v-list-item-action>
-              </template>
-
-              <v-list-item-title>Toistaiseksi voimassa oleva</v-list-item-title>
-
-              <v-list-item-subtitle>
-              </v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-col>
-
-      <v-col cols="12">
-        <v-divider class="pb-5"></v-divider>
-      </v-col>
-    </v-row> -->
-  </div>
-
-  <div class="loading-container" v-if="error">
-    <div v-if="error" class="error-container">
-      <span>Töiden haussa tapahtui virhe</span>
-      <v-btn
-        prepend-icon="mdi-refresh"
-        @click="getJobs()"
-      >
-        Päivitä työt
-      </v-btn>
-    </div>
-  </div>
-  <div id="jobs-container">
-    <template v-if="!loading">
-      <template v-for="job in jobs" :key="job.id">
-        <v-hover v-slot="{ isHovering, props }">
-          <router-link :to="'/jobs/' + job.hashed_id" class="job">
-            <v-card
-              @click="handleJobClick(job)"
-              class="job"
-              :elevation="isHovering ? 6 : 3"
-              v-bind="props"
-            >
-              <v-img
-                :src="imageUrl(job)"
-                :lazy-src="imageUrl(job, true)"
-                cover
-                class="job-image"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-              <div class="job-content">
-                  <div class="job-main">
-                      <div class="job-title">{{ job.title }}</div>
-                      <div class="job-description">{{ store.jobShortInfo(job) }}</div>
-                  </div>
-
-                  <div class="job-info">
-                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
-                    <div class="job-info-item mt-2">
-                      <div class="area-container">
-                        <div
-                          v-for="(area, index) in job.area"
-                          :key="index"
-                          class="area-chip"
-                        >
-                          {{ area }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-              </div>
-            </v-card >
-          </router-link>
-        </v-hover>
-      </template>
-    </template>
-
-    <template v-else>
-      <v-card
-        class="job"
-        v-for="i in 6"
-        :key="i"
-      >
-        <v-skeleton-loader
-          class="job-image"
-          type="image"
-        ></v-skeleton-loader>
-        <div class="job-content">
-          <div class="job-main">
-            <v-skeleton-loader
-              type="list-item-two-line"
-            ></v-skeleton-loader>
+          <div class="search-btn bg-blue-darken-1" @click="getJobs">
+            <v-icon>
+              mdi-magnify
+            </v-icon>
           </div>
+
+
         </div>
-      </v-card >
+        </v-col>
 
-    </template>
-  </div>
+        <v-col cols="3" v-if="false">
+          <v-menu
+            :close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" class="text-none filter-btn" prepend-icon="mdi-chevron-down">Työsuhteen tyyppi</v-btn>
+            </template>
+            <v-list select-strategy="classic">
+              <v-list-subheader>Työsuhteen tyyppi</v-list-subheader>
 
-  <div class="pagination-container" v-if="!loading">
-    <v-pagination
-      v-model="store.jobParams.page"
-      :length="totalPages"
-      :total-visible="7"
-      @update:modelValue="pageChange()"
-    ></v-pagination>
+              <v-list-item value="Keikkatyö" class="filter-item">
+                <template v-slot:prepend="{ isActive }">
+                  <v-list-item-action start>
+                    <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                  </v-list-item-action>
+                </template>
+
+                <v-list-item-title>Keikkatyö</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item value="Vakituinen" class="filter-item">
+                <template v-slot:prepend="{ isActive }">
+                  <v-list-item-action start>
+                    <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                  </v-list-item-action>
+                </template>
+
+                <v-list-item-title>Vakituinen</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item value="Toistaiseksi" class="filter-item">
+                <template v-slot:prepend="{ isActive }">
+                  <v-list-item-action start>
+                    <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                  </v-list-item-action>
+                </template>
+
+                <v-list-item-title>Toistaiseksi voimassa oleva</v-list-item-title>
+
+                <v-list-item-subtitle>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-col>
+
+        <v-col cols="12">
+          <v-divider class="pb-5"></v-divider>
+        </v-col>
+      </v-row> -->
+    </div>
+
+    <div class="loading-container" v-if="error">
+      <div v-if="error" class="error-container">
+        <span>Töiden haussa tapahtui virhe</span>
+        <v-btn
+          prepend-icon="mdi-refresh"
+          @click="getJobs()"
+        >
+          Päivitä työt
+        </v-btn>
+      </div>
+    </div>
+    <div id="jobs-container">
+      <template v-if="!loading || store.jobs.length > 0">
+        <template v-for="job in store.jobs" :key="job.id">
+          <JobCard :job="job"/>
+        </template>
+      </template>
+
+      <!-- <template v-else>
+        <v-card
+          class="job"
+          v-for="i in 6"
+          :key="i"
+        >
+          <v-skeleton-loader
+            class="job-image"
+            type="image"
+          ></v-skeleton-loader>
+          <div class="job-content">
+            <div class="job-main">
+              <v-skeleton-loader
+                type="list-item-two-line"
+              ></v-skeleton-loader>
+            </div>
+          </div>
+        </v-card >
+
+      </template> -->
+    </div>
+
+    <div class="pagination-container" v-if="!loading">
+      <v-pagination
+        v-model="store.jobParams.page"
+        :length="totalPages"
+        :total-visible="7"
+        @update:modelValue="pageChange()"
+      ></v-pagination>
+    </div>
   </div>
 
   <add-job-component
@@ -191,6 +144,7 @@ import { useAppStore } from '@/store/app'
 import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
 import AddJobComponent from'@/components/AddJob.vue';
+import JobCard from '@/components/JobCard.vue';
 
 window.scrollTo(0, 0);
 const router = useRouter();
@@ -208,7 +162,6 @@ store.jobParams.limit = query.l ?? 10;
 const totalPages = computed(() => {
   return Math.ceil(store.jobParams.totalCount / store.jobParams.limit);
 });
-const jobs = ref([]);
 const showAddJob = ref(false);
 const queryLoading = ref(false);
 const params = computed(() => {
@@ -221,21 +174,11 @@ const params = computed(() => {
 
 const jobTypes = ref(null);
 
-router.push({ query: params.value });
+router.replace({ query: params.value });
 
 
 
-function handleJobClick(job) {
-  router.push('/jobs/' + job.hashed_id);
-}
 
-function imageUrl(job, lazy) {
-  if (job.job_images && job.job_images.length > 0) {
-    return store.url + '/job-image/' + job.job_images[0].name;
-  } else {
-    return store.url + '/no-img.png'
-  }
-}
 
 function submit() {
   queryLoading.value = true;
@@ -247,7 +190,7 @@ function submit() {
 
 function pageChange() {
   window.scrollTo(0, 0);
-  router.push({ query: params.value });
+  router.replace({ query: params.value });
   getJobs();
 }
 
@@ -263,7 +206,6 @@ function lastItem() {
 function getJobs() {
   error.value = false;
   loading.value = true;
-  jobs.value = [];
   const minLoadTime = 300;
   let minLoadTimeOver = false;
   let loaded = false;
@@ -273,11 +215,7 @@ function getJobs() {
       loading.value = false;
     }
   }, minLoadTime);
-  store.fetchJobs().then((response) => {
-    let data = response.data;
-    if (!data.error) {
-      jobs.value = data.jobs;
-    }
+  store.fetchJobs().then(() => {
     loaded = true;
     if (minLoadTimeOver) {
       loading.value = false;
@@ -310,7 +248,9 @@ getJobs();
     justify-content: center;
     align-items: center;
     padding-bottom: 60px;
-    min-height: calc(100vh - 270px);
+    height: 100%;
+    /* min-height: calc(100vh - 270px); */
+    flex-grow: 1;
     justify-content: start;
   }
   .top-layout {
@@ -326,41 +266,7 @@ getJobs();
   .filters {
       width: 500px;
   }
-  .job {
-    cursor: pointer;
-    border-radius: 6px;
-    width: 100%;
-    max-width: 1000px;
-    height: 80px;
-    display: flex;
-    position: relative;
-    margin: 10px;
-    text-decoration: none;
-  }
-  .job-image {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      /* border-radius: 6px; */
-  }
-  .job-title {
-      font-weight: 600;
-      font-size: 20px;
-  }
-  .job-main {
-      width: 70%;
-  }
 
-  .job-content {
-      display: flex;
-      padding: 5px;
-      padding-right: 10px;
-      padding-left: 20px;
-      width: calc(100% - 50px);
-  }
-  .job-info {
-      width: 30%;
-  }
 
   .send-message-btn {
       position: absolute;
@@ -369,11 +275,6 @@ getJobs();
   }
   .add-button {
     float: right;
-  }
-  .job-info-item {
-    font-size: 14px;
-    display: flex;
-    justify-content: flex-end;
   }
 
   .dark-background {
@@ -464,5 +365,15 @@ getJobs();
   position: absolute;
   right: 80px;
   top: 7px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--app-bar-height));
+}
+
+.pagination-container {
+  padding: 20px 0;
 }
 </style>

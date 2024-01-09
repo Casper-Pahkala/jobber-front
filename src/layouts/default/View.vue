@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <div style="min-height: calc(100vh - 64px)">
+    <div style="min-height: calc(100vh - var(--app-bar-height))">
       <router-view/>
     </div>
 
@@ -153,7 +153,7 @@ export default {
 <style scoped>
 
   .main-content {
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - var(--app-bar-height));
   }
 
   .footer {

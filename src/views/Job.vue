@@ -8,60 +8,78 @@
           </v-btn>
 
           <v-container id="images-container">
-          <!-- <img id="main-image" class="job-image" src="/mowing.jpg"> -->
-          <v-container
-            class="main-image-container"
-          >
-            <v-img
-              :src="imageUrl(imageIndex)"
-              :lazy-src="imageUrl(imageIndex, true)"
-              contain
-              class="job-image"
-              id="mainJobImage"
-              @click="toggleFullscreen()"
+            <v-container
+              class="main-image-container"
+              id="mainImageContainer"
             >
-              <template v-slot:placeholder>
-                <v-row
-                  class="fill-height ma-0"
-                  align="center"
-                  justify="center"
-                >
-                  <v-progress-circular
-                    indeterminate
-                    color="grey-lighten-5"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-img>
-          </v-container>
-          <div
-            class="carousel mt-2"
-          >
-            <v-img
-              v-for="(a, index) in job.job_images"
-              :key="index"
-              :src="imageUrl(index)"
-              :lazy-src="imageUrl(index, true)"
-              cover
-              class="carousel-img"
-              @click="imageIndex = index"
-              :class="image === mainImage ? 'selected' : ''"
-              aspect-ratio="1"
+              <v-img
+                :src="imageUrl(imageIndex)"
+                :lazy-src="imageUrl(imageIndex, true)"
+                contain
+                class="job-image"
+                id="mainJobImage"
+              >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="grey-lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
+              </v-img>
+              <v-btn
+                class="fullscreen-btn"
+                flat
+                icon="mdi-fullscreen"
+                elevation="10"
+                @click="toggleFullscreen()"
+                v-if="job.job_images.length > 0"
+              >
+              </v-btn>
+
+              <v-btn
+                class="close-btn"
+                flat
+                icon="mdi-close"
+                elevation="8"
+                @click="toggleFullscreen()"
+                v-if="fullscreen"
+              >
+              </v-btn>
+            </v-container>
+            <div
+              class="carousel mt-2"
             >
-              <template v-slot:placeholder>
-                <v-row
-                  class="fill-height ma-0"
-                  align="center"
-                  justify="center"
-                >
-                  <v-progress-circular
-                    indeterminate
-                    color="grey-lighten-5"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-img>
-          </div>
+              <v-img
+                v-for="(a, index) in job.job_images"
+                :key="index"
+                :src="imageUrl(index)"
+                :lazy-src="imageUrl(index, true)"
+                cover
+                class="carousel-img"
+                @click="imageIndex = index"
+                :class="image === mainImage ? 'selected' : ''"
+                aspect-ratio="1"
+              >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="grey-lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
+              </v-img>
+            </div>
         </v-container>
           <h1 id="job-title">
             {{ job.title }}
@@ -96,7 +114,8 @@
               {{ jobSalary() }}
           </div>
           <v-divider class="mt-5"></v-divider>
-          <p id="job-description">
+          <h4 class="mt-3">Kuvaus</h4>
+          <p id="job-description" class="mt-2">
             {{ job.description }}
           </p>
         </v-container>
@@ -105,9 +124,8 @@
 
         <div>
           <v-container>
-            <v-card class="pa-5" elevation="8">
+            <v-card class="user-card pa-5" elevation="8">
               <div>
-
                 <div style="display: flex; gap: 5px;">
                   <v-icon icon="mdi-account"></v-icon>
                   <h3>
@@ -133,6 +151,7 @@
                 v-else
                 class="mt-4"
                 color="red"
+                style="color: white"
                 @click="deleteListing()"
               >
                 Poista listaus
@@ -223,7 +242,10 @@ const jobUserFullName = ref('');
 const isMyJob = computed(() => {
   return job.value.user && store.user && job.value.user.hashed_id === store.user.id;
 });
-
+const fullscreen = computed(() => {
+  console.log(store.fullscreen, 'ss');
+  return store.fullscreen;
+});
 const imageIndex = ref(0);
 store.displayedJob.id = route.params.id;
 
@@ -272,11 +294,7 @@ function imageUrl(index = 0, lazy = false) {
 }
 
 function toggleFullscreen() {
-  // store.toggleFullscreen(document.getElementById('mainJobImage'));
-}
-
-function selectItem(index) {
-  carousel.value.selectItem(index);
+  store.toggleFullscreen(document.getElementById('mainImageContainer'));
 }
 
 function contractType() {
@@ -325,6 +343,13 @@ function deleteListing() {
     })
   }
 }
+
+document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) {
+        // The user has exited fullscreen mode
+        store.fullscreen = false;
+    }
+});
 </script>
 <style scoped>
   .main-wrapper {
@@ -337,7 +362,7 @@ function deleteListing() {
     /* padding-top: 40px; */
   }
   #job-description {
-    padding: 20px 0;
+    /* padding: 20px 0; */
   }
 
   #job-title {
@@ -362,6 +387,7 @@ function deleteListing() {
     height: 60px;
     font-size: 20px;
     border-radius: 50%;
+    background-color: var(--card-bg-color);
   }
 
   .carousel {
@@ -387,8 +413,9 @@ function deleteListing() {
     height: 500px;
     display: flex;
     justify-content: center;
-    background-color: #ededed;
+    background-color: var(--main-very-light-color);
     padding: 0;
+    position: relative;
     /* margin: 10px; */
   }
   .carousel-img.selected {
@@ -408,14 +435,41 @@ function deleteListing() {
   }
 
   .delimiter-image {
-  /* Your styles for small images as delimiters */
-  cursor: pointer;
-  max-width: 50px; /* example size for delimiter images */
-  opacity: 0.7;
-}
-.delimiter-image:hover {
-  opacity: 1;
-}
+    /* Your styles for small images as delimiters */
+    cursor: pointer;
+    max-width: 50px; /* example size for delimiter images */
+    opacity: 0.7;
+  }
+  .delimiter-image:hover {
+    opacity: 1;
+  }
+
+  .area-chip {
+    text-wrap: nowrap;
+  }
+
+  .area-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .fullscreen-btn {
+    top: 10px;
+    right: 10px;
+    position: absolute;
+    background-color: var(--card-bg-color);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+  }
+
+  .user-card {
+    background-color: var(--card-bg-color);
+  }
 </style>
 <style>
   .job-info .v-icon {

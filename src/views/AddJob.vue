@@ -21,6 +21,7 @@
                 :key="index"
                 elevation="8"
                 width="180"
+                class="image-card"
               >
                 <v-img
                   :src="image ? image.image : '#'"
@@ -44,10 +45,11 @@
               </v-card>
               <canvas id="imageCanvas" style="display: none;"></canvas>
               <v-card
-                v-if="selectedFileResults.length <= 9"
+                v-if="selectedFileResults.length < 8"
                 elevation="8"
                 width="180"
                 height="180"
+                class="image-card"
               >
                   <input
                     type="file"
@@ -56,7 +58,7 @@
                     style="display: none;"
                     id="customFileInput"
                   />
-                  <v-btn @click="openFileInput" icon="mdi-plus" flat id="add-img-btn" class="text-none">
+                  <v-btn @click="openFileInput" icon="mdi-plus" flat id="add-img-btn" class="text-none image-card">
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
                       <v-icon
                         style="font-size: 35px;"
@@ -119,7 +121,7 @@
               </v-form>
             </div>
             <div class="actions">
-              <v-btn @click="changeJobTab('one')" class="text-none">Takaisin</v-btn>
+              <v-btn @click="changeJobTab('one')" class="back-btn text-none">Takaisin</v-btn>
               <v-btn color="primary" type="submit" class="text-none" @click="changeJobTab('three')" append-icon="mdi-chevron-right">Seuraava</v-btn>
             </div>
         </v-window-item>
@@ -287,7 +289,7 @@
           </div>
 
           <div class="actions">
-            <v-btn @click="changeJobTab('two')" class="text-none">Takaisin</v-btn>
+            <v-btn @click="changeJobTab('two')" class="back-btn text-none">Takaisin</v-btn>
             <v-btn color="primary" class="text-none" append-icon="mdi-chevron-right" style="float: right;" @click="addjob">Luo listaus</v-btn>
           </div>
         </v-window-item>
@@ -556,7 +558,7 @@ function sanitizeSalary() {
 <style scoped>
 
   .add-container {
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - var(--app-bar-height));
     max-width: 1080px;
   }
 
@@ -571,6 +573,8 @@ function sanitizeSalary() {
     top: 10px;
     right: 10px;
     z-index: 100;
+    background-color: var(--card-bg-color);
+    border-radius: 50%;
   }
 
   .images {
@@ -603,6 +607,7 @@ function sanitizeSalary() {
     justify-content: end;
     align-items: end;
     padding: 10px;
+    margin-bottom: 60px;
   }
 
   .window .content {
@@ -619,5 +624,13 @@ function sanitizeSalary() {
     flex-direction: column;
     gap: 20px;
   }
+  .image-card {
+    background-color: var(--card-bg-color) !important;
+  }
 
+</style>
+<style>
+  .back-btn span {
+    color: black !important;
+  }
 </style>

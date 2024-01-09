@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app :class="{ 'light-theme': store.lightTheme }">
     <default-bar />
 
     <default-view :key="store.updateMainComponent"/>
@@ -73,6 +73,7 @@ const store = useAppStore();
 ::-webkit-scrollbar-thumb:hover {
     background: #555; /* color of the scroll thumb on hover */
 }
+
 
 
 </style>

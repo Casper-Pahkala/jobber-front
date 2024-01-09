@@ -1,0 +1,27 @@
+// sv.js
+export default {
+  Etusivu: 'Hem',
+  'Tuotteet': 'Produkter',
+  Tarjoukset: 'Erjudanden',
+  'Ota yhteyttä': 'Kontakta oss',
+  'Yhteystiedot': 'Kontaktinformation',
+  'Pasi Högnäsbacka': 'Pasi Högnäsbacka',
+  'Puh. (06) 3179103': 'Telefon (06) 3179103',
+  'Fax (06) 3179103': 'Fax (06) 3179103',
+  'Hietasaarenkatu 13 E': 'Hietasaarenkatu 13 E',
+  '65100 Vaasa': '65100 Vaasa',
+  'Aukioloajat': 'Öppettider',
+  'Ma - Pe 9-16': 'Mån - Fre 9-16',
+  'La 12-16': 'Lör 12-16',
+  'Su suljettu': 'Sön stängt',
+  '© 2023 Vaasan Pyörähuolto': '© 2023 Vaasan Pyörähuolto',
+  'Powered by': 'Drivs av',
+  'Data Dreams': 'Data Dreams',
+  'Näytä kaikki': 'Visa alla',
+  'Suositut': 'Populära',
+  'Alkup.': 'Urspr.',
+  'Ajanvaraus': 'Tidsbokning',
+  'Tietoa meistä': 'Om oss',
+  'Lisätiedot': 'Ytterligare information',
+  'Tekniset tiedot': 'Tekniska specifikationer'
+};

@@ -27,8 +27,15 @@
 <script setup>
 
 import { useAppStore } from '@/store/app';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
+import i18n from "@/i18n/i18n";
 
+const locale = localStorage.getItem('locale');
+
+if (locale) {
+  i18n.global.locale = locale;
+}
+// i18n.global.locale = 'en';
 const store = useAppStore();
 
 store.initializeAxios();
@@ -74,6 +81,8 @@ function checkPassword() {
   padding: 2px 15px;
   background-color: #e7e7e7;
   border-radius: 30px;
+  text-wrap: nowrap;
+  background-color: var(--main-light-color);
 }
 
 .area-container {
@@ -94,4 +103,18 @@ body, html {
   cursor: default;
   pointer-events: all;
 }
+
+main {
+  background-color: var(--main-bg-color);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.v-main {
+  padding-top: var(--app-bar-height) !important;
+}
+
 </style>

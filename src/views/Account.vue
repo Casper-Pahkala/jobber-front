@@ -2,7 +2,7 @@
   <div class="main-wrapper">
     <div class="main-content">
 
-      <v-container
+      <div
        v-if="store.user"
       >
         <v-tabs
@@ -31,7 +31,7 @@
             <listings></listings>
           </v-window-item>
         </v-window>
-      </v-container>
+      </div>
     </div>
   </div>
 </template>
@@ -88,22 +88,22 @@ watch(currentRoute, async (newVal, oldVal) => {
     justify-content: center;
   }
   .main-content {
-    max-width: 1400px;
+    max-width: 1000px;
     width: 100%;
     /* padding-top: 40px; */
   }
 
-#tabs-bottom {
+/* #tabs-bottom {
   position: absolute;
   bottom: 0;
   height: 2px;
   background-color: #acacac;
   width: 100%;
-}
+} */
 
 .tab {
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
+  /* border-top-right-radius: 10px;
+  border-top-left-radius: 10px; */
 }
 </style>
 

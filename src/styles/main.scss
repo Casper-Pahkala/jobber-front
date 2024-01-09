@@ -1,32 +1,84 @@
-.profile-tabs {
-    .v-tab__slider {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: none !important;
-        border-top: 2px solid #acacac;
-        border-right: 2px solid #acacac;
-        border-left: 2px solid #acacac;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        z-index: 10;
-        box-sizing: border-box;
+// .profile-tabs {
+//     .v-tab__slider {
+//         top: 0;
+//         left: 0;
+//         right: 0;
+//         bottom: 0;
+//         background: none !important;
+//         border-top: 2px solid #acacac;
+//         border-right: 2px solid #acacac;
+//         border-left: 2px solid #acacac;
+//         border-top-right-radius: 10px;
+//         border-top-left-radius: 10px;
+//         z-index: 10;
+//         box-sizing: border-box;
+//         height: 100%;
+//     }
+
+//     .v-tab__slider::before {
+//         content: '';
+//         position: absolute;
+//         bottom: 0;
+//         left: 0%;
+//         height: 2px;
+//         background: #ffffff;
+//         width: 100%;
+//         z-index: 0;
+//     }
+
+//     .v-ripple__container {
+//         z-index: 10;
+//     }
+// }
+
+/* Dark theme */
+:root {
+    --main-bg-color: #212121; /* Dark background */
+    --main-text-color: white; /* Light text */
+    --main-text-light-color: rgb(184, 184, 184); /* Lighter text */
+    --card-bg-color: #151515; /* Darker card background */
+    --main-light-color: #313131; /* Dark light color */
+    --main-very-light-color: rgb(26, 26, 26); /* Very dark light color */
+    --app-bar-bg-color: #131313;
+
+    --app-bar-height: 80px;
+}
+
+/* Light theme */
+.light-theme {
+    --main-bg-color: #ffffff; /* Light background */
+    --main-text-color: #212121; /* Dark text */
+    --main-text-light-color: rgb(100, 100, 100); /* Darker text */
+    --card-bg-color: #f0f0f0; /* Lighter card background */
+    --main-light-color: #e0e0e0; /* Light light color */
+    --main-very-light-color: #ededed; /* Lighter very light color */
+    --app-bar-bg-color: #f7f7f7;
+}
+
+div {
+    color: var(--main-text-color);
+}
+
+.app-bar {
+    .tab .v-btn__content {
         height: 100%;
-    }
-
-    .v-tab__slider::before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0%;
-        height: 2px;
-        background: #ffffff;
         width: 100%;
-        z-index: 0;
     }
 
-    .v-ripple__container {
-        z-index: 10;
+    .tab {
+        padding: 0 !important;
+    }
+
+    .v-toolbar__content {
+        height: 100% !important;
+        position: relative;
+    }
+
+    .v-tabs {
+        height: 100% !important;
+    }
+
+    .v-tabs button{
+        height: 100% !important;
     }
 }

@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    lightTheme: false,
     allowed: true,
     feedbackDialog: false,
     maintenanceDialog: false,
@@ -47,7 +48,9 @@ export const useAppStore = defineStore('app', {
     },
     addJobForm: {
       images: [],
-    }
+    },
+    jobs: [],
+    fullscreen: false
   }),
   actions: {
     connectToWebsocket() {
@@ -123,11 +126,12 @@ export const useAppStore = defineStore('app', {
           if (!data.error) {
             data.jobs.forEach(job => {
               job.area = JSON.parse(job.area);
-            })
+            });
           }
           this.jobParams.page = parseInt(data.page);
           this.jobParams.limit = parseInt(data.limit);
           this.jobParams.totalCount = parseInt(data.totalCount);
+          this.jobs = data.jobs;
           resolve(response);
         })
         .catch((error) => {
@@ -278,6 +282,9 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/users/my-listings.json`).then((response) => {
           let data = response.data;
+          data.listings.forEach(job => {
+            job.area = JSON.parse(job.area);
+          });
           resolve(data);
         })
         .catch((error) => {
@@ -286,7 +293,7 @@ export const useAppStore = defineStore('app', {
       })
     },
     formatDate(date, format = 'DD.MM.YYYY') {
-      return moment(date).format(format);
+      return moment(date).format(format).replace(/(^|\.)(0+)/g, '$1');
     },
     uploadProfileImage(payload) {
       return new Promise((resolve, reject) => {
@@ -320,15 +327,22 @@ export const useAppStore = defineStore('app', {
     },
     toggleFullscreen(element) {
       if (document.fullscreenElement) {
-        return document.exitFullscreen() // exit fullscreen on next click
+        this.fullscreen = false;
+        document.exitFullscreen() // exit fullscreen on next click
       }
       if (element.requestFullscreen) {
+        this.fullscreen = true;
         element.requestFullscreen()
       } else if (this.element.webkitRequestFullscreen) {
+        this.fullscreen = true;
         element.webkitRequestFullscreen() // Safari
       } else if (this.element.msRequestFullscreen) {
+        this.fullscreen = true;
         element.msRequestFullscreen() // IE11
+      } else {
+        // TODO Cant fullscreen
       }
+      console.log(this.fullscreen);
     },
     successToast(message) {
       this.snackbar = false;
