@@ -252,6 +252,7 @@ getJobs();
     /* min-height: calc(100vh - 270px); */
     flex-grow: 1;
     justify-content: start;
+    padding: 0 15px;
   }
   .top-layout {
     padding-top: 30px;

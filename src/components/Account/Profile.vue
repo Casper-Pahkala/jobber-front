@@ -1,54 +1,53 @@
 <template>
-    <div
-      class="row"
-    >
-          <div class="profile-image-container">
-            <v-img
-                v-if="store.user.has_image"
-                :src="store.user.profileImageUrl"
-                cover
-                class="profile-image"
-                :key="profileImageUpdated"
-                @click.stop="openFileInput()"
+    <div class="row">
+      <div class="profile-image-container">
+        <v-img
+            v-if="store.user.has_image"
+            :src="store.user.profileImageUrl"
+            cover
+            class="profile-image"
+            :key="profileImageUpdated"
+            @click.stop="openFileInput()"
+          >
+            <template v-slot:placeholder>
+              <v-row
+                class="fill-height ma-0"
+                align="center"
+                justify="center"
               >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
+                <v-progress-circular
+                  indeterminate
+                  color="grey-lighten-5"
+                ></v-progress-circular>
+              </v-row>
+            </template>
 
-              </v-img>
-              <div v-if="!store.user.has_image" class="profile-image empty">
-                <v-icon class="empty-icon">
-                  mdi-account
-                </v-icon>
-              </div>
-
-              <v-icon
-                @click.stop="openFileInput()"
-                id="edit-profile-image-btn"
-              >
-                mdi-pencil
-              </v-icon>
+          </v-img>
+          <div v-if="!store.user.has_image" class="profile-image empty">
+            <v-icon class="empty-icon">
+              mdi-account
+            </v-icon>
           </div>
-            <div class="user-info">
-              <span class="fullname">
-                {{ fullName }}
-              </span>
-              <span class="joined-at">
-                {{ joinedAt }}
-              </span>
-            </div>
-        </div>
 
-      <v-container class="profile-container" v-if="store.user">
+          <v-icon
+            @click.stop="openFileInput()"
+            id="edit-profile-image-btn"
+          >
+            mdi-pencil
+          </v-icon>
+      </div>
+
+      <div class="user-info">
+        <span class="fullname">
+          {{ fullName }}
+        </span>
+        <span class="joined-at">
+          {{ joinedAt }}
+        </span>
+      </div>
+    </div>
+
+      <div class="profile-container" v-if="store.user">
 
         <v-row
           class="info-wrapper"
@@ -247,8 +246,7 @@
             </v-btn>
           </v-col>
         </v-row> -->
-      </v-container>
-
+      </div>
   <input
     type="file"
     ref="fileInput"

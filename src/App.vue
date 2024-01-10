@@ -27,21 +27,19 @@
 <script setup>
 
 import { useAppStore } from '@/store/app';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import i18n from "@/i18n/i18n";
 
 const locale = localStorage.getItem('locale');
-
+const store = useAppStore();
 if (locale) {
   i18n.global.locale = locale;
 }
-// i18n.global.locale = 'en';
-const store = useAppStore();
+
+const lightThemeEnabled = localStorage.getItem('light_theme');
+store.lightTheme = lightThemeEnabled && lightThemeEnabled === 'true';
 
 store.initializeAxios();
-// if (!store.auth_token) {
-//   store.auth_token = window.auth_token;
-// }
 if (store.auth_token) {
   store.getUser().then((response) => {
     store.userInit();
@@ -62,6 +60,31 @@ function checkPassword() {
     passwordError.value = true;
   }
 }
+store.window.width = window.innerWidth;
+store.window.height = window.innerHeight;
+window.addEventListener("resize", () => {
+  store.window.width = window.innerWidth;
+  store.window.height = window.innerHeight;
+});
+var root = document.querySelector(':root');
+if (store.lightTheme) {
+  root.style.setProperty('--scrollbar-track-color', 'rgb(237, 237, 237)');
+  root.style.setProperty('--scrollbar-color', 'rgb(70, 70, 70)');
+} else {
+  root.style.setProperty('--scrollbar-track-color', 'rgb(25, 25, 25)');
+  root.style.setProperty('--scrollbar-color', 'rgb(70, 70, 70)');
+}
+watch(() => store.lightTheme, (newVal) => {
+  var root = document.querySelector(':root');
+  if (newVal) {
+    root.style.setProperty('--scrollbar-track-color', 'rgb(237, 237, 237)');
+    root.style.setProperty('--scrollbar-color', 'rgb(150, 150, 150)');
+  } else {
+    root.style.setProperty('--scrollbar-track-color', 'rgb(25, 25, 25)');
+    root.style.setProperty('--scrollbar-color', 'rgb(70, 70, 70)');
+  }
+  localStorage.setItem('light_theme', newVal);
+})
 
 </script>
 

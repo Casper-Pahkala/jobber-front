@@ -1,83 +1,83 @@
 <template>
-        <v-container v-if="messages.length > 0">
-          <v-card
-            v-for="(message, index) in messages"
-            :key="index"
-            @click="store.openChat(message)"
-            class="message-container"
-            elevation="4"
-          >
-            <div class="message-wrapper">
-              <v-img
-                :src="`${store.url}/profile-image/${message.other_user_id}.jpg`"
-                cover
-                class="job-image"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
+  <div v-if="messages.length > 0">
+    <v-card
+      v-for="(message, index) in messages"
+      :key="index"
+      @click="store.openChat(message)"
+      class="message-container"
+      elevation="4"
+    >
+      <div class="message-wrapper">
+        <v-img
+          :src="`${store.url}/profile-image/${message.other_user_id}.jpg`"
+          cover
+          class="job-image"
+        >
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey-lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
 
-              <div class="message-info">
-                <div class="name">
-                  {{ message.other_full_name }}
-                </div>
-                <div class="job-title">
-                  {{ message.job_title ?? 'Poistettu' }}
-                </div>
-                <div class="latest-message">
-                  <div class="message">
-                    {{ latestMessage(message) }}
-                  </div>
-
-                  <v-icon
-                    icon="mdi-circle"
-                    size="6"
-                  >
-                  </v-icon>
-
-                  {{ timeFromDate(message.time) }}
-                </div>
-              </div>
-            </div>
-
-            <div v-if="message.deleted" class="deleted">
-
-            </div>
-          </v-card>
-
-          <div v-if="loading" class="loading-container">
-            <span class="loader"></span>
+        <div class="message-info">
+          <div class="name">
+            {{ message.other_full_name }}
           </div>
+          <div class="job-title">
+            {{ message.job_title ?? 'Poistettu' }}
+          </div>
+          <div class="latest-message">
+            <div class="message">
+              {{ latestMessage(message) }}
+            </div>
 
-        </v-container>
-        <div v-if="messages.length == 0 && store.user && !loading" class="no-messages-text">
-          Ei viestejä
-          <v-btn color="primary" class="text-none" @click="toJobs()">
-            Etsi töitä
-          </v-btn>
-        </div>
+            <v-icon
+              icon="mdi-circle"
+              size="6"
+            >
+            </v-icon>
 
-        <div v-if="!store.user" class="no-messages-text">
-          Kirjaudu sisään niin pääset näkemään viestisi
-          <v-btn
-            class="mt-7"
-            size="large"
-            color="primary"
-            @click="store.loginDialogShowing = true"
-          >
-            Kirjaudu
-          </v-btn>
+            {{ timeFromDate(message.time) }}
+          </div>
         </div>
+      </div>
+
+      <div v-if="message.deleted" class="deleted">
+
+      </div>
+    </v-card>
+
+    <div v-if="loading" class="loading-container">
+      <span class="loader"></span>
+    </div>
+
+  </div>
+  <div v-if="messages.length == 0 && store.user && !loading" class="no-messages-text">
+    Ei viestejä
+    <v-btn color="primary" class="text-none" @click="toJobs()">
+      Etsi töitä
+    </v-btn>
+  </div>
+
+  <div v-if="!store.user" class="no-messages-text">
+    Kirjaudu sisään niin pääset näkemään viestisi
+    <v-btn
+      class="mt-7"
+      size="large"
+      color="primary"
+      @click="store.loginDialogShowing = true"
+    >
+      Kirjaudu
+    </v-btn>
+  </div>
 </template>
 
 <script setup>
@@ -142,8 +142,9 @@ function latestMessage(message) {
 
   .message-container {
     padding: 10px;
-    margin: 20px;
+    margin: 20px 0;
     position: relative;
+    background-color: var(--card-bg-color);
   }
 
   .message-wrapper {

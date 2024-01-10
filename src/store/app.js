@@ -50,7 +50,11 @@ export const useAppStore = defineStore('app', {
       images: [],
     },
     jobs: [],
-    fullscreen: false
+    fullscreen: false,
+    window: {
+      width: null,
+      height: null
+    }
   }),
   actions: {
     connectToWebsocket() {
@@ -374,7 +378,7 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
-          Cookies.set('auth_token', null);
+          Cookies.remove('auth_token');
           window.location.href = '/';
           resolve(data);
         })
@@ -708,6 +712,12 @@ export const useAppStore = defineStore('app', {
 
   },
   getters: {
+    theme() {
+      return this.lightTheme ? 'light' : 'dark';
+    },
+    cardCloseBtnColor() {
+      return this.lightTheme ? '#f0f0f0' : 'rgb(33, 33, 33)';
+    },
     latestMessages() {
       let latestMessages = [];
 

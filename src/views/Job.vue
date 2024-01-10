@@ -190,6 +190,7 @@
               <v-skeleton-loader
                 style="width: 100%; height: 100%;"
                 class="job-image"
+                :theme="store.theme"
               ></v-skeleton-loader>
             </v-container>
             <div
@@ -198,25 +199,25 @@
             </div>
         </v-container>
 
-          <v-skeleton-loader type="article"></v-skeleton-loader>
+          <v-skeleton-loader type="article" :theme="store.theme"></v-skeleton-loader>
 
           <v-divider class="mt-5"></v-divider>
 
-          <v-skeleton-loader type="list-item-three-line"></v-skeleton-loader>
+          <v-skeleton-loader type="list-item-three-line" :theme="store.theme"></v-skeleton-loader>
           <v-divider class="mt-5 mb-5"></v-divider>
           <v-card class="pa-5" elevation="8">
             <div>
 
               <div style="display: flex; gap: 5px; align-items: center;">
                 <v-icon icon="mdi-account"></v-icon>
-                <v-skeleton-loader type="text" width="300px"></v-skeleton-loader>
+                <v-skeleton-loader type="text" width="300px" :theme="store.theme"></v-skeleton-loader>
               </div>
               <div class="mb-7">
-                <v-skeleton-loader type="text" width="300px" height="20px" style="margin-top: -10px;"></v-skeleton-loader>
+                <v-skeleton-loader type="text" width="300px" height="20px" style="margin-top: -10px;" :theme="store.theme"></v-skeleton-loader>
               </div>
             </div>
 
-            <v-skeleton-loader width="200px" height="40px" class="mt-6"></v-skeleton-loader>
+            <v-skeleton-loader width="200px" height="40px" class="mt-6" :theme="store.theme"></v-skeleton-loader>
           </v-card>
         </v-container>
       </template>
@@ -286,7 +287,7 @@ function contact() {
 
 function imageUrl(index = 0, lazy = false) {
   if (job.value.job_images && job.value.job_images.length > 0) {
-    return store.url + '/job-image/' + job.value.job_images[index].name;
+    return store.url + '/job-image/' + job.value.job_images[index].name + '.jpg';
 
   } else {
     return store.url + '/no-img.png';
@@ -465,6 +466,7 @@ document.addEventListener("fullscreenchange", () => {
     top: 10px;
     right: 10px;
     z-index: 100;
+    background-color: var(--card-bg-color);
   }
 
   .user-card {

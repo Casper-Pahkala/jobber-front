@@ -32,7 +32,7 @@
 
       <div class="pb-10">
         <v-btn
-          class="mx-4"
+          class="some-btn mx-4"
           variant="text"
           href="https://www.instagram.com/rekrytorsuomi/"
           target="_blank"
@@ -41,7 +41,7 @@
         </v-btn>
 
         <v-btn
-          class="mx-4"
+          class="some-btn mx-4"
           variant="text"
           icon
           href="https://www.tiktok.com/@rekrytorsuomi"
@@ -86,8 +86,8 @@
 
   </v-btn>
 
-  <v-dialog v-model="store.feedbackDialog" persistent max-width="600px">
-      <v-card>
+  <v-dialog v-model="store.feedbackDialog" persistent max-width="600px" :class="{ 'light-theme': store.lightTheme }">
+      <v-card class="feedback-card">
         <v-card-title>
           <span class="headline pl-8">Anna palautetta tai ehdotuksia</span>
         </v-card-title>
@@ -191,5 +191,14 @@ export default {
     position: fixed;
     right: 20px;
     bottom: 20px;
+  }
+
+  .feedback-card {
+    background-color: var(--card-bg-color);
+  }
+
+  .some-btn {
+    color: var(--main-text-color);
+    color: white;
   }
 </style>

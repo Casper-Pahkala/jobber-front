@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="store.loginDialogShowing" max-width="500" persistent>
-  <v-card>
+  <v-dialog v-model="store.loginDialogShowing" max-width="500" persistent class="login-dialog" :class="{ 'light-theme': store.lightTheme }">
+  <v-card class="login-card">
     <v-card-title class="headline pa-4">
       Kirjaudu sisään
     </v-card-title>
@@ -20,6 +20,7 @@
       </v-alert>
       <v-form @submit.prevent="login">
         <v-text-field
+          :theme="store.theme"
           v-model="email"
           label="Sähköposti"
           outlined
@@ -29,6 +30,7 @@
           class="my-2"
         ></v-text-field>
         <v-text-field
+          :theme="store.theme"
           v-model="password"
           label="Salasana"
           outlined
@@ -58,7 +60,7 @@
       </a>
     </v-card-text>
 
-    <v-btn icon @click="store.loginDialogShowing = false" class="dialog-close-btn" flat>
+    <v-btn icon @click="store.loginDialogShowing = false" class="dialog-close-btn" flat  :color="store.lightTheme ? 'white' : 'grey-darken-4'">
       <v-icon>mdi-close</v-icon>
     </v-btn>
   </v-card>
@@ -165,5 +167,9 @@ function toRegister() {
   color: #1565C0;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.login-card {
+  background-color: var(--card-bg-color);
 }
 </style>

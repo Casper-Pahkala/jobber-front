@@ -6,7 +6,7 @@
        v-if="store.user"
       >
         <v-tabs
-          class="d-none d-sm-flex mb-10 profile-tabs"
+          class="d-sm-flex profile-tabs"
           v-model="accountTab"
         >
           <v-tab @click="changeTab('profile')" value="profile" class="text-none tab">Profiili</v-tab>
@@ -18,16 +18,16 @@
           </div>
         </v-tabs>
 
-        <v-window v-model="accountTab">
-          <v-window-item value="profile">
+        <v-window v-model="accountTab" class="pt-10">
+          <v-window-item value="profile" class="window">
             <profile></profile>
           </v-window-item>
 
-          <v-window-item value="messages">
+          <v-window-item value="messages" class="window">
             <messages></messages>
           </v-window-item>
 
-          <v-window-item value="listings">
+          <v-window-item value="listings" class="window">
             <listings></listings>
           </v-window-item>
         </v-window>
@@ -104,6 +104,15 @@ watch(currentRoute, async (newVal, oldVal) => {
 .tab {
   /* border-top-right-radius: 10px;
   border-top-left-radius: 10px; */
+}
+
+.window {
+  min-height: calc(100vh - var(--app-bar-height) - 98px);
+  padding: 0 15px;
+}
+
+.profile-tabs {
+  padding: 0 15px;
 }
 </style>
 

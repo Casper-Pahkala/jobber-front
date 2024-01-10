@@ -3,9 +3,11 @@
     v-model="store.chatOpen"
     max-width="700"
     persistent
+    :class="{ 'light-theme': store.lightTheme }"
   >
       <v-card
-      min-width="300"
+        min-width="300"
+        class="chat-card"
       >
         <div class="chat">
           <div class="contact bar">
@@ -14,11 +16,13 @@
               <v-skeleton-loader
                 class="profile-image"
                 type="image"
+                :theme="store.theme"
               >
 
               </v-skeleton-loader>
 
               <v-skeleton-loader
+                :theme="store.theme"
                 type="list-item-two-line"
               ></v-skeleton-loader>
             </template>
@@ -128,22 +132,23 @@
               <v-card
                 class="job-container"
                 :elevation="isHovering && !job.is_deleted ? 8 : 6"
-                color="grey-lighten-3"
+                :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'"
                 v-bind="props"
                 @click="openJob()"
                 :disabled="!job || job.is_deleted || loading"
               >
-
                 <v-card-item>
                   <div class="job-container">
                     <template v-if="loading">
                       <v-skeleton-loader
+                        :theme="store.theme"
                         type="image"
                         class="job-image"
                       >
                       </v-skeleton-loader>
 
                       <v-skeleton-loader
+                        :theme="store.theme"
                         class="job-content"
                         type="list-item-two-line"
                       ></v-skeleton-loader>
@@ -205,8 +210,9 @@
                     @keyup.enter="sendMessage"
                     class="message-input ml-2 mr-2 mb-2 mt-2"
                     elevation="12"
-                    bg-color="grey-lighten-2"
+                    :bg-color="store.lightTheme ? 'grey-lighten-2' : 'grey-darken-3'"
                     :disabled="!job || job.is_deleted"
+                    :theme="store.theme"
                   ></v-text-field>
 
                   <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="!job || job.is_deleted">
@@ -226,6 +232,7 @@
           flat
           icon="mdi-close"
           @click="close()"
+          :color="store.cardCloseBtnColor"
         >
         </v-btn>
       </v-card>
@@ -577,28 +584,6 @@ function imageUrl(job, lazy) {
     padding-top: 40px;
   }
 
-.sent-message {
-  /* text-align: center; */
-  line-height: 30px;
-  padding: 10px 20px;
-  border: 1px solid #ccc;
-  background-color: #ccc;
-  max-width: 60%;
-  width: fit-content;
-  border-radius: 10px 10px 10px 0; /* top left, top right, bottom right, bottom left */
-
-}
-
-.receiver-message {
-  text-align: center;
-  line-height: 30px;
-  padding: 10px 20px;
-  border: 1px solid #ccc;
-  background-color: #ccc;
-
-
-}
-
 #chat-container {
   border: 1px solid black;
   height: calc(60vh - 100px);
@@ -611,7 +596,7 @@ body, html {
   line-height: 1.25em;
   letter-spacing: 0.025em;
   color: #333;
-  background: #F7F7F7;
+  /* background: #F7F7F7; */
 }
 
 .center {
@@ -712,8 +697,9 @@ body, html {
   max-height: 45rem;
   z-index: 2;
   box-sizing: border-box;
-  border-radius: 1rem;
-  background: #F7F7F7;
+  /* border-radius: 1rem; */
+  overflow: hidden;
+  /* background: #F7F7F7; */
   box-shadow: 0 0 8rem 0 rgba(0, 0, 0, 0.1), 0rem 2rem 4rem -3rem rgba(0, 0, 0, 0.5);
 }
 .chat .contact.bar {
@@ -726,7 +712,7 @@ body, html {
 .chat .messages {
   position: relative;
   padding: 1rem;
-  background: #F7F7F7;
+  /* background: #F7F7F7; */
   flex-shrink: 2;
   overflow-y: auto;
   box-shadow: inset 0 2rem 2rem -2rem rgba(0, 0, 0, 0.05), inset 0 -2rem 2rem -2rem rgba(0, 0, 0, 0.05);
@@ -735,7 +721,7 @@ body, html {
 }
 .chat .messages .date {
   font-size: 0.8rem;
-  background: #EEE;
+  background-color: var(--chat-light-bg);
   padding: 0.25rem 1rem;
   border-radius: 2rem;
   color: #999;
@@ -771,7 +757,7 @@ body, html {
   box-sizing: border-box;
   padding: 0.5rem 1rem;
   margin: 1.6rem;
-  background: #FFF;
+  background-color: var(--chat-other-color);
   border-radius: 1.125rem 1.125rem 1.125rem 0;
   min-height: 2.25rem;
   width: -webkit-fit-content;
@@ -783,7 +769,11 @@ body, html {
 .chat .messages .message.sent {
   margin: 1.6rem 1rem 1.6rem auto;
   border-radius: 1.125rem 1.125rem 0 1.125rem;
-  background: #333;
+  color: white;
+  background-color: var(--chat-my-color);
+}
+
+.chat .messages .message.sent div {
   color: white;
 }
 .chat .messages .message .typing {
@@ -792,7 +782,7 @@ body, html {
   height: 0.8rem;
   margin-right: 0rem;
   box-sizing: border-box;
-  background: #ccc;
+  background-color: var(--chat-other-color);
   border-radius: 50%;
 }
 .chat .messages .message .typing.typing-1 {
@@ -920,7 +910,7 @@ body, html {
 
 /* Customize the scrollbar track (background) */
 #messages::-webkit-scrollbar-track {
-  background: #f0f0f0; /* Scrollbar track color */
+  background-color: var(--card-bg-color);
 }
 
 .job-container {
@@ -1037,6 +1027,14 @@ body, html {
 .pdf-loader {
   width: 24px;
   height: 24px;
+}
+
+.chat-card {
+  background-color: var(--card-bg-color);
+}
+
+.chat-container {
+  background-color: var(--card-bg-color);
 }
 </style>
 <style>

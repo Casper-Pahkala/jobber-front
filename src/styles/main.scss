@@ -33,26 +33,56 @@
 
 /* Dark theme */
 :root {
-    --main-bg-color: #212121; /* Dark background */
+    --app-bar-height: 80px;
+    
+    --main-bg-color: rgb(25,25,25); /* Dark background */
     --main-text-color: white; /* Light text */
     --main-text-light-color: rgb(184, 184, 184); /* Lighter text */
-    --card-bg-color: #151515; /* Darker card background */
-    --main-light-color: #313131; /* Dark light color */
+    --card-bg-color: rgb(33,33,33); /* Darker card background */
+    --main-light-color: #292929; /* Dark light color */
     --main-very-light-color: rgb(26, 26, 26); /* Very dark light color */
     --app-bar-bg-color: #131313;
+    
+    
+    --chat-other-color: rgb(45, 45, 45);
+    --chat-my-color: rgb(20,20,20);
+    --chat-light-bg: rgb(42, 42, 42);
 
-    --app-bar-height: 80px;
+    --scrollbar-track-color: rgb(25, 25, 25);
+    --scrollbar-color: rgb(70, 70, 70);
 }
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    border-radius: 14px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 
 /* Light theme */
 .light-theme {
-    --main-bg-color: #ffffff; /* Light background */
-    --main-text-color: #212121; /* Dark text */
+    --main-bg-color: rgb(237, 237, 237); /* Light background */
+    --main-text-color: rgb(33,33,33); /* Dark text */
     --main-text-light-color: rgb(100, 100, 100); /* Darker text */
     --card-bg-color: #f0f0f0; /* Lighter card background */
     --main-light-color: #e0e0e0; /* Light light color */
     --main-very-light-color: #ededed; /* Lighter very light color */
     --app-bar-bg-color: #f7f7f7;
+
+    --chat-light-bg: #e2e2e2;
+    --chat-other-color: #ccc;
+    --chat-my-color: #333;
 }
 
 div {

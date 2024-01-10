@@ -1,5 +1,5 @@
 <template>
-  <!-- <v-navigation-drawer v-model="drawer" temporary>
+  <v-navigation-drawer v-model="drawer" temporary :theme="store.theme">
     <v-list>
 
       <template v-if="store.user">
@@ -77,15 +77,18 @@
         </v-list-item>
       </template>
     </v-list>
-  </v-navigation-drawer> -->
+  </v-navigation-drawer>
 
     <v-app-bar flat class="app-bar" :class="{ scrolled: scrolled}" :elevation="scrolled ? 4 : 0">
       <div class="app-bar-content">
-
-        <div class="rekrytor-text">
-          Rekrytor
+        <div>
+          <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="menu-btn" :ripple="false" flat v-if="store.window.width < 640"></v-app-bar-nav-icon>
+          <router-link to="/jobs" @click="updateTab('jobs')" v-if="store.window.width >= 640">
+            <div class="rekrytor-text">
+              Rekrytor
+            </div>
+          </router-link>
         </div>
-        <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon> -->
         <div class="tabs">
           <v-tabs
             class="d-none d-sm-flex"
@@ -116,6 +119,7 @@
                 v-model="messagesMenu"
                 class="mr-1"
                 :close-on-content-click="false"
+                :theme="store.theme"
               >
                 <template v-slot:activator="{ props }">
                   <div class="unseen-wrapper">
@@ -145,7 +149,7 @@
                   </div>
                   <v-divider></v-divider>
                   <v-list
-                   v-if="recentMessages.length > 0"
+                    v-if="recentMessages.length > 0"
                     class="recent-messages"
                   >
                     <v-list-item
@@ -197,6 +201,7 @@
                 :class="{ 'light-theme': store.lightTheme }"
                 :close-on-content-click="false"
                 v-model="accountMenu"
+                :theme="store.theme"
               >
                 <template v-slot:activator="{ props }">
                   <v-btn
@@ -209,15 +214,34 @@
                   class="menu-card"
                   min-width="180px"
                 >
-                  <v-list-item
-                    v-for="(item, index) in accountItems"
-                    :key="index"
-                    :value="index"
-                    @click="item.onClick()"
-                    :append-icon="item.icon ?? ''"
-                  >
+                <template
+                  v-for="(item, index) in accountItems"
+                  :key="index"
+                >
+                <v-list-item
+                  :value="index"
+                  @click="item.onClick()"
+                  v-if="item.element && item.element === 'theme'"
+                >
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  </v-list-item>
+                    <template v-slot:append>
+                      <v-switch
+                        inset
+                        hide-details
+                        v-model="store.lightTheme"
+                        density="compact"
+                      ></v-switch>
+                    </template>
+                </v-list-item>
+                <v-list-item
+                  :value="index"
+                  @click="item.onClick()"
+                  :append-icon="item.icon ?? ''"
+                  v-else
+                >
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item>
+                </template>
                 </v-list>
               </v-menu>
             </template>
@@ -318,6 +342,13 @@ const accountItems = [
     icon: 'mdi-clipboard-account'
   },
   {
+    title: 'Teema',
+    onClick: () => {
+      store.lightTheme = !store.lightTheme;
+    },
+    element: 'theme'
+  },
+  {
     title: 'Kirjaudu ulos',
     onClick: () => logOut(),
     icon: 'mdi-logout'
@@ -400,7 +431,7 @@ if (window.scrollY > 0) {
   }
 
   .recent-messages::-webkit-scrollbar-track {
-    background: #fff; /* Track color */
+    background-color: var(--card-bg-color);
   }
 
   .recent-messages::-webkit-scrollbar-thumb {
@@ -497,7 +528,8 @@ if (window.scrollY > 0) {
 
   .app-bar {
     background: var(--main-bg-color) !important;
-    transition: all 0.4s ease;
+    /* transition: all 0.4s ease; */
+    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     height: var(--app-bar-height);
   }
 
@@ -515,6 +547,7 @@ if (window.scrollY > 0) {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 5px;
   }
 
   .tabs {
@@ -529,10 +562,12 @@ if (window.scrollY > 0) {
     font-size: 28px;
     font-weight: 600;
     color: var(--main-text-color);
+    padding-left: 15px;
   }
 
   .rekrytor-text, .app-bar-append {
     width: 400px;
+    flex-shrink: 0;
   }
 
   .app-bar-append {
@@ -552,20 +587,23 @@ if (window.scrollY > 0) {
     padding: 20px;
   }
 
-  .menu-card {
-    background: var(--card-bg-color) !important;
+  .menu-btn {
+    font-size: 20px;
   }
 
   @media (max-width: 1199px) {
-    .main-nav {
-      display: none;
-    }
     .add-job-btn {
       display: none;
     }
 
     .rekrytor-text, .app-bar-append {
       width: 100px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .tabs {
+      display: none;
     }
   }
 </style>

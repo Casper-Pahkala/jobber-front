@@ -33,11 +33,30 @@
               <div class="job-main">
                   <div class="job-title">{{ job.title }}</div>
                   <div class="job-description">{{ store.jobShortInfo(job) }}</div>
+
+                  <div class="job-info small" v-show="store.window.width < 1199">
+                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                    <div class="job-info-item" >
+                      <div class="area-container" :style="myListing ? 'margin-right: 50px;' : ''">
+                        <template
+                          v-for="(area, index) in job.area"
+                          :key="index"
+                        >
+                          <div v-if="index < 1" class="area-chip">
+                            {{ area }}
+                          </div>
+                        </template>
+                        <div v-if="job.area.length > 2" style="line-height: 25px; letter-spacing: 2px;">
+                          +{{ job.area.length - 2 }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
               </div>
 
-              <div class="job-info">
+              <div class="job-info" v-show="store.window.width >= 1199">
                 <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
-                <div class="job-info-item mt-2">
+                <div class="job-info-item mt-2" >
                   <div class="area-container" :style="myListing ? 'margin-right: 50px;' : ''">
                     <template
                       v-for="(area, index) in job.area"
@@ -64,7 +83,7 @@
         v-if="myListing"
         class="action-btns"
       >
-        <v-menu @click.stop :theme="store.lightTheme ? 'light' : 'dark'">
+        <v-menu @click.stop :theme="store.theme">
           <template v-slot:activator="{ props }">
             <v-btn @click.stop v-bind="props" icon="mdi-dots-vertical" class="more-btn" :color="!store.lightTheme ? 'grey-darken-3' : 'grey-lighten-3'"></v-btn>
           </template>
@@ -105,7 +124,7 @@ function handleJobClick(job) {
 
 function imageUrl(job, lazy) {
   if (job.job_images && job.job_images.length > 0) {
-    return store.url + '/job-image/' + job.job_images[0].name;
+    return store.url + '/job-image/' + job.job_images[0].name + '.jpg';
   } else {
     return store.url + '/no-img.png'
   }
@@ -172,6 +191,15 @@ function deleteListing(listing) {
       flex-direction: column;
       gap: 5px;
   }
+
+  .job-info.small {
+    width: 100%;
+  }
+
+  .job-info.small .job-info-item {
+    justify-content: start;
+    font-size: 12px;
+  }
   .job-info-item {
     font-size: 14px;
     display: flex;
@@ -186,5 +214,35 @@ function deleteListing(listing) {
   .more-btn {
     height: 40px;
     width: 40px;
+  }
+
+  @media (max-width: 1199px) {
+    .job {
+      margin: 5px 0;
+      height: 120px;
+
+    }
+
+    .job-image {
+      height: 120px;
+      width: auto;
+      aspect-ratio: 1;
+    }
+
+    .job-content {
+      padding: 0 10px;
+    }
+
+    .job-main {
+      width: 100%;
+    }
+
+    .area-chip {
+      padding: 0;
+      background-color: transparent;
+      display: flex;
+      align-items: center;
+      padding-right: 5px;
+    }
   }
 </style>

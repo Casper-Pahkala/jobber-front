@@ -9,7 +9,7 @@ const routes = [
       {
         path: '',
         name: '',
-        component: () => import('@/views/Home2.vue'),
+        component: () => import('@/views/Home.vue'),
       },
     ],
   },
