@@ -80,182 +80,187 @@
   </v-navigation-drawer>
 
     <v-app-bar flat class="app-bar" :class="{ scrolled: scrolled}" :elevation="scrolled ? 4 : 0">
-      <div class="app-bar-content">
-        <div>
-          <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="menu-btn" :ripple="false" flat v-if="store.window.width < 640"></v-app-bar-nav-icon>
-          <router-link to="/jobs" @click="updateTab('jobs')" v-if="store.window.width >= 640">
-            <div class="rekrytor-text">
-              Rekrytor
-            </div>
-          </router-link>
-        </div>
-        <div class="tabs">
-          <v-tabs
-            class="d-none d-sm-flex"
-            v-model="store.tab"
-          >
-            <v-tab @click="updateTab('jobs')" value="jobs" class="text-none tab" :ripple="false">
-              <router-link to="/jobs" class="router-link">{{ $t('Avoimet työt') }}</router-link>
-            </v-tab>
-            <v-tab @click="updateTab('workers')" value="workers" class="text-none tab" :ripple="false">
-              <router-link to="/workers" class="router-link">{{ $t('Henkilöt ja palvelut') }}</router-link>
-            </v-tab>
-          </v-tabs>
-        </div>
-          <div class="app-bar-append">
+      <div class="app-bar-content-wrapper">
+        <div class="app-bar-content">
 
-            <template v-if="store.user">
-              <v-btn
-                prepend-icon="mdi-plus"
-                class="add-job-btn mr-5"
-                style="height: 48px;"
-                @click="changeTab('add-job')"
-              >
-                {{ $t('Luo listaus') }}
-              </v-btn>
+          <div>
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="menu-btn" :ripple="false" flat v-if="store.window.width < 640"></v-app-bar-nav-icon>
+            <router-link to="/jobs" @click="updateTab('jobs')" v-if="store.window.width >= 640">
+              <div class="rekrytor-text">
+                Rekrytor
+              </div>
+            </router-link>
+          </div>
+          <div class="tabs">
+            <v-tabs
+              class="d-none d-sm-flex"
+              v-model="store.tab"
+            >
+              <v-tab @click="updateTab('jobs')" value="jobs" class="text-none tab" :ripple="false">
+                <router-link to="/jobs" class="router-link">{{ $t('Avoimet työt') }}</router-link>
+              </v-tab>
+              <v-tab @click="updateTab('workers')" value="workers" class="text-none tab" :ripple="false">
+                <router-link to="/workers" class="router-link">{{ $t('Henkilöt ja palvelut') }}</router-link>
+              </v-tab>
+            </v-tabs>
+          </div>
+            <div class="app-bar-append">
 
-              <v-menu
-                :class="{ 'light-theme': store.lightTheme }"
-                v-model="messagesMenu"
-                class="mr-1"
-                :close-on-content-click="false"
-                :theme="store.theme"
-              >
-                <template v-slot:activator="{ props }">
-                  <div class="unseen-wrapper">
+              <template v-if="store.user">
+                <v-btn
+                  prepend-icon="mdi-plus"
+                  class="add-job-btn mr-5"
+                  style="height: 48px;"
+                  @click="changeTab('add-job')"
+                >
+                  {{ $t('Luo listaus') }}
+                </v-btn>
+
+                <v-menu
+                  :class="{ 'light-theme': store.lightTheme }"
+                  v-model="messagesMenu"
+                  class="mr-1"
+                  :close-on-content-click="false"
+                  :theme="store.theme"
+                  location="bottom end"
+                >
+                  <template v-slot:activator="{ props }">
+                    <div class="unseen-wrapper">
+                      <v-btn
+                        icon="mdi-message-text"
+                        v-bind="props"
+                      >
+                      </v-btn>
+                      <div
+                        class="unseen-count"
+                        v-if="recentMessages.length > 0"
+                      >
+                        {{ allUnseenMessages.length }}
+                      </div>
+                    </div>
+
+                  </template>
+                  <v-card class="menu-card">
+                    <v-card-title
+                     style="font-size: 18px;"
+                    >
+                      Lukemattomat viestit
+                    </v-card-title>
+
+                    <div class="show-all-messages" @click="changeTab('messages')">
+                      Näytä kaikki
+                    </div>
+                    <v-divider></v-divider>
+                    <v-list
+                      v-if="recentMessages.length > 0"
+                      class="recent-messages"
+                    >
+                      <v-list-item
+                        v-for="(item, index) in recentMessages"
+                        :key="index"
+                        :value="index"
+                        class="pt-4 pb-4"
+                        @click="openRecentMessage(item)"
+                      >
+                        <template v-slot:prepend>
+                          <div class="not-seen"></div>
+                          <v-avatar size="50px">
+                            <v-img
+                              alt="Avatar"
+                              :src="`${store.url}/profile-image/${item.other_user_id}.jpg`"
+                            ></v-img>
+                          </v-avatar>
+                        </template>
+
+                        <v-list-item-title>{{ item.other_full_name }}</v-list-item-title>
+                        <v-list-item-subtitle style="opacity: 1;" class="pt-1">{{ item.job_title }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="pt-1">
+                          <div class="latest-message">
+                            <div class="message">
+                              {{ item.message }}
+                            </div>
+
+                            <v-icon
+                              icon="mdi-circle"
+                              size="6"
+                            >
+                            </v-icon>
+
+                            {{ timeFromDate(item.time) }}
+                          </div>
+                        </v-list-item-subtitle>
+                        <div class="messages-count">
+                          {{ allMessagesCount(item) }}
+                        </div>
+                      </v-list-item>
+                    </v-list>
+
+                    <div v-else class="no-messages-text">
+                      Tyhjää täynnä
+                    </div>
+                  </v-card>
+                </v-menu>
+                <v-menu
+                  :class="{ 'light-theme': store.lightTheme }"
+                  :close-on-content-click="false"
+                  v-model="accountMenu"
+                  :theme="store.theme"
+                  location="bottom end"
+                >
+                  <template v-slot:activator="{ props }">
                     <v-btn
-                      icon="mdi-message-text"
+                      icon="mdi-account"
                       v-bind="props"
                     >
                     </v-btn>
-                    <div
-                      class="unseen-count"
-                      v-if="recentMessages.length > 0"
-                    >
-                      {{ allUnseenMessages.length }}
-                    </div>
-                  </div>
-
-                </template>
-                <v-card class="menu-card">
-                  <v-card-title
-                   style="font-size: 18px;"
-                  >
-                    Lukemattomat viestit
-                  </v-card-title>
-
-                  <div class="show-all-messages" @click="changeTab('messages')">
-                    Näytä kaikki
-                  </div>
-                  <v-divider></v-divider>
+                  </template>
                   <v-list
-                    v-if="recentMessages.length > 0"
-                    class="recent-messages"
+                    class="menu-card"
+                    min-width="180px"
                   >
-                    <v-list-item
-                      v-for="(item, index) in recentMessages"
-                      :key="index"
-                      :value="index"
-                      class="pt-4 pb-4"
-                      @click="openRecentMessage(item)"
-                    >
-                      <template v-slot:prepend>
-                        <div class="not-seen"></div>
-                        <v-avatar size="50px">
-                          <v-img
-                            alt="Avatar"
-                            :src="`${store.url}/profile-image/${item.other_user_id}.jpg`"
-                          ></v-img>
-                        </v-avatar>
+                  <template
+                    v-for="(item, index) in accountItems"
+                    :key="index"
+                  >
+                  <v-list-item
+                    :value="index"
+                    @click="item.onClick()"
+                    v-if="item.element && item.element === 'theme'"
+                  >
+                      <v-list-item-title>{{ item.title }}</v-list-item-title>
+                      <template v-slot:append>
+                        <v-switch
+                          inset
+                          hide-details
+                          v-model="store.lightTheme"
+                          density="compact"
+                        ></v-switch>
                       </template>
-
-                      <v-list-item-title>{{ item.other_full_name }}</v-list-item-title>
-                      <v-list-item-subtitle style="opacity: 1;" class="pt-1">{{ item.job_title }}</v-list-item-subtitle>
-                      <v-list-item-subtitle class="pt-1">
-                        <div class="latest-message">
-                          <div class="message">
-                            {{ item.message }}
-                          </div>
-
-                          <v-icon
-                            icon="mdi-circle"
-                            size="6"
-                          >
-                          </v-icon>
-
-                          {{ timeFromDate(item.time) }}
-                        </div>
-                      </v-list-item-subtitle>
-                      <div class="messages-count">
-                        {{ allMessagesCount(item) }}
-                      </div>
-                    </v-list-item>
-                  </v-list>
-
-                  <div v-else class="no-messages-text">
-                    Tyhjää täynnä
-                  </div>
-                </v-card>
-              </v-menu>
-              <v-menu
-                :class="{ 'light-theme': store.lightTheme }"
-                :close-on-content-click="false"
-                v-model="accountMenu"
-                :theme="store.theme"
-              >
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                    icon="mdi-account"
-                    v-bind="props"
+                  </v-list-item>
+                  <v-list-item
+                    :value="index"
+                    @click="item.onClick()"
+                    :append-icon="item.icon ?? ''"
+                    v-else
                   >
-                  </v-btn>
-                </template>
-                <v-list
-                  class="menu-card"
-                  min-width="180px"
-                >
-                <template
-                  v-for="(item, index) in accountItems"
-                  :key="index"
-                >
-                <v-list-item
-                  :value="index"
-                  @click="item.onClick()"
-                  v-if="item.element && item.element === 'theme'"
-                >
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    <template v-slot:append>
-                      <v-switch
-                        inset
-                        hide-details
-                        v-model="store.lightTheme"
-                        density="compact"
-                      ></v-switch>
-                    </template>
-                </v-list-item>
-                <v-list-item
-                  :value="index"
-                  @click="item.onClick()"
-                  :append-icon="item.icon ?? ''"
-                  v-else
-                >
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
-                </v-list-item>
-                </template>
-                </v-list>
-              </v-menu>
-            </template>
+                  </v-list-item>
+                  </template>
+                  </v-list>
+                </v-menu>
+              </template>
 
-            <template v-else>
-              <v-btn
-                size="small"
-                text="81"
-                rounded="xl"
-                class="text-none login-btn bg-primary"
-                @click="store.loginDialogShowing = true"
-              >Kirjaudu sisään</v-btn>
-            </template>
-          </div>
+              <template v-else>
+                <v-btn
+                  size="small"
+                  text="81"
+                  rounded="xl"
+                  class="text-none login-btn bg-primary"
+                  @click="store.loginDialogShowing = true"
+                >Kirjaudu sisään</v-btn>
+              </template>
+            </div>
+        </div>
       </div>
     </v-app-bar>
 </template>
@@ -537,17 +542,13 @@ if (window.scrollY > 0) {
     background-color: var(--app-bar-bg-color) !important;
   }
 
-  .app-bar-content {
+  .app-bar-content-wrapper {
     position: absolute;
     max-width: 1200px;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 5px;
   }
 
   .tabs {
@@ -589,6 +590,16 @@ if (window.scrollY > 0) {
 
   .menu-btn {
     font-size: 20px;
+  }
+
+  .app-bar-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
   }
 
   @media (max-width: 1199px) {

@@ -248,13 +248,18 @@
         v-model="confirmAttachmentDialog"
         width="500"
       >
-        <v-card>
+        <v-card
+          :theme="store.theme"
+        >
           <v-card-title>
             Vahvista liite
           </v-card-title>
           <v-card-item>
             <div @click="openAttachment" class="attachmentName">
               {{ attachmentName }}
+              <v-icon style="font-size: 18px; margin-left: 5px;">
+                mdi-open-in-new
+              </v-icon>
             </div>
           </v-card-item>
 

@@ -18,7 +18,7 @@
           </div>
         </v-tabs>
 
-        <v-window v-model="accountTab" class="pt-10">
+        <v-window v-model="accountTab" class="pt-10" disabled>
           <v-window-item value="profile" class="window">
             <profile></profile>
           </v-window-item>
@@ -109,6 +109,8 @@ watch(currentRoute, async (newVal, oldVal) => {
 .window {
   min-height: calc(100vh - var(--app-bar-height) - 98px);
   padding: 0 15px;
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-tabs {

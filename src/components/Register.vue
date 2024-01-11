@@ -10,10 +10,25 @@
           <v-form @submit.prevent="register">
             <v-text-field v-model="firstName" label="Etunimi" type="text" name="fname" :theme="store.theme"></v-text-field>
             <v-text-field v-model="lastName" label="Sukunimi" type="text" name="lname" :theme="store.theme"></v-text-field>
-            <v-text-field v-model="email" label="Sähköposti" type="email" :theme="store.theme"></v-text-field>
+            <v-text-field
+              v-model="email"
+              label="Sähköposti"
+              type="email"
+              :theme="store.theme"
+              :error="emailError"
+              @input="isValidEmail(email)"
+              name="email"
+            ></v-text-field>
             <v-text-field v-model="password" label="Salasana" type="password" :theme="store.theme"></v-text-field>
+            <v-text-field
+              v-model="confirmPassword"
+              label="Vahvista salasana"
+              type="password"
+              :theme="store.theme"
+              :error-messages="confirmPasswordError"
+            ></v-text-field>
             <v-col class="text-right">
-              <v-btn type="submit" color="primary" class="text-none">Luo käyttäjä</v-btn>
+              <v-btn type="submit" color="primary" class="text-none" :disabled="!canRegister">Luo käyttäjä</v-btn>
             </v-col>
           </v-form>
         </v-card-text>
@@ -25,14 +40,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useAppStore } from '@/store/app';
 
 const store = useAppStore();
-const firstName = ref(null);
-const lastName = ref(null);
-const email = ref(null);
-const password = ref(null);
+const firstName = ref('');
+const lastName = ref('');
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+
+const emailError = ref(false);
+const confirmPasswordError = ref('');
+const canRegister = computed(() => {
+  if (!firstName.value || firstName.value.length <= 0) {
+    return false;
+  }
+  if (!lastName.value || lastName.value.length <= 0) {
+    return false;
+  }
+  if (!email.value || email.value.length <= 0) {
+    return false;
+  }
+  if (!password.value || password.value.length <= 0) {
+    return false;
+  }
+  if (!confirmPassword.value || confirmPassword.value.length <= 0) {
+    return false;
+  }
+
+  if (confirmPasswordError.value.length !== 0) {
+    return false;
+  }
+
+  if (!isValidEmail(email.value)) {
+    return false;
+  }
+  return true;
+})
 
 function register() {
   let payload = {
@@ -41,23 +86,46 @@ function register() {
     email: email.value,
     password: password.value,
   };
-  store.loading = true;
-  store.register(payload).then((response) => {
-    if (response.status != 'error' && response.token) {
-      store.registerDialogShowing = false;
-      store.auth_token = response.token;
-      store.getUser().then(() => {
-        store.loading = false;
-      });
-    } else {
-      store.loading = false;
+  store.register(payload).then(() => {
+
+  }).catch((data) => {
+    let emailErrors = [
+      101,
+      102
+    ];
+    if (emailErrors.includes(data.errorCode)) {
+      emailError.value = true;
     }
-  }).catch(() => {
-    store.loading = false;
-    // store.loadingBackground = false;
-    store.errorToast('Käyttäjän luominen epäonnistui');
-  });;
+  });
 }
+
+function isValidEmail(email) {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (regex.test(email)) {
+      emailError.value = false;
+      return true;
+    } else {
+      emailError.value = true;
+      return false;
+    }
+}
+
+watch(() => confirmPassword.value, () => {
+  validateConfirmPassword();
+})
+
+watch(() => password.value, () => {
+  validateConfirmPassword();
+})
+
+function validateConfirmPassword() {
+  if (confirmPassword.value && confirmPassword.value !== password.value) {
+    confirmPasswordError.value = 'Salasanat eivät täsmää';
+  } else {
+    confirmPasswordError.value = '';
+  }
+}
+
 
 </script>
 
@@ -79,4 +147,6 @@ function register() {
 .register-card {
   background-color: var(--card-bg-color);
 }
+
 </style>
+

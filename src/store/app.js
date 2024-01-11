@@ -209,10 +209,34 @@ export const useAppStore = defineStore('app', {
     },
     register(payload) {
       return new Promise((resolve, reject) => {
+        this.loading = true;
         this.axios.post(this.url + `/api/users/register.json`, payload).then((response) => {
-          resolve(response.data);
+          const data = response.data;
+          if (data.status != 'error' && data.token) {
+            this.registerDialogShowing = false;
+            this.auth_token = data.token;
+            this.getUser().then(() => {
+              this.loading = false;
+              this.loginDialogShowing = false;
+            });
+            resolve(data);
+          } else {
+            switch (data.errorCode) {
+              case 101:
+                this.errorToast('Sähköposti on jo käytössä');
+                reject(data);
+                break;
+              case 102:
+                this.errorToast('Sähköpostin tallennuksessa tapahtui virhe');
+                reject(data);
+                break;
+            }
+          }
+          this.loading = false;
         })
         .catch((error) => {
+          this.loading = false;
+          this.errorToast('Käyttäjän luominen epäonnistui');
           reject(error);
         })
       })

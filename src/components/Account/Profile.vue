@@ -499,11 +499,11 @@ function editName() {
   position: absolute;
   height: 40px;
   width: 40px;
-  background-color: #e7e7e7;
+  background-color: var(--edit-pencil-bg);
   border-radius: 50%;
   right: 0px;
   bottom: 0px;
-  color: #646464;
+  color: var(--edit-pencil-color);
   cursor: pointer;
 }
 

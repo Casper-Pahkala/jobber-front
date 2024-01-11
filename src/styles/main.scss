@@ -50,6 +50,9 @@
 
     --scrollbar-track-color: rgb(25, 25, 25);
     --scrollbar-color: rgb(70, 70, 70);
+
+    --edit-pencil-bg: #3f3f3f;
+    --edit-pencil-color: #8e8e8e;
 }
 
 ::-webkit-scrollbar {
@@ -83,6 +86,9 @@
     --chat-light-bg: #e2e2e2;
     --chat-other-color: #ccc;
     --chat-my-color: #333;
+
+    --edit-pencil-bg: #e7e7e7;
+    --edit-pencil-color: #646464;
 }
 
 div {
@@ -111,4 +117,8 @@ div {
     .v-tabs button{
         height: 100% !important;
     }
+}
+
+.v-messages__message {
+    color: inherit;
 }

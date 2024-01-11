@@ -242,6 +242,8 @@ function latestMessage(message) {
   font-size: 18px;
   flex-direction: column;
   gap: 20px;
+  flex-grow: 1;
+  padding-bottom: 10%;
 }
 
 .job-image {

@@ -29,10 +29,10 @@
       </div>
 
 
-      <div v-if="myListings.length == 0 && store.user && !loading" class="no-messages-text">
+      <div v-if="myListings.length == 0 && store.user && !loading" class="no-listings-text">
         Ei listauksia
-        <v-btn color="primary" class="text-none" @click="toJobs()">
-          Lisää työ
+        <v-btn color="primary" class="text-none" @click="toAdd()">
+          Luo listaus
         </v-btn>
       </div>
 
@@ -85,106 +85,17 @@ if (store.user) {
   store.loginDialogShowing = true;
 }
 
-function toJobs() {
-  store.tab = 'jobs';
-  router.push('/jobs');
-}
-
-function imageUrl(job, lazy) {
-  if (job.job_images && job.job_images.length > 0) {
-    return store.url + '/job-image/' + job.job_images[0].name;
-  } else {
-    return store.url + '/no-img.png'
-  }
-}
-
-function handleJobClick(job) {
-  router.push('/jobs/' + job.hashed_id);
-}
-
-function editListing(listing) {
-
+function toAdd() {
+  store.tab = 'add-job';
+  router.push({
+    name: 'add-job'
+  });
 }
 
 
 
 </script>
 <style scoped>
-.main-content {
-  display: flex;
-  justify-content: center;
-}
-
-#jobs-container {
-    /* margin-top: 60px; */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 100px;
-    /* width: 1000px; */
-  }
-  .top-layout {
-    margin-top: 60px;
-    display: flex;
-    justify-content: center;
-  }
-  .top-wrapper {
-    max-width: 1024px;
-    display: flex;
-    justify-content: space-between;
-  }
-  .filters {
-      width: 500px;
-  }
-  .job {
-    cursor: default;
-    border-radius: 6px;
-    width: 100%;
-    height: 120px;
-    display: flex;
-    position: relative;
-  }
-  .job-image {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      /* border-radius: 6px; */
-  }
-  .job-title {
-      font-weight: 600;
-      font-size: 24px;
-  }
-  .job-main {
-      width: 70%;
-  }
-
-  .job-content {
-      display: flex;
-      padding: 5px;
-      padding-right: 10px;
-      padding-left: 20px;
-      width: calc(100% - 90px);
-  }
-  .job-info {
-      width: 30%;
-  }
-
-  .send-message-btn {
-      position: absolute;
-      bottom: 10px;
-      /* right: 10px; */
-  }
-  .add-button {
-    float: right;
-  }
-  .job-info-item {
-    direction: rtl;
-  }
-
-  .dark-background {
-  pointer-events: all;
-  background-color: rgba(0, 0, 0, 0.5);
-}
 
 .loader {
   width: 80px;
@@ -195,6 +106,18 @@ function editListing(listing) {
   border-right: 3px solid transparent;
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
+}
+
+.no-listings-text {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-direction: column;
+  gap: 20px;
+  flex-grow: 1;
+  padding-bottom: 10%;
 }
 
 @keyframes rotation {
@@ -212,11 +135,5 @@ function editListing(listing) {
   align-items: center;
   width: 100%;
   height: 70vh;
-}
-
-
-
-.menu-action-btn {
-  cursor: pointer;
 }
 </style>
