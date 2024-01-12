@@ -239,6 +239,26 @@ function deleteListing(listing) {
       padding-right: 5px;
     }
   }
+
+  .deleted {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #00000040;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .deleted::after {
+    content: "Poistettu";
+    color: #000;
+    font-size: 24px;
+    font-weight: 600;
+    transform: rotate(17deg);
+  }
 </style>
 <style>
 
