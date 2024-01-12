@@ -14,16 +14,7 @@
           class="job-image"
         >
           <template v-slot:placeholder>
-            <v-row
-              class="fill-height ma-0"
-              align="center"
-              justify="center"
-            >
-              <v-progress-circular
-                indeterminate
-                color="grey-lighten-5"
-              ></v-progress-circular>
-            </v-row>
+            <v-skeleton-loader type="image" round :theme="store.theme"/>
           </template>
         </v-img>
 

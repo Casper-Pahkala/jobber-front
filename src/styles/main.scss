@@ -35,12 +35,14 @@
 :root {
     --app-bar-height: 80px;
     
+    --main-text-plain-color: rgb(255, 255, 255);
+
     --main-bg-color: rgb(25,25,25); /* Dark background */
-    --main-text-color: white; /* Light text */
+    --main-text-color: rgb(240, 240, 240); /* Light text */
     --main-text-light-color: rgb(184, 184, 184); /* Lighter text */
     --card-bg-color: rgb(33,33,33); /* Darker card background */
     --main-light-color: #292929; /* Dark light color */
-    --main-very-light-color: rgb(26, 26, 26); /* Very dark light color */
+    --main-very-light-color: rgb(40, 40, 40); /* Very dark light color */
     --app-bar-bg-color: #131313;
     
     
@@ -75,12 +77,14 @@
 
 /* Light theme */
 .light-theme {
+    --main-text-plain-color: rgb(0, 0, 0);
+
     --main-bg-color: rgb(237, 237, 237); /* Light background */
     --main-text-color: rgb(33,33,33); /* Dark text */
     --main-text-light-color: rgb(100, 100, 100); /* Darker text */
     --card-bg-color: #f0f0f0; /* Lighter card background */
     --main-light-color: #e0e0e0; /* Light light color */
-    --main-very-light-color: #ededed; /* Lighter very light color */
+    --main-very-light-color: rgb(225, 225, 225); /* Lighter very light color */
     --app-bar-bg-color: #f7f7f7;
 
     --chat-light-bg: #e2e2e2;
@@ -122,3 +126,21 @@ div {
 .v-messages__message {
     color: inherit;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.7s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.unselectable {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera, and Edge */
+  }
+  

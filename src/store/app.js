@@ -85,6 +85,7 @@ export const useAppStore = defineStore('app', {
             console.log('in chat to receive');
             this.getMessages(this.chat.jobId, this.chat.userId);
           } else {
+            data.message.message = data.message.message.replace(/\n/g, '<br>');
             this.allMessages.unshift(data.message);
           }
         } else if (data.action === 'CHAT_SEEN') {
@@ -275,9 +276,11 @@ export const useAppStore = defineStore('app', {
           data.messages.forEach(item => {
               let m = this.allMessages.find(m => m.id === item.id);
               if (!m) {
+                item.message = item.message.replace(/\n/g, '<br>');
                 this.allMessages.push(item);
               }
           });
+          console.log(this.allMessages);
           resolve(data);
         })
         .catch((error) => {
@@ -297,6 +300,7 @@ export const useAppStore = defineStore('app', {
               m.attachment_url = '';
               // this.getImageSrc(m.attachment_id, m);
             }
+            m.message = m.message.replace(/\n/g, '<br>');
           })
           this.allMessages = messages;
           resolve(data);

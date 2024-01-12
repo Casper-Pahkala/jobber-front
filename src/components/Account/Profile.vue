@@ -2,38 +2,28 @@
     <div class="row">
       <div class="profile-image-container">
         <v-img
-            v-if="store.user.has_image"
-            :src="store.user.profileImageUrl"
-            cover
-            class="profile-image"
-            :key="profileImageUpdated"
-            @click.stop="openFileInput()"
-          >
-            <template v-slot:placeholder>
-              <v-row
-                class="fill-height ma-0"
-                align="center"
-                justify="center"
-              >
-                <v-progress-circular
-                  indeterminate
-                  color="grey-lighten-5"
-                ></v-progress-circular>
-              </v-row>
-            </template>
+          v-if="store.user.has_image"
+          :src="store.user.profileImageUrl"
+          cover
+          class="profile-image"
+          :key="profileImageUpdated"
+          @click.stop="openFileInput()"
+        >
+          <template v-slot:placeholder>
+            <v-skeleton-loader type="image" round :theme="store.theme"/>
+          </template>
+        </v-img>
+        <div v-else class="profile-image empty">
+          <v-icon class="empty-icon" @click.stop="openFileInput()">
+            mdi-account
+          </v-icon>
+        </div>
 
-          </v-img>
-          <div v-if="!store.user.has_image" class="profile-image empty">
-            <v-icon class="empty-icon">
-              mdi-account
-            </v-icon>
-          </div>
-
-          <v-icon
-            @click.stop="openFileInput()"
-            id="edit-profile-image-btn"
-          >
-            mdi-pencil
+        <v-icon
+          @click.stop="openFileInput()"
+          id="edit-profile-image-btn"
+        >
+          mdi-pencil
           </v-icon>
       </div>
 
@@ -72,45 +62,48 @@
             </template>
 
             <template v-else>
-              <v-row style="max-width: 440px;">
-                <v-col cols="6">
-                  <v-text-field
-                    variant="outlined"
-                    style="max-width: 200px;"
-                    density="compact"
-                    v-model="userFirstName"
-                  >
-                  </v-text-field>
-                </v-col>
+              <v-form ref="form">
+                <v-row style="max-width: 440px;">
+                  <v-col cols="6">
+                    <v-text-field
+                      variant="outlined"
+                      style="max-width: 200px;"
+                      density="compact"
+                      v-model="userFirstName"
+                    >
+                    </v-text-field>
+                  </v-col>
 
-                <v-col cols="6">
-                  <v-text-field
-                    variant="outlined"
-                    style="max-width: 200px;"
-                    density="compact"
-                    v-model="userLastName"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
+                  <v-col cols="6">
+                    <v-text-field
+                      variant="outlined"
+                      style="max-width: 200px;"
+                      density="compact"
+                      v-model="userLastName"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
 
 
-              <v-btn
-                variant="outlined"
-                class="text-none"
-                @click="cancelNameEditing()"
-              >
-                Peruuta
-              </v-btn>
+                <v-btn
+                  variant="outlined"
+                  class="text-none"
+                  @click="cancelNameEditing()"
+                >
+                  Peruuta
+                </v-btn>
 
-              <v-btn
-                variant="outlined"
-                class="text-none ml-5"
-                color="primary"
-                @click="editName()"
-              >
-                Tallenna
-              </v-btn>
+                <v-btn
+                  variant="outlined"
+                  class="text-none ml-5"
+                  color="primary"
+                  @click="editName()"
+                  :disabled="!fullNameValid"
+                >
+                  Tallenna
+                </v-btn>
+              </v-form>
             </template>
           </v-col>
 
@@ -320,12 +313,29 @@ const fullName = computed(() => {
 });
 
 const valid = ref(true);
+const fullNameValid = computed(() => {
+  if (store.user.first_name === userFirstName.value && store.user.last_name === userLastName.value) {
+    return false;
+  }
+
+  const pattern = /^[a-zA-Z]+([-']?[a-zA-Z]+)*$/;
+  if (!pattern.test(userFirstName.value)) {
+    return false;
+  }
+
+  if (!pattern.test(userLastName.value)) {
+    return false;
+  }
+
+  return true;
+});
 
 const emailRules = [
   v => !!v || 'Syötä sähköposti',
   v => /.+@.+\..+/.test(v) || 'Syötä kelpaava sähköposti',
   v => v != store.user.email || 'Syötä uusi sähköposti'
 ];
+
 
 const joinedAt = computed(() => {
   if (!store.user) {
@@ -429,9 +439,12 @@ function confirmProfileImage() {
     store.loading = false;
     store.loadingBackground = false;
 
-    let url = new URL(store.user.profileImageUrl);
-    url.searchParams.set('t', new Date());
-    store.user.profileImageUrl = url.toString();
+    if (store.user.profileImageUrl) {
+      let url = new URL(store.user.profileImageUrl);
+      url.searchParams.set('t', new Date());
+      store.user.profileImageUrl = url.toString();
+    }
+    store.user.has_image = true;
     setTimeout(() => {
       profileImageUpdated.value++;
     }, 500);

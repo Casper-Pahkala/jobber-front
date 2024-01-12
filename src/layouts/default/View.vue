@@ -1,7 +1,8 @@
 <template>
   <v-main>
     <div style="min-height: calc(100vh - var(--app-bar-height))">
-      <router-view/>
+      <router-view>
+      </router-view>
     </div>
 
     <v-footer
@@ -11,19 +12,19 @@
       <h4 class="title">Käytäntömme</h4>
 
       <div class="policy">
-        <a class="footer-link">
+        <a class="footer-link unselectable" href="#">
           Tietosuojakäytäntö
         </a>
 
         <div class="divider"></div>
 
-        <a class="footer-link">
+        <a class="footer-link unselectable"  href="#">
           Ehdot
         </a>
 
         <div class="divider"></div>
 
-        <a class="footer-link">
+        <a class="footer-link unselectable"  href="#">
           Ohje ja tuki
         </a>
       </div>
@@ -76,7 +77,7 @@
     </v-card>
   </v-dialog>
 
-  <v-btn
+  <!-- <v-btn
     id="feedback-btn"
     icon="mdi-comment"
     size="large"
@@ -84,7 +85,7 @@
     color="primary"
   >
 
-  </v-btn>
+  </v-btn> -->
 
   <v-dialog v-model="store.feedbackDialog" persistent max-width="600px" :class="{ 'light-theme': store.lightTheme }">
       <v-card class="feedback-card">
@@ -126,6 +127,7 @@ export default {
     feedback: {
       message: ''
     },
+    key: 0,
   }),
   mounted() {
   },

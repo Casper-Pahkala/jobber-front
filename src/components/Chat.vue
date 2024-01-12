@@ -32,19 +32,9 @@
                 :src="jobUser && jobUser.has_profile_image ? `${store.url}/profile-image/${jobUser.id}` : `${store.url}/no-profile-img.png`"
                 cover
                 class="profile-image"
-
               >
                 <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
+                  <v-skeleton-loader type="image" round :theme="store.theme"/>
                 </template>
               </v-img>
 
@@ -87,7 +77,7 @@
                         class="pdf-loader"
                         color="grey-lighten-5"
                       ></v-progress-circular>
-                      {{ getMessage(message) }}
+                      <div v-html="getMessage(message)"></div>
                     </template>
 
                     <v-img
@@ -96,21 +86,12 @@
                       v-else
                     >
                       <template v-slot:placeholder>
-                        <v-row
-                          class="fill-height ma-0 cursor-default"
-                          align="center"
-                          justify="center"
-                        >
-                          <v-progress-circular
-                            indeterminate
-                            color="grey-lighten-5"
-                          ></v-progress-circular>
-                        </v-row>
+                        <v-skeleton-loader type="image" :theme="store.theme"/>
                       </template>
                     </v-img>
                   </div>
                   <div v-else>
-                    {{ getMessage(message) }}
+                    <div v-html="getMessage(message)"></div>
                   </div>
                 </div>
                 <div v-if="(index == messages.length - 1) && !message.received" class="status">
@@ -161,16 +142,7 @@
                         class="job-image"
                       >
                         <template v-slot:placeholder>
-                          <v-row
-                            class="fill-height ma-0 cursor-default"
-                            align="center"
-                            justify="center"
-                          >
-                            <v-progress-circular
-                              indeterminate
-                              color="grey-lighten-5"
-                            ></v-progress-circular>
-                          </v-row>
+                          <v-skeleton-loader type="image" round :theme="store.theme"/>
                         </template>
                       </v-img>
 
@@ -200,20 +172,23 @@
           <v-card class="chat-container" elevation="3">
             <v-card-text>
               <v-row align="center">
-                  <v-text-field
+                  <v-textarea
+                    :no-resize="true"
                     v-model="message"
                     outlined
                     placeholder="Viesti"
                     solo
                     hide-details
                     variant="solo"
-                    @keyup.enter="sendMessage"
-                    class="message-input ml-2 mr-2 mb-2 mt-2"
+                    class="message-input ma-2"
                     elevation="12"
+                    auto-grow
+                    :rows="1"
+                    :max-rows="3"
                     :bg-color="store.lightTheme ? 'grey-lighten-2' : 'grey-darken-3'"
                     :disabled="!job || job.is_deleted"
                     :theme="store.theme"
-                  ></v-text-field>
+                  ></v-textarea>
 
                   <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="!job || job.is_deleted">
                     <v-icon size="24px">mdi-paperclip</v-icon>
@@ -289,16 +264,7 @@
           class="large-image"
         >
           <template v-slot:placeholder>
-            <v-row
-              class="fill-height ma-0"
-              align="center"
-              justify="center"
-            >
-              <v-progress-circular
-                indeterminate
-                color="grey-lighten-5"
-              ></v-progress-circular>
-            </v-row>
+            <v-skeleton-loader type="image" round :theme="store.theme"/>
           </template>
         </v-img>
 
@@ -1046,6 +1012,6 @@ body, html {
 .message-input input {
   padding: 0 10px;
   min-height: 45px !important;
-  height: 45px;
+  /* height: 45px; */
 }
 </style>

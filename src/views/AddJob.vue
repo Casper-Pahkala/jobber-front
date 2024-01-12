@@ -1,26 +1,24 @@
 <template>
   <v-container
     v-if="store.user"
-    class="add-container pa-10"
+    class="add-container"
   >
-    <h1 class="pb-5">Luo listaus</h1>
-      <v-window v-model="jobTab" class="main-window">
+    <h1 class="title pb-5">Luo listaus</h1>
+      <v-window v-model="jobTab" class="main-window" disabled>
         <v-window-item value="one" class="window">
-          <div class="title">
+          <!-- <div class="title">
             <h2>Kuvat</h2>
-          </div>
-
+          </div> -->
           <div class="content">
             <v-row
               justify="center"
               align="center"
-              class="images mt-10"
+              class="images"
             >
               <v-card
                 v-for="(image, index) in selectedFileResults"
                 :key="index"
                 elevation="8"
-                width="180"
                 class="image-card"
               >
                 <v-img
@@ -37,6 +35,7 @@
                   icon="mdi-delete"
                   elevation="8"
                   size="35"
+                  :style="store.lightTheme ? 'color: rgb(25, 25, 25);' : 'color: rgb(220, 220, 220);'"
                   @click="deleteImage(index)"
                 >
                 </v-btn>
@@ -47,8 +46,6 @@
               <v-card
                 v-if="selectedFileResults.length < 8"
                 elevation="8"
-                width="180"
-                height="180"
                 class="image-card"
               >
                   <input
@@ -91,6 +88,7 @@
                     label="Työn otsikko"
                     :rules="jobTitleRules"
                     required
+                    :theme="store.theme"
                   ></v-text-field>
                 </v-container>
 
@@ -111,6 +109,7 @@
                     chips
                     closable-chips
                     no-data-text="Aluetta ei löytynyt"
+                    :theme="store.theme"
                   ></v-autocomplete>
                 </v-container>
 
@@ -121,7 +120,7 @@
               </v-form>
             </div>
             <div class="actions">
-              <v-btn @click="changeJobTab('one')" class="back-btn text-none">Takaisin</v-btn>
+              <v-btn @click="changeJobTab('one')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
               <v-btn color="primary" type="submit" class="text-none" @click="changeJobTab('three')" append-icon="mdi-chevron-right">Seuraava</v-btn>
             </div>
         </v-window-item>
@@ -160,9 +159,10 @@
                     @update:focused="dateDialogShowing = true"
                     :rules="jobDateRules"
                     required
+                    :theme="store.theme"
                   ></v-text-field>
                 </template>
-                <v-card>
+                <v-card :theme="store.theme">
                   <v-card-item>
                     <v-locale-provider locale="fi">
                       <v-date-picker
@@ -212,6 +212,7 @@
                     @update:model-value="estimatedTimeUpdated"
                     min="0"
                     :rules="numberRules"
+                    :theme="store.theme"
                   >
                   </v-text-field>
 
@@ -239,6 +240,7 @@
                     min="0"
                     @change="sanitizeSalary()"
                     :rules="numberRules"
+                    :theme="store.theme"
                   >
                   </v-text-field>
                   </template>
@@ -255,6 +257,7 @@
                       v-model="hoursPerWeek"
                       min="0"
                       :rules="numberRules"
+                      :theme="store.theme"
                     >
                     </v-text-field>
 
@@ -273,7 +276,6 @@
                         {{ salaryType }}
                       </v-chip>
                     </v-chip-group>
-
                     <v-text-field
                       :label="salaryTypes2[salaryType]"
                       :suffix="salaryType == 0 ? '€/h' : '€/kk'"
@@ -282,6 +284,7 @@
                       min="0"
                       :rules="numberRules"
                       @change="sanitizeSalary()"
+                      :theme="store.theme"
                     >
                     </v-text-field>
                   </template>
@@ -289,7 +292,7 @@
           </div>
 
           <div class="actions">
-            <v-btn @click="changeJobTab('two')" class="back-btn text-none">Takaisin</v-btn>
+            <v-btn @click="changeJobTab('two')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
             <v-btn color="primary" class="text-none" append-icon="mdi-chevron-right" style="float: right;" @click="addjob">Luo listaus</v-btn>
           </div>
         </v-window-item>
@@ -583,7 +586,8 @@ function sanitizeSalary() {
     justify-content: center;
     align-items: center;
     flex: none !important;
-    margin: 20px !important;
+    height: fit-content;
+    margin: 10px;
   }
 
   .main-window {
@@ -612,7 +616,9 @@ function sanitizeSalary() {
 
   .window .content {
     flex: 8;
-    display: grid;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
   }
 
   .login-container {
@@ -626,11 +632,35 @@ function sanitizeSalary() {
   }
   .image-card {
     background-color: var(--card-bg-color) !important;
+    width: 180px;
+    height: 180px;
   }
 
-</style>
-<style>
-  .back-btn span {
-    color: black !important;
+  @media (max-width: 1199px) {
+    .image-card {
+      width: 160px;
+      height: 160px;
+    }
+
+    .title {
+      font-size: 24px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .window .content {
+      flex: 10;
+      justify-content: start;
+    }
   }
+
+  @media (max-width: 699px) {
+    .image-card {
+      width: 140px;
+      height: 140px;
+    }
+  }
+
 </style>

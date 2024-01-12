@@ -303,7 +303,6 @@ function changeTab(tab) {
   }
   setTimeout(() => {
     router.push(`/${tab}`);
-    store.tab = tab;
   }, 10);
 
   setTimeout(() => {
@@ -492,7 +491,7 @@ if (window.scrollY > 0) {
     letter-spacing: 0.001rem;
     font-size: 1rem;
     font-weight: 700;
-    color: var(--main-text-light-color);
+    color: var(--main-text-color);
   }
 
   .messages-count {
@@ -608,7 +607,7 @@ if (window.scrollY > 0) {
     }
 
     .rekrytor-text, .app-bar-append {
-      width: 100px;
+      width: 150px;
     }
   }
 
@@ -621,6 +620,6 @@ if (window.scrollY > 0) {
 
 <style>
   .v-slide-group-item--active {
-    color: var(--main-text-color) !important;
+    color: var(--main-text-plain-color) !important;
   }
 </style>

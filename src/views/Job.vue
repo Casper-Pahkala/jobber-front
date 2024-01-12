@@ -1,168 +1,153 @@
 <template>
   <div class="main-wrapper">
     <div class="main-content">
-      <template v-if="!job.is_deleted && !loading">
-        <v-container>
-          <v-btn flat rounded id="back-btn" @click="goBack">
-            <v-icon icon="mdi-arrow-left"></v-icon>
-          </v-btn>
+      <transition name="fade">
+        <div v-if="!job.is_deleted && !loading" :key="loading">
 
-          <v-container id="images-container">
-            <v-container
-              class="main-image-container"
-              id="mainImageContainer"
-            >
-              <v-img
-                :src="imageUrl(imageIndex)"
-                :lazy-src="imageUrl(imageIndex, true)"
-                contain
-                class="job-image"
-                id="mainJobImage"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-              <v-btn
-                class="fullscreen-btn"
-                flat
-                icon="mdi-fullscreen"
-                elevation="10"
-                @click="toggleFullscreen()"
-                v-if="job.job_images.length > 0"
-              >
-              </v-btn>
-
-              <v-btn
-                class="close-btn"
-                flat
-                icon="mdi-close"
-                elevation="8"
-                @click="toggleFullscreen()"
-                v-if="fullscreen"
-              >
-              </v-btn>
-            </v-container>
-            <div
-              class="carousel mt-2"
-            >
-              <v-img
-                v-for="(a, index) in job.job_images"
-                :key="index"
-                :src="imageUrl(index)"
-                :lazy-src="imageUrl(index, true)"
-                cover
-                class="carousel-img"
-                @click="imageIndex = index"
-                :class="image === mainImage ? 'selected' : ''"
-                aspect-ratio="1"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-            </div>
-        </v-container>
-          <h1 id="job-title">
-            {{ job.title }}
-          </h1>
-          <v-divider></v-divider>
-          <div class="job-info" v-if="job">
-            <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
-          </div>
-          <div class="job-info" v-if="job.area">
-            <v-icon icon="mdi-map-marker"></v-icon>
-            <div class="area-container">
-              <div
-                v-for="(area, index) in job.area"
-                :key="index"
-                class="area-chip"
-              >
-                {{ area }}
-              </div>
-            </div>
-          </div>
-          <div class="job-info" v-if="job.date">
-              <v-icon icon="mdi-calendar-range"></v-icon>
-              {{ store.formatDate(job.date) }}
-          </div>
-          <div class="job-info" v-if="job.hours" >
-              <v-icon icon="mdi-timer-outline"></v-icon>
-              {{ job.hours }}h
-              {{ job.contract_type === 1 || job.contract_type === 2 ? '/ viikko' : '' }}
-          </div>
-          <div class="job-info" v-if="job.salary">
-              <v-icon icon="mdi-cash"></v-icon>
-              {{ jobSalary() }}
-          </div>
-          <v-divider class="mt-5"></v-divider>
-          <h4 class="mt-3">Kuvaus</h4>
-          <p id="job-description" class="mt-2">
-            {{ job.description }}
-          </p>
-        </v-container>
-
-        <v-divider class="mt-5 mb-5"></v-divider>
-
-        <div>
           <v-container>
-            <v-card class="user-card pa-5" elevation="8">
-              <div>
-                <div style="display: flex; gap: 5px;">
-                  <v-icon icon="mdi-account"></v-icon>
-                  <h3>
-                    {{ jobUserFullName }}
-                  </h3>
-                </div>
-                <div class="mt-2">
-                  Käyttäjä luotu {{ store.formatDate(job.user.created_at) }}
+            <v-btn flat rounded id="back-btn" @click="goBack">
+              <v-icon icon="mdi-arrow-left"></v-icon>
+            </v-btn>
+
+            <div class="images-container">
+              <v-container
+                class="main-image-container"
+                id="mainImageContainer"
+              >
+                <v-img
+                  :src="imageUrl(imageIndex)"
+                  :lazy-src="imageUrl(imageIndex, true)"
+                  contain
+                  class="job-image"
+                  id="mainJobImage"
+                >
+                  <template v-slot:placeholder>
+                    <v-skeleton-loader type="image" :theme="store.theme" height="100%" />
+                  </template>
+                </v-img>
+                <v-btn
+                  class="fullscreen-btn"
+                  flat
+                  icon="mdi-fullscreen"
+                  elevation="10"
+                  @click="toggleFullscreen()"
+                  v-if="job.job_images.length > 0"
+                >
+                </v-btn>
+
+                <v-btn
+                  class="close-btn"
+                  flat
+                  icon="mdi-close"
+                  elevation="8"
+                  @click="toggleFullscreen()"
+                  v-if="fullscreen"
+                >
+                </v-btn>
+              </v-container>
+              <div
+                class="carousel mt-2"
+              >
+                <v-img
+                  v-for="(a, index) in job.job_images"
+                  :key="index"
+                  :src="imageUrl(index)"
+                  :lazy-src="imageUrl(index, true)"
+                  cover
+                  class="carousel-img"
+                  @click="imageIndex = index"
+                  :class="image === mainImage ? 'selected' : ''"
+                  aspect-ratio="1"
+                >
+                  <template v-slot:placeholder>
+                    <v-skeleton-loader type="image" round :theme="store.theme"/>
+                  </template>
+                </v-img>
+              </div>
+            </div>
+            <h1 id="job-title">
+              {{ job.title }}
+            </h1>
+            <v-divider></v-divider>
+            <div class="job-info" v-if="job">
+              <v-icon icon="mdi-briefcase"></v-icon>{{ contractType() }}
+            </div>
+            <div class="job-info" v-if="job.area">
+              <v-icon icon="mdi-map-marker"></v-icon>
+              <div class="area-container">
+                <div
+                  v-for="(area, index) in job.area"
+                  :key="index"
+                  class="area-chip"
+                >
+                  {{ area }}
                 </div>
               </div>
-
-
-              <v-btn
-                v-if="!isMyJob"
-                class="mt-6"
-                color="primary"
-                @click="contact()"
-              >
-                Ota yhteyttä
-              </v-btn>
-
-              <v-btn
-                v-else
-                class="mt-4"
-                color="red"
-                style="color: white"
-                @click="deleteListing()"
-              >
-                Poista listaus
-              </v-btn>
-            </v-card>
+            </div>
+            <div class="job-info" v-if="job.date">
+                <v-icon icon="mdi-calendar-range"></v-icon>
+                {{ store.formatDate(job.date) }}
+            </div>
+            <div class="job-info" v-if="job.hours" >
+                <v-icon icon="mdi-timer-outline"></v-icon>
+                {{ job.hours }}h
+                {{ job.contract_type === 1 || job.contract_type === 2 ? '/ viikko' : '' }}
+            </div>
+            <div class="job-info" v-if="job.salary">
+                <v-icon icon="mdi-cash"></v-icon>
+                {{ jobSalary() }}
+            </div>
+            <v-divider class="mt-5"></v-divider>
+            <h4 class="mt-3">Kuvaus</h4>
+            <p id="job-description" class="mt-2">
+              {{ job.description }}
+            </p>
           </v-container>
-          <v-divider class="mt-5 mb-5"></v-divider>
-        </div>
-      </template>
 
-      <template v-else-if="!loading">
+          <v-divider class="mt-5 mb-5"></v-divider>
+
+          <div>
+            <v-container>
+              <v-card class="user-card pa-5" elevation="8">
+                <div>
+                  <div style="display: flex; gap: 5px;">
+                    <v-icon icon="mdi-account"></v-icon>
+                    <h3>
+                      {{ jobUserFullName }}
+                    </h3>
+                  </div>
+                  <div class="mt-2">
+                    Käyttäjä luotu {{ store.formatDate(job.user.created_at) }}
+                  </div>
+                </div>
+
+
+                <v-btn
+                  v-if="!isMyJob"
+                  class="mt-6"
+                  color="primary"
+                  @click="contact()"
+                >
+                  Ota yhteyttä
+                </v-btn>
+
+                <v-btn
+                  v-else
+                  class="mt-4"
+                  color="red"
+                  style="color: white"
+                  @click="deleteListing()"
+                >
+                  Poista listaus
+                </v-btn>
+              </v-card>
+            </v-container>
+            <v-divider class="mt-5 mb-5"></v-divider>
+          </div>
+        </div>
+      </transition>
+
+      <template v-if="!loading && job.is_deleted">
         <div class="listing-deleted">
           <div>
             Listaus poistettu
@@ -183,7 +168,7 @@
             <v-icon icon="mdi-arrow-left"></v-icon>
           </v-btn>
 
-          <v-container id="images-container">
+          <v-container class="images-container">
             <v-container
               class="main-image-container"
             >
@@ -205,7 +190,7 @@
 
           <v-skeleton-loader type="list-item-three-line" :theme="store.theme"></v-skeleton-loader>
           <v-divider class="mt-5 mb-5"></v-divider>
-          <v-card class="pa-5" elevation="8">
+          <v-card class="pa-5" elevation="8" :theme="store.theme">
             <div>
 
               <div style="display: flex; gap: 5px; align-items: center;">
@@ -251,15 +236,17 @@ const imageIndex = ref(0);
 store.displayedJob.id = route.params.id;
 
 store.fetchJob(store.displayedJob.id).then((response) => {
-  let data = response.data;
-  if (!data.error) {
+  setTimeout(() => {
+    let data = response.data;
+    if (!data.error) {
 
-    data.job.area = JSON.parse(data.job.area);
-    job.value = data.job;
-    jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
-    store.displayedJob.userId = data.job.user.hashed_id;
-  }
-  loading.value = false;
+      data.job.area = JSON.parse(data.job.area);
+      job.value = data.job;
+      jobUserFullName.value = data.job.user.first_name + ' ' + data.job.user.last_name;
+      store.displayedJob.userId = data.job.user.hashed_id;
+    }
+    loading.value = false;
+  }, 0);
 })
 
 function goBack() {
@@ -374,14 +361,13 @@ document.addEventListener("fullscreenchange", () => {
     display: flex;
   }
 
-  #images-container {
+  .images-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* padding-bottom: 500px; */
-    /* gap: 20px; */
-    /* background-color: #ededed; */
+    width: 100%;
     border-radius: 12px;
+    margin-top: 10px;
   }
   #back-btn {
     width: 60px;
@@ -472,9 +458,40 @@ document.addEventListener("fullscreenchange", () => {
   .user-card {
     background-color: var(--card-bg-color);
   }
+
+  .carousel {
+    overflow-x: auto;
+  }
+
+  .carousel::-webkit-scrollbar {
+      height: 5px;
+  }
+
+  .carousel::-webkit-scrollbar-track {
+      background-color: var(--scrollbar-track-color);
+  }
+
+  .carousel::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-color);
+      border-radius: 14px;
+  }
+
+  .carousel::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
+
+  @media (max-width: 1199px) {
+    .carousel {
+      justify-content: start;
+    }
+  }
 </style>
 <style>
   .job-info .v-icon {
     width: 40px;
+  }
+
+  .v-skeleton-loader .v-skeleton-loader__bone {
+    height: 100%;
   }
 </style>

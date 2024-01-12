@@ -16,16 +16,7 @@
             class="job-image"
           >
             <template v-slot:placeholder>
-              <v-row
-                class="fill-height ma-0"
-                align="center"
-                justify="center"
-              >
-                <v-progress-circular
-                  indeterminate
-                  color="grey-lighten-5"
-                ></v-progress-circular>
-              </v-row>
+              <v-skeleton-loader type="image" round :theme="store.theme"/>
             </template>
           </v-img>
           <!-- <v-divider :vertical="true"></v-divider> -->
@@ -83,7 +74,7 @@
         v-if="myListing"
         class="action-btns"
       >
-        <v-menu @click.stop :theme="store.theme">
+        <v-menu @click.stop :theme="store.theme" location="bottom end">
           <template v-slot:activator="{ props }">
             <v-btn @click.stop v-bind="props" icon="mdi-dots-vertical" class="more-btn" :color="!store.lightTheme ? 'grey-darken-3' : 'grey-lighten-3'"></v-btn>
           </template>
@@ -91,9 +82,11 @@
           <v-list>
             <v-list-item
               @click.stop="deleteListing(job)"
-              class="menu-action-btn"
-              title="Poista listaus"
+              class="menu-action-btn text-red"
             >
+              <v-list-item>
+                Poista listaus
+              </v-list-item>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -119,7 +112,8 @@ const job = props.job;
 const myListing = props.myListing;
 
 function handleJobClick(job) {
-  router.push('/jobs/' + job.hashed_id);
+  // router.push('/jobs/' + job.hashed_id);
+  store.tab = 'job';
 }
 
 function imageUrl(job, lazy) {
@@ -208,8 +202,8 @@ function deleteListing(listing) {
 
   .action-btns {
     position: absolute;
-    bottom: 15px;
-    right: 5px;
+    bottom: 10px;
+    right: 10px;
   }
   .more-btn {
     height: 40px;
@@ -244,5 +238,11 @@ function deleteListing(listing) {
       align-items: center;
       padding-right: 5px;
     }
+  }
+</style>
+<style>
+
+  .menu-action-btn div {
+    color: #E53935;
   }
 </style>

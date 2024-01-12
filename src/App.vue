@@ -29,15 +29,21 @@
 import { useAppStore } from '@/store/app';
 import { ref, watch } from 'vue';
 import i18n from "@/i18n/i18n";
+import { useRoute } from 'vue-router';
 
 const locale = localStorage.getItem('locale');
 const store = useAppStore();
+const route = useRoute();
 if (locale) {
   i18n.global.locale = locale;
 }
 
 const lightThemeEnabled = localStorage.getItem('light_theme');
 store.lightTheme = lightThemeEnabled && lightThemeEnabled === 'true';
+
+watch(() => route.name, (newVal) => {
+  store.tab = newVal;
+})
 
 store.initializeAxios();
 if (store.auth_token) {
