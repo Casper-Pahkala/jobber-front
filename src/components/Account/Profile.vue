@@ -70,6 +70,8 @@
                       style="max-width: 200px;"
                       density="compact"
                       v-model="userFirstName"
+                      label="Etunimi"
+                      :theme="store.theme"
                     >
                     </v-text-field>
                   </v-col>
@@ -80,6 +82,8 @@
                       style="max-width: 200px;"
                       density="compact"
                       v-model="userLastName"
+                      label="Sukunimi"
+                      :theme="store.theme"
                     >
                     </v-text-field>
                   </v-col>
@@ -98,7 +102,7 @@
                   variant="outlined"
                   class="text-none ml-5"
                   color="primary"
-                  @click="editName()"
+                  @click="saveFullname()"
                   :disabled="!fullNameValid"
                 >
                   Tallenna
@@ -160,6 +164,8 @@
                   required
                   type="email"
                   name="email"
+                  label="Sähköposti"
+                  :theme="store.theme"
                 >
                 </v-text-field>
 
@@ -175,7 +181,7 @@
                   variant="outlined"
                   class="text-none ml-5"
                   color="primary"
-                  @click="editEmail()"
+                  @click="saveEmail()"
                   :disabled="!valid"
                 >
                   Tallenna
@@ -197,6 +203,94 @@
               v-if="!editingEmail"
             >
               Muokkaa
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-row
+          class="info-wrapper"
+        >
+          <v-col
+            sm="12"
+            md="3"
+            class="title"
+          >
+          <h4>
+            Vaihda salasana
+          </h4>
+          </v-col>
+
+          <v-col
+            sm="12"
+            md="6"
+            class="content"
+          >
+            <template v-if="!editingPassword">
+              {{ '*********' }}
+            </template>
+
+            <template v-else>
+              <v-form ref="form" v-model="valid">
+                <v-text-field
+                  variant="outlined"
+                  style="max-width: 400px;"
+                  density="compact"
+                  v-model="userNewPassword"
+                  required
+                  type="password"
+                  name="password"
+                  label="Uusi salasana"
+                  :theme="store.theme"
+                >
+                </v-text-field>
+
+                <v-text-field
+                  variant="outlined"
+                  style="max-width: 400px;"
+                  density="compact"
+                  v-model="userNewConfirmPassword"
+                  required
+                  type="password"
+                  label="Vahvista salasana"
+                  :error-messages="confirmPasswordError"
+                  :theme="store.theme"
+                >
+                </v-text-field>
+
+                <v-btn
+                  variant="outlined"
+                  class="text-none"
+                  @click="cancelPasswordEditing()"
+                >
+                  Peruuta
+                </v-btn>
+
+                <v-btn
+                  variant="outlined"
+                  class="text-none ml-5"
+                  color="primary"
+                  @click="savePassword()"
+                  :disabled="!canSavePassword"
+                >
+                  Tallenna
+                </v-btn>
+              </v-form>
+            </template>
+          </v-col>
+
+          <v-col
+            sm="12"
+            md="3"
+            class="actions"
+          >
+            <v-btn
+              variant="outlined"
+              class="text-none"
+              color="primary"
+              @click="editingPassword = true"
+              v-if="!editingPassword"
+            >
+              Vaihda salasana
             </v-btn>
           </v-col>
         </v-row>
@@ -284,7 +378,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
 
@@ -300,10 +394,26 @@ const profileImageUpdated = ref(0);
 
 const editingEmail = ref(false);
 const editingName = ref(false);
+const editingPassword = ref(false);
 
 const userEmail = ref('');
 const userFirstName = ref('');
 const userLastName = ref('');
+const userNewPassword = ref('');
+const userNewConfirmPassword = ref('');
+const confirmPasswordError = ref('');
+const canSavePassword = computed(() => {
+  if (!userNewPassword.value || userNewPassword.value.length <= 0) {
+    return false;
+  }
+  if (!userNewConfirmPassword.value || userNewConfirmPassword.value.length <= 0) {
+    return false;
+  }
+  if (confirmPasswordError.value.length !== 0) {
+    return false;
+  }
+  return true;
+});
 
 const fullName = computed(() => {
   if (!store.user) {
@@ -467,6 +577,12 @@ function cancelNameEditing() {
   userLastName.value = store.user.last_name;
 }
 
+function cancelPasswordEditing() {
+  editingPassword.value = false;
+  userNewPassword.value = '';
+  userNewConfirmPassword.value = '';
+}
+
 function deleteUser() {
   let confirm = window.confirm('Haluatko varmasti poistaa käyttäjäsi?');
 
@@ -475,20 +591,24 @@ function deleteUser() {
   }
 }
 
-function editEmail() {
+function saveEmail() {
   let payload = {
     email: userEmail.value,
     type: 'email'
   };
+
   store.editUser(payload).then(() => {
     editingEmail.value = false;
     setTimeout(() => {
       store.getUser();
     }, 100);
+    store.successToast('Sähköposti päivitetty onnistuneesti');
+  }).catch(() => {
+    store.errorToast('Sähköpostin tallennuksessa tapahtui virhe');
   });
 }
 
-function editName() {
+function saveFullname() {
   let payload = {
     first_name: userFirstName.value,
     last_name: userLastName.value,
@@ -500,7 +620,42 @@ function editName() {
     setTimeout(() => {
       store.getUser();
     }, 100);
+    store.successToast('Nimi päivitetty onnistuneesti');
+  }).catch(() => {
+    store.errorToast('Nimen tallennuksessa tapahtui virhe');
   });
+}
+
+function savePassword() {
+  let payload = {
+    password: userNewPassword.value,
+    type: 'password'
+  };
+
+  store.editUser(payload).then(() => {
+    editingPassword.value = false;
+    setTimeout(() => {
+      store.getUser();
+    }, 100);
+    store.successToast('Salasana päivitetty onnistuneesti');
+  }).catch(() => {
+    store.errorToast('Salasanan tallennuksessa tapahtui virhe');
+  });
+}
+watch(() => userNewConfirmPassword.value, () => {
+  validateConfirmPassword();
+})
+
+watch(() => userNewPassword.value, () => {
+  validateConfirmPassword();
+})
+
+function validateConfirmPassword() {
+  if (userNewConfirmPassword.value && userNewConfirmPassword.value !== userNewPassword.value) {
+    confirmPasswordError.value = 'Salasanat eivät täsmää';
+  } else {
+    confirmPasswordError.value = '';
+  }
 }
 
 

@@ -77,7 +77,7 @@ const canRegister = computed(() => {
     return false;
   }
   return true;
-})
+});
 
 function register() {
   let payload = {

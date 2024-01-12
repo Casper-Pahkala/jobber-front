@@ -456,17 +456,14 @@ export const useAppStore = defineStore('app', {
           this.loading = false;
           this.loadingBackground = false;
           if (data.status !== 'success') {
-            this.errorToast('Nimen muokkauksessa tapahtui virhe: ' + data.message);
-            reject(data.message)
+            reject(data.message);
             return;
           }
-          this.successToast('Nimi päivitetty onnistuneesti');
           resolve(data);
         })
         .catch((error) => {
           this.loading = false;
           this.loadingBackground = false;
-          this.errorToast('Nimen muokkauksessa tapahtui virhe');
           reject(error);
         })
       })
