@@ -347,7 +347,7 @@
     width="500"
   >
 
-    <v-card>
+    <v-card :theme="store.theme">
       <canvas id="imageCanvas" style="display: none;"></canvas>
       <v-card-item>
         <div class="new-profile-img-wrapper">
