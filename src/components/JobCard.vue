@@ -2,12 +2,13 @@
   <v-hover v-slot="{ isHovering, props }">
     <div style="position: relative;" class="job-wrapper">
 
-      <router-link :to="'/jobs/' + job.hashed_id">
+      <router-link :to="!job.is_deleted ? ('/jobs/' + job.hashed_id) : ''" :disabled="job.is_deleted">
         <v-card
-          @click="handleJobClick(job)"
           class="job"
+          :class="{ 'deleted': job.is_deleted }"
           :elevation="isHovering ? 6 : 3"
           v-bind="props"
+          :disabled="job.is_deleted"
         >
           <v-img
             :src="imageUrl(job)"
@@ -76,7 +77,13 @@
       >
         <v-menu @click.stop :theme="store.theme" location="bottom end">
           <template v-slot:activator="{ props }">
-            <v-btn @click.stop v-bind="props" icon="mdi-dots-vertical" class="more-btn" :color="!store.lightTheme ? 'grey-darken-3' : 'grey-lighten-3'"></v-btn>
+            <v-btn
+            @click.stop
+            v-bind="props"
+            icon="mdi-dots-vertical"
+            class="more-btn"
+            :color="menuButtonColor"
+            :disabled=job.is_deleted></v-btn>
           </template>
 
           <v-list>
@@ -134,6 +141,14 @@ function deleteListing(listing) {
     store.deleteListing(payload).then(res => {
       listing.is_deleted = true;
     })
+  }
+}
+
+function menuButtonColor(job) {
+  if (job.is_deleted) {
+    return '';
+  } else {
+    return !store.lightTheme ? 'grey-darken-3' : 'grey-lighten-3'
   }
 }
 </script>
@@ -240,7 +255,11 @@ function deleteListing(listing) {
     }
   }
 
-  .deleted {
+  .job.deleted {
+    cursor: default;
+  }
+
+  .job .deleted {
     position: absolute;
     left: 0;
     top: 0;
@@ -252,12 +271,12 @@ function deleteListing(listing) {
     align-items: center;
   }
 
-  .deleted::after {
+  .job .deleted::after {
     content: "Poistettu";
-    color: #000;
+    color: var(--main-text-light-color);
     font-size: 24px;
     font-weight: 600;
-    transform: rotate(17deg);
+    transform: rotate(0deg);
   }
 </style>
 <style>
