@@ -1,244 +1,173 @@
 <template>
-    <div
-      class="row"
-    >
-          <div class="profile-image-container">
-            <v-img
-                v-if="store.user.has_image"
-                :src="store.user.profileImageUrl"
-                cover
-                class="profile-image"
-                :key="profileImageUpdated"
-                @click.stop="openFileInput()"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey-lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
+  <div class="top-wrapper">
 
-              </v-img>
-              <div v-if="!store.user.has_image" class="profile-image empty">
-                <v-icon class="empty-icon">
-                  mdi-account
-                </v-icon>
-              </div>
-
-              <v-icon
-                @click.stop="openFileInput()"
-                id="edit-profile-image-btn"
-              >
-                mdi-pencil
-              </v-icon>
-          </div>
-            <div class="user-info">
-              <span class="fullname">
-                {{ fullName }}
-              </span>
-              <span class="joined-at">
-                {{ joinedAt }}
-              </span>
-            </div>
+    <div class="row">
+      <div class="profile-image-container">
+        <v-img
+          v-if="store.user.has_image"
+          :src="store.user.profileImageUrl"
+          cover
+          class="profile-image"
+          :key="profileImageUpdated"
+          @click.stop="openFileInput()"
+        >
+          <template v-slot:placeholder>
+            <v-skeleton-loader type="image" round :theme="store.theme"/>
+          </template>
+        </v-img>
+        <div v-else class="profile-image empty">
+          <v-icon class="empty-icon" @click.stop="openFileInput()">
+            mdi-account
+          </v-icon>
         </div>
 
-      <v-container class="profile-container" v-if="store.user">
-
-        <v-row
-          class="info-wrapper"
+        <v-icon
+          @click.stop="openFileInput()"
+          id="edit-profile-image-btn"
         >
-          <v-col
-            cols="3"
-            class="title"
-          >
-          <h4>
-            Nimi
-          </h4>
-          </v-col>
+          mdi-pencil
+          </v-icon>
+      </div>
 
-          <v-col
-            cols="6"
-            class="content"
-          >
-          <template v-if="!editingName">
-              {{ fullName }}
-            </template>
+      <div class="user-info">
+        <span class="fullname">
+          {{ fullName }}
+        </span>
+        <span class="joined-at">
+          {{ joinedAt }}
+        </span>
+      </div>
 
-            <template v-else>
-              <v-row style="max-width: 440px;">
-                <v-col cols="6">
-                  <v-text-field
-                    variant="outlined"
-                    style="max-width: 200px;"
-                    density="compact"
-                    v-model="userFirstName"
-                  >
-                  </v-text-field>
-                </v-col>
+    </div>
+  </div>
 
-                <v-col cols="6">
-                  <v-text-field
-                    variant="outlined"
-                    style="max-width: 200px;"
-                    density="compact"
-                    v-model="userLastName"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
+  <div class="info-container">
+    <div class="info-item">
+      <v-checkbox
+        label="Näytä profiili julkisilla listoilla"
+        v-model="showInPublicLists"
+        :theme="store.theme"
+      ></v-checkbox>
+    </div>
 
+    <div class="info-item large row">
+      <div class="info-item medium">
+        <label>Näkyvyys</label>
+        <v-select
+          v-model="visibility"
+          item-value="id"
+          item-title="text"
+          variant="outlined"
+          :items="visibilityItems"
+          :theme="store.theme"
+        ></v-select>
+      </div>
 
-              <v-btn
-                variant="outlined"
-                class="text-none"
-                @click="cancelNameEditing()"
-              >
-                Peruuta
-              </v-btn>
+      <div class="info-item medium">
+        <label>Rooli</label>
+        <v-select
+          v-model="role"
+          item-value="id"
+          item-title="text"
+          variant="outlined"
+          :items="roleItems"
+          :theme="store.theme"
+        ></v-select>
+      </div>
+    </div>
 
-              <v-btn
-                variant="outlined"
-                class="text-none ml-5"
-                color="primary"
-                @click="editName()"
-              >
-                Tallenna
-              </v-btn>
-            </template>
-          </v-col>
+    <div class="info-item large">
+      <div class="label-container">
+        <label v-if="role === 1">Haettavat työt</label>
+        <label v-else-if="role === 2">Tarjottavat työt</label>
+        <label v-else>Tarjottavat palvelut</label>
 
-          <v-col
-            cols="3"
-            class="actions"
-            v-if="!editingName"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="primary"
-              @click="editingName = true"
-            >
-              Muokkaa
-            </v-btn>
-          </v-col>
-        </v-row>
+        <div class="label-info">
+          Lisää painamalla enter tai klikkaamalla ulos kentästä
+        </div>
+      </div>
+      <v-combobox
+        v-model="lookingOrOfferingJobs"
+        chips
+        multiple
+        variant="outlined"
+        :placeholder="role !== 3 ? 'Esim. Nurmikonleikkuu, Lastenhoito' : 'Esim. Muuttopalvelut'"
+        :theme="store.theme"
+      ></v-combobox>
+    </div>
 
-        <v-divider></v-divider>
-
-        <v-row
-          class="info-wrapper"
+    <div class="info-item large">
+      <label>Alue</label>
+      <v-chip-group
+        mandatory
+        selected-class="text-primary"
+        column
+        style="width: 100%;"
+        v-model="areaType"
+      >
+        <v-chip
+        class="chip"
+        color="primary"
         >
-          <v-col
-            cols="3"
-            class="title"
-          >
-          <h4>
-            Sähköposti
-          </h4>
-          </v-col>
-
-
-          <v-col
-            cols="6"
-            class="content"
-          >
-            <template v-if="!editingEmail">
-              {{ store.user.email }}
-            </template>
-
-            <template v-else>
-              <v-form ref="form" v-model="valid">
-                <v-text-field
-                  variant="outlined"
-                  style="max-width: 400px;"
-                  density="compact"
-                  v-model="userEmail"
-                  :rules="emailRules"
-                  required
-                  type="email"
-                  name="email"
-                >
-                </v-text-field>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none"
-                  @click="cancelEmailEditing()"
-                >
-                  Peruuta
-                </v-btn>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none ml-5"
-                  color="primary"
-                  @click="editEmail()"
-                  :disabled="!valid"
-                >
-                  Tallenna
-                </v-btn>
-              </v-form>
-            </template>
-          </v-col>
-
-          <v-col
-            cols="3"
-            class="actions"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="primary"
-              @click="editingEmail = true"
-              v-if="!editingEmail"
-            >
-              Muokkaa
-            </v-btn>
-          </v-col>
-        </v-row>
-
-        <v-divider></v-divider>
-
-        <v-row
-          class="info-wrapper"
+          Valitse kaupungit
+        </v-chip>
+        <v-chip
+        class="chip"
         >
-          <v-col
-            cols="3"
-            class="title"
-          >
-          <h4>
-            Poista käyttäjä
-          </h4>
-          </v-col>
+          Koko suomi
+        </v-chip>
+      </v-chip-group>
+      <v-autocomplete
+        v-show="areaType === 0"
+        v-model="areas"
+        v-model:search="areaSearchTerm"
+        auto-select-first
+        clearable
+        multiple
+        chips
+        closable-chips
+        item-value="id"
+        item-title="name"
+        variant="outlined"
+        :theme="store.theme"
+        :items="store.finnishCities"
+        placeholder="Valitse kaupunki"
+      ></v-autocomplete>
+    </div>
 
-          <v-col
-            cols="6"
-            class="content"
-          >
-          Kaikki tietosi poistetaan tietokannastamme, eikä tätä voi peruuttaa
-          </v-col>
+    <div class="info-item large">
+      <label>Kuvaus</label>
+      <v-textarea
+        :no-resize="true"
+        v-model="description"
+        placeholder="Esittele itsesi tai yrityksesi tässä"
+        variant="outlined"
+        auto-grow
+        :rows="1"
+        :max-rows="1"
+        :theme="store.theme"
+      >
+      </v-textarea>
+    </div>
 
-          <v-col
-            cols="3"
-            class="actions"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="error"
-              @click="deleteUser"
-            >
-              Poista käyttäjä
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+    <div class="actions">
+      <v-btn
+        class="text-none"
+        :theme="store.theme"
+        variant="outlined"
+      >
+        Peruuta
+      </v-btn>
+
+      <v-btn
+        class="text-none"
+        color="primary"
+        @click="saveProfile()"
+      >
+        Tallenna
+      </v-btn>
+    </div>
+  </div>
 
   <input
     type="file"
@@ -253,7 +182,7 @@
     width="500"
   >
 
-    <v-card>
+    <v-card :theme="store.theme">
       <canvas id="imageCanvas" style="display: none;"></canvas>
       <v-card-item>
         <div class="new-profile-img-wrapper">
@@ -284,9 +213,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
+import { nextTick } from 'vue';
 
 const router = useRouter();
 window.scrollTo(0, 0);
@@ -294,16 +224,27 @@ const store = useAppStore();
 const fileInput = ref(null);
 const profileImageDialog = ref(false);
 
+const showInPublicLists = ref(false);
 const newProfileImageResult = ref(null);
 const newProfileImage = ref(null);
 const profileImageUpdated = ref(0);
-
-const editingEmail = ref(false);
-const editingName = ref(false);
-
-const userEmail = ref('');
-const userFirstName = ref('');
-const userLastName = ref('');
+const visibility = ref(1);
+const role = ref(1);
+const lookingOrOfferingJobs = ref([]);
+const areas = ref([]);
+const areaSearchTerm = ref('');
+const areaType = ref(0);
+const description = ref('');
+const visibilityItems = [
+  { id: 1, text: 'Julkinen' },
+  { id: 2, text: 'Vain ystävät' },
+  { id: 3, text: 'Yksityinen' }
+];
+const roleItems = [
+  { id: 1, text: 'Työnhakija' },
+  { id: 2, text: 'Työnantaja' },
+  { id: 3, text: 'Palvelun tarjoaja' },
+];
 
 const fullName = computed(() => {
   if (!store.user) {
@@ -312,28 +253,13 @@ const fullName = computed(() => {
   return store.user.first_name + ' ' + store.user.last_name;
 });
 
-const valid = ref(true);
-
-const emailRules = [
-  v => !!v || 'Syötä sähköposti',
-  v => /.+@.+\..+/.test(v) || 'Syötä kelpaava sähköposti',
-  v => v != store.user.email || 'Syötä uusi sähköposti'
-];
-
 const joinedAt = computed(() => {
   if (!store.user) {
     return '';
   }
   return 'Käyttäjä luotu ' + store.formatDate(store.user.created_at);
 });
-if (store.user) {
-  userEmail.value = store.user.email;
-  userFirstName.value = store.user.first_name;
-  userLastName.value = store.user.last_name;
-  // router.replace({ path: '/' })
-  // store.tab = '';
-  // fullName.value = ;
-} else {
+if (!store.user) {
   store.loginDialogShowing = true;
 }
 
@@ -411,79 +337,37 @@ function openFileInput() {
   fileInput.value.click();
 }
 
-function confirmProfileImage() {
-  let payload = {
-    image: newProfileImage.value
+function saveProfile() {
+  const payload = {
+    profile: {
+      show_publicly: showInPublicLists.value,
+      visibility: visibility.value,
+      role: role.value,
+      description: description.value,
+    },
+    jobs: lookingOrOfferingJobs.value,
+    areas: areas.value
   };
-  store.loading = true;
-  store.loadingBackground = true;
-  store.uploadProfileImage(payload).then(() => {
-    profileImageDialog.value = false;
-    store.loading = false;
-    store.loadingBackground = false;
+  console.log(payload);
 
-    let url = new URL(store.user.profileImageUrl);
-    url.searchParams.set('t', new Date());
-    store.user.profileImageUrl = url.toString();
-    setTimeout(() => {
-      profileImageUpdated.value++;
-    }, 500);
-  }).catch(() => {
-    store.loading = false;
-    store.loadingBackground = false;
-  })
+  store.saveProfile(payload);
 }
 
-store.tab = 'account';
-
-function cancelEmailEditing() {
-  editingEmail.value = false;
-  userEmail.value = store.user.email;
-}
-
-function cancelNameEditing() {
-  editingName.value = false;
-  userFirstName.value = store.user.first_name;
-  userLastName.value = store.user.last_name;
-}
-
-function deleteUser() {
-  let confirm = window.confirm('Haluatko varmasti poistaa käyttäjäsi?');
-
-  if (confirm) {
-    store.deleteUser();
+watch(areas, (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    areaSearchTerm.value = ''
   }
-}
+});
 
-function editEmail() {
-  let payload = {
-    email: userEmail.value,
-    type: 'email'
-  };
-  store.editUser(payload).then(() => {
-    editingEmail.value = false;
-    setTimeout(() => {
-      store.getUser();
-    }, 100);
-  });
-}
-
-function editName() {
-  let payload = {
-    first_name: userFirstName.value,
-    last_name: userLastName.value,
-    type: 'name'
-  };
-
-  store.editUser(payload).then(() => {
-    editingName.value = false;
-    setTimeout(() => {
-      store.getUser();
-    }, 100);
-  });
-}
-
-
+watch(lookingOrOfferingJobs, (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    let newArray = [];
+    lookingOrOfferingJobs.value.forEach(job => {
+      newArray.push(job.charAt(0).toUpperCase() + job.slice(1));
+    });
+    lookingOrOfferingJobs.value = newArray;
+  }
+});
 </script>
 
 <style scoped>
@@ -492,11 +376,11 @@ function editName() {
   position: absolute;
   height: 40px;
   width: 40px;
-  background-color: #e7e7e7;
+  background-color: var(--edit-pencil-bg);
   border-radius: 50%;
   right: 0px;
   bottom: 0px;
-  color: #646464;
+  color: var(--edit-pencil-color);
   cursor: pointer;
 }
 
@@ -508,6 +392,7 @@ function editName() {
     display: flex;
     gap: 40px;
     align-items: center;
+    padding-bottom: 10px;
   }
   .profile-image {
     width: 100px;
@@ -537,6 +422,11 @@ function editName() {
     display: flex;
     flex-direction: column;
     padding-bottom: 25px;
+  }
+
+  .privacy-container {
+    flex-grow: 1;
+    max-width: 200px;
   }
 
   .joined-at {
@@ -584,7 +474,80 @@ function editName() {
     padding: 20px 10px;
   }
 
-.info-wrapper .actions {
-  direction: rtl;
+.actions {
+  max-width: 600px;
+  display: flex;
+  width: 100%;
+  justify-content: end;
+  gap: 20px;
+}
+
+.top-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item.row {
+  flex-direction: row;
+  gap: 20px;
+}
+
+.info-item.row .info-item {
+  flex-grow: 1;
+}
+.info-item.small {
+  max-width: 200px;
+}
+
+.info-item.medium {
+  max-width: 300px;
+}
+
+.info-item.large {
+  max-width: 600px;
+}
+
+.info-item label {
+  font-weight: 600;
+  font-size: 16px;
+  text-wrap: nowrap;
+}
+
+.flex {
+  display: flex;
+  gap: 20px;
+}
+
+.label-container {
+  display: flex;
+  align-items: end;
+}
+
+.label-info {
+  margin-left: 10px;
+  color: var(--text-light-color);
+  font-size: 14px;
+}
+@media (max-width: 960px) {
+  .info-wrapper {
+    flex-direction: column;
+  }
+
+  .info-wrapper .actions {
+    direction: ltr;
+  }
 }
 </style>

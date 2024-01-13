@@ -1,7 +1,8 @@
 <template>
   <v-main>
-    <div style="min-height: calc(100vh - 64px)">
-      <router-view/>
+    <div style="min-height: calc(100vh - var(--app-bar-height))">
+      <router-view>
+      </router-view>
     </div>
 
     <v-footer
@@ -11,19 +12,19 @@
       <h4 class="title">Käytäntömme</h4>
 
       <div class="policy">
-        <a class="footer-link">
+        <a class="footer-link unselectable" href="#">
           Tietosuojakäytäntö
         </a>
 
         <div class="divider"></div>
 
-        <a class="footer-link">
+        <a class="footer-link unselectable"  href="#">
           Ehdot
         </a>
 
         <div class="divider"></div>
 
-        <a class="footer-link">
+        <a class="footer-link unselectable"  href="#">
           Ohje ja tuki
         </a>
       </div>
@@ -32,7 +33,7 @@
 
       <div class="pb-10">
         <v-btn
-          class="mx-4"
+          class="some-btn mx-4"
           variant="text"
           href="https://www.instagram.com/rekrytorsuomi/"
           target="_blank"
@@ -41,7 +42,7 @@
         </v-btn>
 
         <v-btn
-          class="mx-4"
+          class="some-btn mx-4"
           variant="text"
           icon
           href="https://www.tiktok.com/@rekrytorsuomi"
@@ -76,7 +77,7 @@
     </v-card>
   </v-dialog>
 
-  <v-btn
+  <!-- <v-btn
     id="feedback-btn"
     icon="mdi-comment"
     size="large"
@@ -84,10 +85,10 @@
     color="primary"
   >
 
-  </v-btn>
+  </v-btn> -->
 
-  <v-dialog v-model="store.feedbackDialog" persistent max-width="600px">
-      <v-card>
+  <v-dialog v-model="store.feedbackDialog" persistent max-width="600px" :class="{ 'light-theme': store.lightTheme }">
+      <v-card class="feedback-card">
         <v-card-title>
           <span class="headline pl-8">Anna palautetta tai ehdotuksia</span>
         </v-card-title>
@@ -126,6 +127,7 @@ export default {
     feedback: {
       message: ''
     },
+    key: 0,
   }),
   mounted() {
   },
@@ -153,7 +155,7 @@ export default {
 <style scoped>
 
   .main-content {
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - var(--app-bar-height));
   }
 
   .footer {
@@ -191,5 +193,14 @@ export default {
     position: fixed;
     right: 20px;
     bottom: 20px;
+  }
+
+  .feedback-card {
+    background-color: var(--card-bg-color);
+  }
+
+  .some-btn {
+    color: var(--main-text-color);
+    color: white;
   }
 </style>

@@ -2,9 +2,12 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import moment from 'moment';
+import Cookies from 'js-cookie';
+import finnishCities from './finnish_cities';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    lightTheme: false,
     allowed: true,
     feedbackDialog: false,
     maintenanceDialog: false,
@@ -12,7 +15,7 @@ export const useAppStore = defineStore('app', {
     url: window.url,
     baseUrl: window.baseUrl,
     user: null,
-    auth_token: null,
+    auth_token: Cookies.get('auth_token') || null,
     loading: false,
     loadingBackground: false,
     loginDialogShowing: false,
@@ -46,7 +49,14 @@ export const useAppStore = defineStore('app', {
     },
     addJobForm: {
       images: [],
-    }
+    },
+    jobs: [],
+    fullscreen: false,
+    window: {
+      width: null,
+      height: null
+    },
+    finnishCities
   }),
   actions: {
     connectToWebsocket() {
@@ -77,6 +87,7 @@ export const useAppStore = defineStore('app', {
             console.log('in chat to receive');
             this.getMessages(this.chat.jobId, this.chat.userId);
           } else {
+            data.message.message = data.message.message.replace(/\n/g, '<br>');
             this.allMessages.unshift(data.message);
           }
         } else if (data.action === 'CHAT_SEEN') {
@@ -119,9 +130,15 @@ export const useAppStore = defineStore('app', {
           params: this.jobParams
         }).then((response) => {
           let data = response.data;
+          if (!data.error) {
+            data.jobs.forEach(job => {
+              job.area = JSON.parse(job.area);
+            });
+          }
           this.jobParams.page = parseInt(data.page);
           this.jobParams.limit = parseInt(data.limit);
           this.jobParams.totalCount = parseInt(data.totalCount);
+          this.jobs = data.jobs;
           resolve(response);
         })
         .catch((error) => {
@@ -184,6 +201,8 @@ export const useAppStore = defineStore('app', {
         this.axios.post(this.url + `/api/users/login.json`, payload).then((response) => {
           const data = response.data;
           this.auth_token = data.token;
+
+          Cookies.set('auth_token', data.token, { expires: 7 });
           resolve(response.data);
         })
         .catch((error) => {
@@ -193,10 +212,34 @@ export const useAppStore = defineStore('app', {
     },
     register(payload) {
       return new Promise((resolve, reject) => {
+        this.loading = true;
         this.axios.post(this.url + `/api/users/register.json`, payload).then((response) => {
-          resolve(response.data);
+          const data = response.data;
+          if (data.status != 'error' && data.token) {
+            this.registerDialogShowing = false;
+            this.auth_token = data.token;
+            this.getUser().then(() => {
+              this.loading = false;
+              this.loginDialogShowing = false;
+            });
+            resolve(data);
+          } else {
+            switch (data.errorCode) {
+              case 101:
+                this.errorToast('Sähköposti on jo käytössä');
+                reject(data);
+                break;
+              case 102:
+                this.errorToast('Sähköpostin tallennuksessa tapahtui virhe');
+                reject(data);
+                break;
+            }
+          }
+          this.loading = false;
         })
         .catch((error) => {
+          this.loading = false;
+          this.errorToast('Käyttäjän luominen epäonnistui');
           reject(error);
         })
       })
@@ -235,9 +278,11 @@ export const useAppStore = defineStore('app', {
           data.messages.forEach(item => {
               let m = this.allMessages.find(m => m.id === item.id);
               if (!m) {
+                item.message = item.message.replace(/\n/g, '<br>');
                 this.allMessages.push(item);
               }
           });
+          console.log(this.allMessages);
           resolve(data);
         })
         .catch((error) => {
@@ -257,6 +302,7 @@ export const useAppStore = defineStore('app', {
               m.attachment_url = '';
               // this.getImageSrc(m.attachment_id, m);
             }
+            m.message = m.message.replace(/\n/g, '<br>');
           })
           this.allMessages = messages;
           resolve(data);
@@ -270,6 +316,9 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.get(this.url + `/api/users/my-listings.json`).then((response) => {
           let data = response.data;
+          data.listings.forEach(job => {
+            job.area = JSON.parse(job.area);
+          });
           resolve(data);
         })
         .catch((error) => {
@@ -278,7 +327,7 @@ export const useAppStore = defineStore('app', {
       })
     },
     formatDate(date, format = 'DD.MM.YYYY') {
-      return moment(date).format(format);
+      return moment(date).format(format).replace(/(^|\.)(0+)/g, '$1');
     },
     uploadProfileImage(payload) {
       return new Promise((resolve, reject) => {
@@ -312,15 +361,22 @@ export const useAppStore = defineStore('app', {
     },
     toggleFullscreen(element) {
       if (document.fullscreenElement) {
-        return document.exitFullscreen() // exit fullscreen on next click
+        this.fullscreen = false;
+        document.exitFullscreen() // exit fullscreen on next click
       }
       if (element.requestFullscreen) {
+        this.fullscreen = true;
         element.requestFullscreen()
       } else if (this.element.webkitRequestFullscreen) {
+        this.fullscreen = true;
         element.webkitRequestFullscreen() // Safari
       } else if (this.element.msRequestFullscreen) {
+        this.fullscreen = true;
         element.msRequestFullscreen() // IE11
+      } else {
+        // TODO Cant fullscreen
       }
+      console.log(this.fullscreen);
     },
     successToast(message) {
       this.snackbar = false;
@@ -352,7 +408,11 @@ export const useAppStore = defineStore('app', {
       return new Promise((resolve, reject) => {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
-          window.location.href = '/';
+          Cookies.remove('auth_token');
+          this.loading = false;
+          this.loadingBackground = false;
+          this.auth_token = null;
+          this.user = null;
           resolve(data);
         })
         .catch((error) => {
@@ -401,17 +461,14 @@ export const useAppStore = defineStore('app', {
           this.loading = false;
           this.loadingBackground = false;
           if (data.status !== 'success') {
-            this.errorToast('Nimen muokkauksessa tapahtui virhe: ' + data.message);
-            reject(data.message)
+            reject(data.message);
             return;
           }
-          this.successToast('Nimi päivitetty onnistuneesti');
           resolve(data);
         })
         .catch((error) => {
           this.loading = false;
           this.loadingBackground = false;
-          this.errorToast('Nimen muokkauksessa tapahtui virhe');
           reject(error);
         })
       })
@@ -680,11 +737,42 @@ export const useAppStore = defineStore('app', {
           reject(error);
         })
       })
+    },
+    saveProfile(payload) {
+      this.loading = true;
+      this.loadingBackground = true;
+      return new Promise((resolve, reject) => {
+        this.axios.post(this.url + `/api/users/profile.json`, payload).then((response) => {
+          let data = response.data;
+          this.loading = false;
+          this.loadingBackground = false;
+          if (data.status !== 'success') {
+            this.errorToast('Profiilin tallennuksessa tapahtui virhe:' + data.message);
+            reject(data.message);
+            return;
+          }
+          this.successToast('Profiili tallennettu onnistuneesti!');
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.feedbackDialog = false;
+          this.loadingBackground = false;
+          this.errorToast('Profiilin tallennuksessa tapahtui tuntematon virhe');
+          reject(error);
+        })
+      })
     }
 
 
   },
   getters: {
+    theme() {
+      return this.lightTheme ? 'light' : 'dark';
+    },
+    cardCloseBtnColor() {
+      return this.lightTheme ? '#f0f0f0' : 'rgb(33, 33, 33)';
+    },
     latestMessages() {
       let latestMessages = [];
 

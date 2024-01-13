@@ -1,26 +1,24 @@
 <template>
   <v-container
-    v-if="store.user"
-    class="add-container pa-10"
+    class="add-container"
   >
-    <h1 class="pb-5">Luo listaus</h1>
-      <v-window v-model="jobTab" class="main-window">
+    <h1 class="title pb-5">Luo listaus</h1>
+      <v-window v-model="jobTab" class="main-window" disabled>
         <v-window-item value="one" class="window">
-          <div class="title">
+          <!-- <div class="title">
             <h2>Kuvat</h2>
-          </div>
-
+          </div> -->
           <div class="content">
             <v-row
               justify="center"
               align="center"
-              class="images mt-10"
+              class="images"
             >
               <v-card
                 v-for="(image, index) in selectedFileResults"
                 :key="index"
                 elevation="8"
-                width="180"
+                class="image-card"
               >
                 <v-img
                   :src="image ? image.image : '#'"
@@ -36,6 +34,7 @@
                   icon="mdi-delete"
                   elevation="8"
                   size="35"
+                  :style="store.lightTheme ? 'color: rgb(25, 25, 25);' : 'color: rgb(220, 220, 220);'"
                   @click="deleteImage(index)"
                 >
                 </v-btn>
@@ -44,10 +43,9 @@
               </v-card>
               <canvas id="imageCanvas" style="display: none;"></canvas>
               <v-card
-                v-if="selectedFileResults.length <= 9"
+                v-if="selectedFileResults.length < 8"
                 elevation="8"
-                width="180"
-                height="180"
+                class="image-card"
               >
                   <input
                     type="file"
@@ -56,7 +54,7 @@
                     style="display: none;"
                     id="customFileInput"
                   />
-                  <v-btn @click="openFileInput" icon="mdi-plus" flat id="add-img-btn" class="text-none">
+                  <v-btn @click="openFileInput" icon="mdi-plus" flat id="add-img-btn" class="text-none image-card">
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
                       <v-icon
                         style="font-size: 35px;"
@@ -89,15 +87,16 @@
                     label="Työn otsikko"
                     :rules="jobTitleRules"
                     required
+                    :theme="store.theme"
                   ></v-text-field>
                 </v-container>
 
                 <v-container>
                   <h4 class="pl-1">Mikä on kohde alueesi? *</h4>
-                  <span class="pl-1">Esim. Suomi tai Helsinki, Suomi</span>
+                  <span class="pl-1">Syötä mikä tahansa kaupungin tai alueen nimi</span>
                   <v-autocomplete
                     label="Alue"
-                    :items="areaSuggestions"
+                    :items="areaSearchTerm.length > 0 ? areaSuggestions : defaultSuggestions"
                     @update:search="getAddressSuggestions()"
                     hide-no-data
                     v-model:search="areaSearchTerm"
@@ -105,6 +104,11 @@
                     auto-select-first
                     clearable
                     :loading="areaSuggestionsLoading"
+                    multiple
+                    chips
+                    closable-chips
+                    no-data-text="Aluetta ei löytynyt"
+                    :theme="store.theme"
                   ></v-autocomplete>
                 </v-container>
 
@@ -115,7 +119,7 @@
               </v-form>
             </div>
             <div class="actions">
-              <v-btn @click="changeJobTab('one')" class="text-none">Takaisin</v-btn>
+              <v-btn @click="changeJobTab('one')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
               <v-btn color="primary" type="submit" class="text-none" @click="changeJobTab('three')" append-icon="mdi-chevron-right">Seuraava</v-btn>
             </div>
         </v-window-item>
@@ -154,9 +158,10 @@
                     @update:focused="dateDialogShowing = true"
                     :rules="jobDateRules"
                     required
+                    :theme="store.theme"
                   ></v-text-field>
                 </template>
-                <v-card>
+                <v-card :theme="store.theme">
                   <v-card-item>
                     <v-locale-provider locale="fi">
                       <v-date-picker
@@ -206,6 +211,7 @@
                     @update:model-value="estimatedTimeUpdated"
                     min="0"
                     :rules="numberRules"
+                    :theme="store.theme"
                   >
                   </v-text-field>
 
@@ -231,7 +237,9 @@
                     type="number"
                     v-model="salary"
                     min="0"
+                    @change="sanitizeSalary()"
                     :rules="numberRules"
+                    :theme="store.theme"
                   >
                   </v-text-field>
                   </template>
@@ -248,6 +256,7 @@
                       v-model="hoursPerWeek"
                       min="0"
                       :rules="numberRules"
+                      :theme="store.theme"
                     >
                     </v-text-field>
 
@@ -266,7 +275,6 @@
                         {{ salaryType }}
                       </v-chip>
                     </v-chip-group>
-
                     <v-text-field
                       :label="salaryTypes2[salaryType]"
                       :suffix="salaryType == 0 ? '€/h' : '€/kk'"
@@ -274,6 +282,8 @@
                       v-model="salary"
                       min="0"
                       :rules="numberRules"
+                      @change="sanitizeSalary()"
+                      :theme="store.theme"
                     >
                     </v-text-field>
                   </template>
@@ -281,17 +291,15 @@
           </div>
 
           <div class="actions">
-            <v-btn @click="changeJobTab('two')" class="text-none">Takaisin</v-btn>
-            <v-btn color="primary" class="text-none" append-icon="mdi-chevron-right" style="float: right;" @click="addjob">Luo listaus</v-btn>
+            <v-btn @click="changeJobTab('two')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
+            <v-btn color="primary" class="text-none" append-icon="mdi-plus" style="float: right;" @click="addjob" v-if="store.user">Luo listaus</v-btn>
+            <v-btn color="primary" class="text-none" style="float: right;" @click="store.loginDialogShowing = true" v-else>Kirjaudu sisään</v-btn>
           </div>
         </v-window-item>
-
       </v-window>
-
-
   </v-container>
 
-  <div v-if="!store.user" class="login-container">
+  <!-- <div v-if="!store.user" class="login-container">
     Kirjaudu sisään niin pääset lisäämään listauksen
     <v-btn
       class="mt-7"
@@ -301,11 +309,11 @@
     >
       Kirjaudu
     </v-btn>
-  </div>
+  </div> -->
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useAppStore } from '@/store/app';
 import moment from 'moment';
 import { useRouter } from 'vue-router';
@@ -323,10 +331,23 @@ const salaryTypes = ['Tuntipalkka', 'Urakkapalkka'];
 const salaryTypes2 = ['Tuntipalkka', 'Kuukausipalkka'];
 const title = ref('');
 
-const area = ref('');
+const area = ref([]);
 const areaSearchTerm = ref('');
 const areaSuggestionsLoading = ref(false);
 const areaSuggestions = ref([]);
+
+const defaultSuggestions = [
+  'Helsinki, Suomi',
+  'Espoo, Suomi',
+  'Tampere, Suomi',
+  'Vantaa, Suomi',
+  'Oulu, Suomi',
+  'Turku, Suomi',
+  'Jyväskylä, Suomi',
+  'Kuopio, Suomi',
+  'Lahti, Suomi',
+  'Pori, Suomi'
+];
 
 const description = ref('');
 
@@ -363,6 +384,12 @@ const allImagesUploaded = computed(() => {
     return false;
   }
 })
+
+watch(area, async (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    areaSearchTerm.value = ''
+  }
+});
 
 function confirmDateSelection() {
   dateDialogShowing.value = false;
@@ -487,15 +514,25 @@ function getAddressSuggestions() {
   setTimeout(() => {
     term = areaSearchTerm.value;
   }, 100);
-  setTimeout(() => {
-    if (areaSearchTerm.value && areaSearchTerm.value.length > 0 && term === areaSearchTerm.value) {
-      areaSuggestionsLoading.value = true;
-      store.getAddressSuggestions(areaSearchTerm.value).then((response) => {
-        areaSuggestions.value = response.suggestions;
-        areaSuggestionsLoading.value = false;
-      });
-    }
-  }, 500);
+  // if (areaSearchTerm.value && areaSearchTerm.value.length > 0 && term === areaSearchTerm.value) {
+    setTimeout(() => {
+      if (areaSearchTerm.value && areaSearchTerm.value.length > 0 && term === areaSearchTerm.value) {
+        areaSuggestionsLoading.value = true;
+        store.getAddressSuggestions(areaSearchTerm.value).then((response) => {
+          areaSuggestions.value = response.suggestions;
+          areaSuggestionsLoading.value = false;
+        });
+      }
+    }, 500);
+  // }
+  // else {
+  //   areaSuggestionsLoading.value = true;
+  //     store.getAddressSuggestions('Helsinki').then((response) => {
+  //       areaSuggestions.value = response.suggestions;
+  //       areaSuggestionsLoading.value = false;
+  //     });
+  // }
+
 }
 
 function addjob() {
@@ -530,16 +567,21 @@ function addjob() {
   // })
 }
 
-
-if (!store.user) {
-  store.loginDialogShowing = true;
+function sanitizeSalary() {
+  var v = parseFloat(salary.value);
+  if (isNaN(v)) {
+    salary.value = '';
+  } else {
+    salary.value = v.toFixed(2);
+  }
 }
+
 </script>
 
 <style scoped>
 
   .add-container {
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - var(--app-bar-height));
     max-width: 1080px;
   }
 
@@ -554,6 +596,8 @@ if (!store.user) {
     top: 10px;
     right: 10px;
     z-index: 100;
+    background-color: var(--card-bg-color);
+    border-radius: 50%;
   }
 
   .images {
@@ -562,7 +606,8 @@ if (!store.user) {
     justify-content: center;
     align-items: center;
     flex: none !important;
-    margin: 20px !important;
+    height: fit-content;
+    margin: 10px;
   }
 
   .main-window {
@@ -586,11 +631,14 @@ if (!store.user) {
     justify-content: end;
     align-items: end;
     padding: 10px;
+    margin-bottom: 60px;
   }
 
   .window .content {
     flex: 8;
-    display: grid;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
   }
 
   .login-container {
@@ -601,6 +649,38 @@ if (!store.user) {
     font-size: 18px;
     flex-direction: column;
     gap: 20px;
+  }
+  .image-card {
+    background-color: var(--card-bg-color) !important;
+    width: 180px;
+    height: 180px;
+  }
+
+  @media (max-width: 1199px) {
+    .image-card {
+      width: 160px;
+      height: 160px;
+    }
+
+    .title {
+      font-size: 24px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .window .content {
+      flex: 10;
+      justify-content: start;
+    }
+  }
+
+  @media (max-width: 699px) {
+    .image-card {
+      width: 140px;
+      height: 140px;
+    }
   }
 
 </style>

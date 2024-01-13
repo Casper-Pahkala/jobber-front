@@ -27,13 +27,25 @@
 <script setup>
 
 import { useAppStore } from '@/store/app';
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
+import i18n from "@/i18n/i18n";
+import { useRoute } from 'vue-router';
 
+const locale = localStorage.getItem('locale');
 const store = useAppStore();
+const route = useRoute();
+if (locale) {
+  i18n.global.locale = locale;
+}
+
+const lightThemeEnabled = localStorage.getItem('light_theme');
+store.lightTheme = lightThemeEnabled && lightThemeEnabled === 'true';
+
+watch(() => route.name, (newVal) => {
+  store.tab = newVal;
+})
 
 store.initializeAxios();
-
-store.auth_token = window.auth_token;
 if (store.auth_token) {
   store.getUser().then((response) => {
     store.userInit();
@@ -41,7 +53,7 @@ if (store.auth_token) {
 }
 
 setTimeout(() => {
-  store.maintenanceDialog = true;
+  // store.maintenanceDialog = true;
 }, 1000);
 
 const password = ref(null);
@@ -54,6 +66,31 @@ function checkPassword() {
     passwordError.value = true;
   }
 }
+store.window.width = window.innerWidth;
+store.window.height = window.innerHeight;
+window.addEventListener("resize", () => {
+  store.window.width = window.innerWidth;
+  store.window.height = window.innerHeight;
+});
+var root = document.querySelector(':root');
+if (store.lightTheme) {
+  root.style.setProperty('--scrollbar-track-color', 'rgb(237, 237, 237)');
+  root.style.setProperty('--scrollbar-color', 'rgb(70, 70, 70)');
+} else {
+  root.style.setProperty('--scrollbar-track-color', 'rgb(25, 25, 25)');
+  root.style.setProperty('--scrollbar-color', 'rgb(70, 70, 70)');
+}
+watch(() => store.lightTheme, (newVal) => {
+  var root = document.querySelector(':root');
+  if (newVal) {
+    root.style.setProperty('--scrollbar-track-color', 'rgb(237, 237, 237)');
+    root.style.setProperty('--scrollbar-color', 'rgb(150, 150, 150)');
+  } else {
+    root.style.setProperty('--scrollbar-track-color', 'rgb(25, 25, 25)');
+    root.style.setProperty('--scrollbar-color', 'rgb(70, 70, 70)');
+  }
+  localStorage.setItem('light_theme', newVal);
+})
 
 </script>
 
@@ -69,6 +106,18 @@ function checkPassword() {
 
 <style>
 
+.area-chip {
+  padding: 2px 15px;
+  background-color: #e7e7e7;
+  border-radius: 30px;
+  text-wrap: nowrap;
+  background-color: var(--main-light-color);
+}
+
+.area-container {
+  display: flex;
+  gap: 5px;
+}
 body, html {
   min-width: 370px;
 }
@@ -83,4 +132,18 @@ body, html {
   cursor: default;
   pointer-events: all;
 }
+
+main {
+  background-color: var(--main-bg-color);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.v-main {
+  padding-top: var(--app-bar-height) !important;
+}
+
 </style>

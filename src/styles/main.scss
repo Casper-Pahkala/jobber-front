@@ -1,32 +1,148 @@
-.profile-tabs {
-    .v-tab__slider {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: none !important;
-        border-top: 2px solid #acacac;
-        border-right: 2px solid #acacac;
-        border-left: 2px solid #acacac;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        z-index: 10;
-        box-sizing: border-box;
+// .profile-tabs {
+//     .v-tab__slider {
+//         top: 0;
+//         left: 0;
+//         right: 0;
+//         bottom: 0;
+//         background: none !important;
+//         border-top: 2px solid #acacac;
+//         border-right: 2px solid #acacac;
+//         border-left: 2px solid #acacac;
+//         border-top-right-radius: 10px;
+//         border-top-left-radius: 10px;
+//         z-index: 10;
+//         box-sizing: border-box;
+//         height: 100%;
+//     }
+
+//     .v-tab__slider::before {
+//         content: '';
+//         position: absolute;
+//         bottom: 0;
+//         left: 0%;
+//         height: 2px;
+//         background: #ffffff;
+//         width: 100%;
+//         z-index: 0;
+//     }
+
+//     .v-ripple__container {
+//         z-index: 10;
+//     }
+// }
+
+/* Dark theme */
+:root {
+    --app-bar-height: 80px;
+    
+    --main-text-plain-color: rgb(255, 255, 255);
+
+    --main-bg-color: rgb(25,25,25); /* Dark background */
+    --main-text-color: rgb(240, 240, 240); /* Light text */
+    --main-text-light-color: rgb(184, 184, 184); /* Lighter text */
+    --card-bg-color: rgb(33,33,33); /* Darker card background */
+    --main-light-color: #292929; /* Dark light color */
+    --main-very-light-color: rgb(40, 40, 40); /* Very dark light color */
+    --app-bar-bg-color: #131313;
+    
+    
+    --chat-other-color: rgb(45, 45, 45);
+    --chat-my-color: rgb(20,20,20);
+    --chat-light-bg: rgb(42, 42, 42);
+
+    --scrollbar-track-color: rgb(25, 25, 25);
+    --scrollbar-color: rgb(70, 70, 70);
+
+    --edit-pencil-bg: #3f3f3f;
+    --edit-pencil-color: #8e8e8e;
+
+    --text-light-color: rgb(120, 120, 120);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    border-radius: 14px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+/* Light theme */
+.light-theme {
+    --main-text-plain-color: rgb(0, 0, 0);
+
+    --main-bg-color: rgb(237, 237, 237); /* Light background */
+    --main-text-color: rgb(33,33,33); /* Dark text */
+    --main-text-light-color: rgb(100, 100, 100); /* Darker text */
+    --card-bg-color: #f0f0f0; /* Lighter card background */
+    --main-light-color: #e0e0e0; /* Light light color */
+    --main-very-light-color: rgb(225, 225, 225); /* Lighter very light color */
+    --app-bar-bg-color: #f7f7f7;
+
+    --chat-light-bg: #e2e2e2;
+    --chat-other-color: #ccc;
+    --chat-my-color: #333;
+
+    --edit-pencil-bg: #e7e7e7;
+    --edit-pencil-color: #646464;
+}
+
+div {
+    color: var(--main-text-color);
+}
+
+.app-bar {
+    .tab .v-btn__content {
         height: 100%;
-    }
-
-    .v-tab__slider::before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0%;
-        height: 2px;
-        background: #ffffff;
         width: 100%;
-        z-index: 0;
     }
 
-    .v-ripple__container {
-        z-index: 10;
+    .tab {
+        padding: 0 !important;
+    }
+
+    .v-toolbar__content {
+        height: 100% !important;
+        position: relative;
+    }
+
+    .v-tabs {
+        height: 100% !important;
+    }
+
+    .v-tabs button{
+        height: 100% !important;
     }
 }
+
+.v-messages__message {
+    color: inherit;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.7s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.unselectable {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera, and Edge */
+  }
+  
