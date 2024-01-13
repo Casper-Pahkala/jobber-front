@@ -51,8 +51,7 @@
 
       <v-list-item prepend-icon="mdi-briefcase" title="Työt" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
       <v-list-item prepend-icon="mdi-account-group" title="Henkilöt ja palvelut" @click="changeTab('workers')" :active="false" class="drawer-item"></v-list-item>
-      <v-list-item v-if="!store.user" prepend-icon="mdi-login" title="Kirjaudu sisään" @click="store.loginDialogShowing = true" :active="false" class="drawer-item"></v-list-item>
-      <v-list-item v-if="!store.user" prepend-icon="mdi-plus" title="Luo käyttäjä" @click="store.registerDialogShowing = true" :active="false" class="drawer-item"></v-list-item>
+      <v-list-item prepend-icon="mdi-plus" title="Luo ilmoitus" @click="changeTab('add-job')" :active="false" class="drawer-item"></v-list-item>
 
       <v-divider class="mt-2 mb-2"></v-divider>
 
@@ -63,6 +62,11 @@
       <v-list-item prepend-icon="mdi-shield" title="Tietosuojakäytäntö" @click="changeTab('jobs')" :active="false" class="drawer-item"></v-list-item>
 
       <v-list-item prepend-icon="mdi-comment" title="Anna palautetta"  @click="openFeedback()" :active="false" class="drawer-item"></v-list-item>
+
+      <v-divider class="mt-2 mb-2" v-if="!store.user"></v-divider>
+
+      <v-list-item v-if="!store.user" prepend-icon="mdi-login" title="Kirjaudu sisään" @click="store.loginDialogShowing = true" :active="false" class="drawer-item"></v-list-item>
+      <v-list-item v-if="!store.user" prepend-icon="mdi-plus" title="Luo käyttäjä" @click="store.registerDialogShowing = true" :active="false" class="drawer-item"></v-list-item>
 
       <template v-if="store.user">
         <v-divider class="mt-2 mb-2"></v-divider>
@@ -84,8 +88,8 @@
         <div class="app-bar-content">
 
           <div>
-            <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="menu-btn" :ripple="false" flat v-if="store.window.width < 640"></v-app-bar-nav-icon>
-            <router-link to="/jobs" @click="updateTab('jobs')" v-if="store.window.width >= 640">
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="menu-btn" :ripple="false" flat v-if="store.window.width < 1199"></v-app-bar-nav-icon>
+            <router-link to="/jobs" @click="updateTab('jobs')" v-if="store.window.width >= 1199">
               <div class="rekrytor-text">
                 Rekrytor
               </div>
@@ -105,16 +109,15 @@
             </v-tabs>
           </div>
             <div class="app-bar-append">
-
+              <v-btn
+                prepend-icon="mdi-plus"
+                class="add-job-btn mr-5"
+                style="height: 48px;"
+                @click="changeTab('add-job')"
+              >
+                {{ $t('Luo ilmoitus') }}
+              </v-btn>
               <template v-if="store.user">
-                <v-btn
-                  prepend-icon="mdi-plus"
-                  class="add-job-btn mr-5"
-                  style="height: 48px;"
-                  @click="changeTab('add-job')"
-                >
-                  {{ $t('Luo listaus') }}
-                </v-btn>
 
                 <v-menu
                   :class="{ 'light-theme': store.lightTheme }"
@@ -321,7 +324,10 @@ function updateTab(tab) {
 }
 
 function logOut() {
-  store.logOut();
+  drawer.value = false;
+  store.logOut().then(() => {
+    // router.replace('/')
+  });
 }
 
 function openRecentMessage(message) {
@@ -608,6 +614,10 @@ if (window.scrollY > 0) {
 
     .rekrytor-text, .app-bar-append {
       width: 150px;
+    }
+
+    .login-btn {
+      margin-right: 10px;
     }
   }
 

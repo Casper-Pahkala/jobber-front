@@ -50,6 +50,11 @@ const routes = [
         component: () => import('@/views/Account.vue'),
       },
       {
+        path: 'profile',
+        name: 'profile',
+        component: () => import('@/views/Account.vue'),
+      },
+      {
         path: 'messages',
         name: 'messages',
         component: () => import('@/views/Account.vue'),

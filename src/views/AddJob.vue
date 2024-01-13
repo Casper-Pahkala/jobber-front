@@ -1,6 +1,5 @@
 <template>
   <v-container
-    v-if="store.user"
     class="add-container"
   >
     <h1 class="title pb-5">Luo listaus</h1>
@@ -94,10 +93,10 @@
 
                 <v-container>
                   <h4 class="pl-1">Mikä on kohde alueesi? *</h4>
-                  <span class="pl-1">Esim. Suomi tai Helsinki, Suomi</span>
+                  <span class="pl-1">Syötä mikä tahansa kaupungin tai alueen nimi</span>
                   <v-autocomplete
                     label="Alue"
-                    :items="areaSuggestions"
+                    :items="areaSearchTerm.length > 0 ? areaSuggestions : defaultSuggestions"
                     @update:search="getAddressSuggestions()"
                     hide-no-data
                     v-model:search="areaSearchTerm"
@@ -293,16 +292,14 @@
 
           <div class="actions">
             <v-btn @click="changeJobTab('two')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
-            <v-btn color="primary" class="text-none" append-icon="mdi-chevron-right" style="float: right;" @click="addjob">Luo listaus</v-btn>
+            <v-btn color="primary" class="text-none" append-icon="mdi-plus" style="float: right;" @click="addjob" v-if="store.user">Luo listaus</v-btn>
+            <v-btn color="primary" class="text-none" style="float: right;" @click="store.loginDialogShowing = true" v-else>Kirjaudu sisään</v-btn>
           </div>
         </v-window-item>
-
       </v-window>
-
-
   </v-container>
 
-  <div v-if="!store.user" class="login-container">
+  <!-- <div v-if="!store.user" class="login-container">
     Kirjaudu sisään niin pääset lisäämään listauksen
     <v-btn
       class="mt-7"
@@ -312,7 +309,7 @@
     >
       Kirjaudu
     </v-btn>
-  </div>
+  </div> -->
 </template>
 
 <script setup>
@@ -338,6 +335,19 @@ const area = ref([]);
 const areaSearchTerm = ref('');
 const areaSuggestionsLoading = ref(false);
 const areaSuggestions = ref([]);
+
+const defaultSuggestions = [
+  'Helsinki, Suomi',
+  'Espoo, Suomi',
+  'Tampere, Suomi',
+  'Vantaa, Suomi',
+  'Oulu, Suomi',
+  'Turku, Suomi',
+  'Jyväskylä, Suomi',
+  'Kuopio, Suomi',
+  'Lahti, Suomi',
+  'Pori, Suomi'
+];
 
 const description = ref('');
 
@@ -504,15 +514,25 @@ function getAddressSuggestions() {
   setTimeout(() => {
     term = areaSearchTerm.value;
   }, 100);
-  setTimeout(() => {
-    if (areaSearchTerm.value && areaSearchTerm.value.length > 0 && term === areaSearchTerm.value) {
-      areaSuggestionsLoading.value = true;
-      store.getAddressSuggestions(areaSearchTerm.value).then((response) => {
-        areaSuggestions.value = response.suggestions;
-        areaSuggestionsLoading.value = false;
-      });
-    }
-  }, 500);
+  // if (areaSearchTerm.value && areaSearchTerm.value.length > 0 && term === areaSearchTerm.value) {
+    setTimeout(() => {
+      if (areaSearchTerm.value && areaSearchTerm.value.length > 0 && term === areaSearchTerm.value) {
+        areaSuggestionsLoading.value = true;
+        store.getAddressSuggestions(areaSearchTerm.value).then((response) => {
+          areaSuggestions.value = response.suggestions;
+          areaSuggestionsLoading.value = false;
+        });
+      }
+    }, 500);
+  // }
+  // else {
+  //   areaSuggestionsLoading.value = true;
+  //     store.getAddressSuggestions('Helsinki').then((response) => {
+  //       areaSuggestions.value = response.suggestions;
+  //       areaSuggestionsLoading.value = false;
+  //     });
+  // }
+
 }
 
 function addjob() {

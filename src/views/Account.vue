@@ -9,6 +9,7 @@
           class="d-sm-flex profile-tabs"
           v-model="accountTab"
         >
+        <v-tab @click="changeTab('account')" value="account" class="text-none tab">Tili</v-tab>
           <v-tab @click="changeTab('profile')" value="profile" class="text-none tab">Profiili</v-tab>
           <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">Viestit</v-tab>
           <v-tab @click="changeTab('listings')" value="listings" class="text-none tab">Omat listaukset</v-tab>
@@ -19,6 +20,10 @@
         </v-tabs>
 
         <v-window v-model="accountTab" class="pt-10" disabled>
+          <v-window-item value="account" class="window">
+            <account></account>
+          </v-window-item>
+
           <v-window-item value="profile" class="window">
             <profile></profile>
           </v-window-item>
@@ -40,6 +45,7 @@
 import { ref, computed, watch } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter, useRoute } from 'vue-router';
+import Account from '@/components/Account/Account.vue';
 import Profile from '@/components/Account/Profile.vue';
 import Messages from '@/components/Account/Messages.vue';
 import Listings from '@/components/Account/MyListings.vue';
@@ -50,12 +56,14 @@ const store = useAppStore();
 let currentTab = route.name || '';
 
 if (store.user) {
-
 } else {
   store.loginDialogShowing = true;
 }
 
-const accountTab = ref('profile');
+const accountTab = ref('account');
+if (currentTab === 'profile') {
+  accountTab.value = 'profile';
+}
 if (currentTab === 'messages') {
   accountTab.value = 'messages';
 }
@@ -63,23 +71,12 @@ if (currentTab === 'listings') {
   accountTab.value = 'listings';
 }
 function changeTab(tab) {
-  if (tab === 'profile') {
+  if (tab === 'account') {
     router.replace(`/account`);
   } else {
     router.replace(`/account/${tab}`);
   }
 }
-
-const currentRoute = computed(() => {
-  return route.name;
-})
-
-watch(currentRoute, async (newVal, oldVal) => {
-  if (newVal === 'account') {
-    newVal = 'profile';
-  }
-  accountTab.value = newVal;
-});
 </script>
 
 <style scoped>

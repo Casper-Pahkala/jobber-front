@@ -1,4 +1,6 @@
 <template>
+  <div class="top-wrapper">
+
     <div class="row">
       <div class="profile-image-container">
         <v-img
@@ -35,305 +37,137 @@
           {{ joinedAt }}
         </span>
       </div>
+
+    </div>
+  </div>
+
+  <div class="info-container">
+    <div class="info-item">
+      <v-checkbox
+        label="Näytä profiili julkisilla listoilla"
+        v-model="showInPublicLists"
+        :theme="store.theme"
+      ></v-checkbox>
     </div>
 
-      <div class="profile-container" v-if="store.user">
-
-        <v-row
-          class="info-wrapper"
-        >
-          <v-col
-            sm="12"
-            md="3"
-            class="title"
-          >
-          <h4>
-            Nimi
-          </h4>
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="6"
-            class="content"
-          >
-          <template v-if="!editingName">
-              {{ fullName }}
-            </template>
-
-            <template v-else>
-              <v-form ref="form">
-                <v-row style="max-width: 440px;">
-                  <v-col cols="6">
-                    <v-text-field
-                      variant="outlined"
-                      style="max-width: 200px;"
-                      density="compact"
-                      v-model="userFirstName"
-                      label="Etunimi"
-                      :theme="store.theme"
-                    >
-                    </v-text-field>
-                  </v-col>
-
-                  <v-col cols="6">
-                    <v-text-field
-                      variant="outlined"
-                      style="max-width: 200px;"
-                      density="compact"
-                      v-model="userLastName"
-                      label="Sukunimi"
-                      :theme="store.theme"
-                    >
-                    </v-text-field>
-                  </v-col>
-                </v-row>
-
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none"
-                  @click="cancelNameEditing()"
-                >
-                  Peruuta
-                </v-btn>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none ml-5"
-                  color="primary"
-                  @click="saveFullname()"
-                  :disabled="!fullNameValid"
-                >
-                  Tallenna
-                </v-btn>
-              </v-form>
-            </template>
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="3"
-            class="actions"
-            v-if="!editingName"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="primary"
-              @click="editingName = true"
-            >
-              Muokkaa
-            </v-btn>
-          </v-col>
-        </v-row>
-
-        <v-divider></v-divider>
-
-        <v-row
-          class="info-wrapper"
-        >
-          <v-col
-            sm="12"
-            md="3"
-            class="title"
-          >
-          <h4>
-            Sähköposti
-          </h4>
-          </v-col>
-
-
-          <v-col
-            sm="12"
-            md="6"
-            class="content"
-          >
-            <template v-if="!editingEmail">
-              {{ store.user.email }}
-            </template>
-
-            <template v-else>
-              <v-form ref="form" v-model="valid">
-                <v-text-field
-                  variant="outlined"
-                  style="max-width: 400px;"
-                  density="compact"
-                  v-model="userEmail"
-                  :rules="emailRules"
-                  required
-                  type="email"
-                  name="email"
-                  label="Sähköposti"
-                  :theme="store.theme"
-                >
-                </v-text-field>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none"
-                  @click="cancelEmailEditing()"
-                >
-                  Peruuta
-                </v-btn>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none ml-5"
-                  color="primary"
-                  @click="saveEmail()"
-                  :disabled="!valid"
-                >
-                  Tallenna
-                </v-btn>
-              </v-form>
-            </template>
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="3"
-            class="actions"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="primary"
-              @click="editingEmail = true"
-              v-if="!editingEmail"
-            >
-              Muokkaa
-            </v-btn>
-          </v-col>
-        </v-row>
-
-        <v-row
-          class="info-wrapper"
-        >
-          <v-col
-            sm="12"
-            md="3"
-            class="title"
-          >
-          <h4>
-            Vaihda salasana
-          </h4>
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="6"
-            class="content"
-          >
-            <template v-if="!editingPassword">
-              {{ '*********' }}
-            </template>
-
-            <template v-else>
-              <v-form ref="form" v-model="valid">
-                <v-text-field
-                  variant="outlined"
-                  style="max-width: 400px;"
-                  density="compact"
-                  v-model="userNewPassword"
-                  required
-                  type="password"
-                  name="password"
-                  label="Uusi salasana"
-                  :theme="store.theme"
-                >
-                </v-text-field>
-
-                <v-text-field
-                  variant="outlined"
-                  style="max-width: 400px;"
-                  density="compact"
-                  v-model="userNewConfirmPassword"
-                  required
-                  type="password"
-                  label="Vahvista salasana"
-                  :error-messages="confirmPasswordError"
-                  :theme="store.theme"
-                >
-                </v-text-field>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none"
-                  @click="cancelPasswordEditing()"
-                >
-                  Peruuta
-                </v-btn>
-
-                <v-btn
-                  variant="outlined"
-                  class="text-none ml-5"
-                  color="primary"
-                  @click="savePassword()"
-                  :disabled="!canSavePassword"
-                >
-                  Tallenna
-                </v-btn>
-              </v-form>
-            </template>
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="3"
-            class="actions"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="primary"
-              @click="editingPassword = true"
-              v-if="!editingPassword"
-            >
-              Vaihda salasana
-            </v-btn>
-          </v-col>
-        </v-row>
-
-        <!-- <v-divider></v-divider>
-
-        <v-row
-          class="info-wrapper"
-        >
-          <v-col
-            sm="12"
-            md="3"
-            class="title"
-          >
-          <h4>
-            Poista käyttäjä
-          </h4>
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="6"
-            class="content"
-          >
-          Kaikki tietosi poistetaan tietokannastamme, eikä tätä voi peruuttaa
-          </v-col>
-
-          <v-col
-            sm="12"
-            md="3"
-            class="actions"
-          >
-            <v-btn
-              variant="outlined"
-              class="text-none"
-              color="error"
-              @click="deleteUser"
-            >
-              Poista käyttäjä
-            </v-btn>
-          </v-col>
-        </v-row> -->
+    <div class="info-item large row">
+      <div class="info-item medium">
+        <label>Näkyvyys</label>
+        <v-select
+          v-model="visibility"
+          item-value="id"
+          item-title="text"
+          variant="outlined"
+          :items="visibilityItems"
+          :theme="store.theme"
+        ></v-select>
       </div>
+
+      <div class="info-item medium">
+        <label>Rooli</label>
+        <v-select
+          v-model="role"
+          item-value="id"
+          item-title="text"
+          variant="outlined"
+          :items="roleItems"
+          :theme="store.theme"
+        ></v-select>
+      </div>
+    </div>
+
+    <div class="info-item large">
+      <div class="label-container">
+        <label v-if="role === 1">Haettavat työt</label>
+        <label v-else-if="role === 2">Tarjottavat työt</label>
+        <label v-else>Tarjottavat palvelut</label>
+
+        <div class="label-info">
+          Lisää painamalla enter tai klikkaamalla ulos kentästä
+        </div>
+      </div>
+      <v-combobox
+        v-model="lookingOrOfferingJobs"
+        chips
+        multiple
+        variant="outlined"
+        :placeholder="role !== 3 ? 'Esim. Nurmikonleikkuu, Lastenhoito' : 'Esim. Muuttopalvelut'"
+        :theme="store.theme"
+      ></v-combobox>
+    </div>
+
+    <div class="info-item large">
+      <label>Alue</label>
+      <v-chip-group
+        mandatory
+        selected-class="text-primary"
+        column
+        style="width: 100%;"
+        v-model="areaType"
+      >
+        <v-chip
+        class="chip"
+        color="primary"
+        >
+          Valitse kaupungit
+        </v-chip>
+        <v-chip
+        class="chip"
+        >
+          Koko suomi
+        </v-chip>
+      </v-chip-group>
+      <v-autocomplete
+        v-show="areaType === 0"
+        v-model="areas"
+        v-model:search="areaSearchTerm"
+        auto-select-first
+        clearable
+        multiple
+        chips
+        closable-chips
+        item-value="id"
+        item-title="name"
+        variant="outlined"
+        :theme="store.theme"
+        :items="store.finnishCities"
+        placeholder="Valitse kaupunki"
+      ></v-autocomplete>
+    </div>
+
+    <div class="info-item large">
+      <label>Kuvaus</label>
+      <v-textarea
+        :no-resize="true"
+        v-model="description"
+        placeholder="Esittele itsesi tai yrityksesi tässä"
+        variant="outlined"
+        auto-grow
+        :rows="1"
+        :max-rows="1"
+        :theme="store.theme"
+      >
+      </v-textarea>
+    </div>
+
+    <div class="actions">
+      <v-btn
+        class="text-none"
+        :theme="store.theme"
+        variant="outlined"
+      >
+        Peruuta
+      </v-btn>
+
+      <v-btn
+        class="text-none"
+        color="primary"
+      >
+        Tallenna
+      </v-btn>
+    </div>
+  </div>
+
   <input
     type="file"
     ref="fileInput"
@@ -381,6 +215,7 @@
 import { ref, computed, watch } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
+import { nextTick } from 'vue';
 
 const router = useRouter();
 window.scrollTo(0, 0);
@@ -388,32 +223,26 @@ const store = useAppStore();
 const fileInput = ref(null);
 const profileImageDialog = ref(false);
 
+const showInPublicLists = ref(false);
 const newProfileImageResult = ref(null);
 const newProfileImage = ref(null);
 const profileImageUpdated = ref(0);
-
-const editingEmail = ref(false);
-const editingName = ref(false);
-const editingPassword = ref(false);
-
-const userEmail = ref('');
-const userFirstName = ref('');
-const userLastName = ref('');
-const userNewPassword = ref('');
-const userNewConfirmPassword = ref('');
-const confirmPasswordError = ref('');
-const canSavePassword = computed(() => {
-  if (!userNewPassword.value || userNewPassword.value.length <= 0) {
-    return false;
-  }
-  if (!userNewConfirmPassword.value || userNewConfirmPassword.value.length <= 0) {
-    return false;
-  }
-  if (confirmPasswordError.value.length !== 0) {
-    return false;
-  }
-  return true;
-});
+const visibility = ref(1);
+const role = ref(1);
+const lookingOrOfferingJobs = ref([]);
+const areas = ref([]);
+const areaSearchTerm = ref('');
+const areaType = ref(0);
+const visibilityItems = [
+  { id: 1, text: 'Julkinen' },
+  { id: 2, text: 'Vain ystävät' },
+  { id: 3, text: 'Yksityinen' }
+];
+const roleItems = [
+  { id: 1, text: 'Työnhakija' },
+  { id: 2, text: 'Työnantaja' },
+  { id: 3, text: 'Palvelun tarjoaja' },
+];
 
 const fullName = computed(() => {
   if (!store.user) {
@@ -422,45 +251,13 @@ const fullName = computed(() => {
   return store.user.first_name + ' ' + store.user.last_name;
 });
 
-const valid = ref(true);
-const fullNameValid = computed(() => {
-  if (store.user.first_name === userFirstName.value && store.user.last_name === userLastName.value) {
-    return false;
-  }
-
-  const pattern = /^[a-zA-Z]+([-']?[a-zA-Z]+)*$/;
-  if (!pattern.test(userFirstName.value)) {
-    return false;
-  }
-
-  if (!pattern.test(userLastName.value)) {
-    return false;
-  }
-
-  return true;
-});
-
-const emailRules = [
-  v => !!v || 'Syötä sähköposti',
-  v => /.+@.+\..+/.test(v) || 'Syötä kelpaava sähköposti',
-  v => v != store.user.email || 'Syötä uusi sähköposti'
-];
-
-
 const joinedAt = computed(() => {
   if (!store.user) {
     return '';
   }
   return 'Käyttäjä luotu ' + store.formatDate(store.user.created_at);
 });
-if (store.user) {
-  userEmail.value = store.user.email;
-  userFirstName.value = store.user.first_name;
-  userLastName.value = store.user.last_name;
-  // router.replace({ path: '/' })
-  // store.tab = '';
-  // fullName.value = ;
-} else {
+if (!store.user) {
   store.loginDialogShowing = true;
 }
 
@@ -538,127 +335,22 @@ function openFileInput() {
   fileInput.value.click();
 }
 
-function confirmProfileImage() {
-  let payload = {
-    image: newProfileImage.value
-  };
-  store.loading = true;
-  store.loadingBackground = true;
-  store.uploadProfileImage(payload).then(() => {
-    profileImageDialog.value = false;
-    store.loading = false;
-    store.loadingBackground = false;
 
-    if (store.user.profileImageUrl) {
-      let url = new URL(store.user.profileImageUrl);
-      url.searchParams.set('t', new Date());
-      store.user.profileImageUrl = url.toString();
-    }
-    store.user.has_image = true;
-    setTimeout(() => {
-      profileImageUpdated.value++;
-    }, 500);
-  }).catch(() => {
-    store.loading = false;
-    store.loadingBackground = false;
-  })
-}
-
-store.tab = 'account';
-
-function cancelEmailEditing() {
-  editingEmail.value = false;
-  userEmail.value = store.user.email;
-}
-
-function cancelNameEditing() {
-  editingName.value = false;
-  userFirstName.value = store.user.first_name;
-  userLastName.value = store.user.last_name;
-}
-
-function cancelPasswordEditing() {
-  editingPassword.value = false;
-  userNewPassword.value = '';
-  userNewConfirmPassword.value = '';
-}
-
-function deleteUser() {
-  let confirm = window.confirm('Haluatko varmasti poistaa käyttäjäsi?');
-
-  if (confirm) {
-    store.deleteUser();
+watch(areas, (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    areaSearchTerm.value = ''
   }
-}
+});
 
-function saveEmail() {
-  let payload = {
-    email: userEmail.value,
-    type: 'email'
-  };
-
-  store.editUser(payload).then(() => {
-    editingEmail.value = false;
-    setTimeout(() => {
-      store.getUser();
-    }, 100);
-    store.successToast('Sähköposti päivitetty onnistuneesti');
-  }).catch(() => {
-    store.errorToast('Sähköpostin tallennuksessa tapahtui virhe');
-  });
-}
-
-function saveFullname() {
-  let payload = {
-    first_name: userFirstName.value,
-    last_name: userLastName.value,
-    type: 'name'
-  };
-
-  store.editUser(payload).then(() => {
-    editingName.value = false;
-    setTimeout(() => {
-      store.getUser();
-    }, 100);
-    store.successToast('Nimi päivitetty onnistuneesti');
-  }).catch(() => {
-    store.errorToast('Nimen tallennuksessa tapahtui virhe');
-  });
-}
-
-function savePassword() {
-  let payload = {
-    password: userNewPassword.value,
-    type: 'password'
-  };
-
-  store.editUser(payload).then(() => {
-    editingPassword.value = false;
-    setTimeout(() => {
-      store.getUser();
-    }, 100);
-    store.successToast('Salasana päivitetty onnistuneesti');
-  }).catch(() => {
-    store.errorToast('Salasanan tallennuksessa tapahtui virhe');
-  });
-}
-watch(() => userNewConfirmPassword.value, () => {
-  validateConfirmPassword();
-})
-
-watch(() => userNewPassword.value, () => {
-  validateConfirmPassword();
-})
-
-function validateConfirmPassword() {
-  if (userNewConfirmPassword.value && userNewConfirmPassword.value !== userNewPassword.value) {
-    confirmPasswordError.value = 'Salasanat eivät täsmää';
-  } else {
-    confirmPasswordError.value = '';
+watch(lookingOrOfferingJobs, (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    let newArray = [];
+    lookingOrOfferingJobs.value.forEach(job => {
+      newArray.push(job.charAt(0).toUpperCase() + job.slice(1));
+    });
+    lookingOrOfferingJobs.value = newArray;
   }
-}
-
-
+});
 </script>
 
 <style scoped>
@@ -683,6 +375,7 @@ function validateConfirmPassword() {
     display: flex;
     gap: 40px;
     align-items: center;
+    padding-bottom: 10px;
   }
   .profile-image {
     width: 100px;
@@ -712,6 +405,11 @@ function validateConfirmPassword() {
     display: flex;
     flex-direction: column;
     padding-bottom: 25px;
+  }
+
+  .privacy-container {
+    flex-grow: 1;
+    max-width: 200px;
   }
 
   .joined-at {
@@ -759,10 +457,73 @@ function validateConfirmPassword() {
     padding: 20px 10px;
   }
 
-.info-wrapper .actions {
-  direction: rtl;
+.actions {
+  max-width: 600px;
+  display: flex;
+  width: 100%;
+  justify-content: end;
+  gap: 20px;
 }
 
+.top-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item.row {
+  flex-direction: row;
+  gap: 20px;
+}
+
+.info-item.row .info-item {
+  flex-grow: 1;
+}
+.info-item.small {
+  max-width: 200px;
+}
+
+.info-item.medium {
+  max-width: 300px;
+}
+
+.info-item.large {
+  max-width: 600px;
+}
+
+.info-item label {
+  font-weight: 600;
+  font-size: 16px;
+  text-wrap: nowrap;
+}
+
+.flex {
+  display: flex;
+  gap: 20px;
+}
+
+.label-container {
+  display: flex;
+  align-items: end;
+}
+
+.label-info {
+  margin-left: 10px;
+  color: var(--text-light-color);
+  font-size: 14px;
+}
 @media (max-width: 960px) {
   .info-wrapper {
     flex-direction: column;

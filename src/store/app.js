@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios';
 import moment from 'moment';
 import Cookies from 'js-cookie';
+import finnishCities from './finnish_cities';
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -54,7 +55,8 @@ export const useAppStore = defineStore('app', {
     window: {
       width: null,
       height: null
-    }
+    },
+    finnishCities
   }),
   actions: {
     connectToWebsocket() {
@@ -407,7 +409,10 @@ export const useAppStore = defineStore('app', {
         this.axios.post(this.url + `/api/users/logout.json`).then((response) => {
           const data = response.data;
           Cookies.remove('auth_token');
-          window.location.href = '/';
+          this.loading = false;
+          this.loadingBackground = false;
+          this.auth_token = null;
+          this.user = null;
           resolve(data);
         })
         .catch((error) => {

@@ -97,7 +97,7 @@ function login() {
           store.snackbarColor = 'green-darken-2';
           store.snackbar = true;
 
-          store.updateMainComponent++;
+          // store.updateMainComponent++;
 
           if (store.redirect) {
             router.replace({ path: '/' + store.redirect.url })

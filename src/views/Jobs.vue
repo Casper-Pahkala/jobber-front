@@ -130,20 +130,12 @@
       ></v-pagination>
     </div>
   </div>
-
-  <add-job-component
-    v-if="showAddJob"
-    v-model="showAddJob"
-    @close="showAddJob = false"
-  >
-  </add-job-component>
 </template>
 
 <script setup>
 import { useAppStore } from '@/store/app'
 import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
-import AddJobComponent from'@/components/AddJob.vue';
 import JobCard from '@/components/JobCard.vue';
 
 window.scrollTo(0, 0);
@@ -162,7 +154,6 @@ store.jobParams.limit = query.l ?? 10;
 const totalPages = computed(() => {
   return Math.ceil(store.jobParams.totalCount / store.jobParams.limit);
 });
-const showAddJob = ref(false);
 const queryLoading = ref(false);
 const params = computed(() => {
   let p = {

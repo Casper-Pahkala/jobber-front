@@ -29,7 +29,7 @@
       </div>
 
 
-      <div v-if="myListings.length == 0 && store.user && !loading" class="no-listings-text">
+      <div v-if="filteredListings.length == 0 && store.user && !loading" class="no-listings-text">
         Ei listauksia
         <v-btn color="primary" class="text-none" @click="toAdd()">
           Luo listaus
