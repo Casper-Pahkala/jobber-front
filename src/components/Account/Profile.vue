@@ -162,6 +162,7 @@
       <v-btn
         class="text-none"
         color="primary"
+        @click="saveProfile()"
       >
         Tallenna
       </v-btn>
@@ -233,6 +234,7 @@ const lookingOrOfferingJobs = ref([]);
 const areas = ref([]);
 const areaSearchTerm = ref('');
 const areaType = ref(0);
+const description = ref('');
 const visibilityItems = [
   { id: 1, text: 'Julkinen' },
   { id: 2, text: 'Vain ystävät' },
@@ -335,6 +337,21 @@ function openFileInput() {
   fileInput.value.click();
 }
 
+function saveProfile() {
+  const payload = {
+    profile: {
+      show_publicly: showInPublicLists.value,
+      visibility: visibility.value,
+      role: role.value,
+      description: description.value,
+    },
+    jobs: lookingOrOfferingJobs.value,
+    areas: areas.value
+  };
+  console.log(payload);
+
+  store.saveProfile(payload);
+}
 
 watch(areas, (newVal, oldVal) => {
   if (newVal.length > oldVal.length) {
