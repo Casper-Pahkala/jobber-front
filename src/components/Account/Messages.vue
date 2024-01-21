@@ -52,21 +52,21 @@
 
   </div>
   <div v-if="messages.length == 0 && store.user && !loading" class="no-messages-text">
-    Ei viestejä
+    {{ $t('Ei viestejä') }}
     <v-btn color="primary" class="text-none" @click="toJobs()">
-      Etsi töitä
+      {{ $t('Etsi töitä') }}
     </v-btn>
   </div>
 
   <div v-if="!store.user" class="no-messages-text">
-    Kirjaudu sisään niin pääset näkemään viestisi
+    {{ $t('Kirjaudu sisään niin pääset näkemään viestisi') }}
     <v-btn
       class="mt-7"
       size="large"
       color="primary"
       @click="store.loginDialogShowing = true"
     >
-      Kirjaudu
+      {{ $t('Kirjaudu') }}
     </v-btn>
   </div>
 </template>

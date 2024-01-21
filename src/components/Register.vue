@@ -5,7 +5,7 @@
     :class="{ 'light-theme': store.lightTheme }"
   >
       <v-card min-width="300" class="register-card">
-        <v-card-title class="headline pa-4">Luo käyttäjä</v-card-title>
+        <v-card-title class="headline pa-4">{{ $t('Luo käyttäjä') }}</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="register">
             <v-text-field v-model="firstName" label="Etunimi" type="text" name="fname" :theme="store.theme"></v-text-field>
@@ -28,7 +28,7 @@
               :error-messages="confirmPasswordError"
             ></v-text-field>
             <v-col class="text-right">
-              <v-btn type="submit" color="primary" class="text-none" :disabled="!canRegister">Luo käyttäjä</v-btn>
+              <v-btn type="submit" color="primary" class="text-none" :disabled="!canRegister">{{ $t('Luo käyttäjä') }}</v-btn>
             </v-col>
           </v-form>
         </v-card-text>

@@ -27,7 +27,7 @@
                   <div class="job-description">{{ store.jobShortInfo(job) }}</div>
 
                   <div class="job-info small" v-show="store.window.width < 1199">
-                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                    <div class="job-info-item">{{ $t('Julkaistu') }} {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
                     <div class="job-info-item" >
                       <div class="area-container" :style="myListing ? 'margin-right: 50px;' : ''">
                         <template
@@ -47,7 +47,7 @@
               </div>
 
               <div class="job-info" v-show="store.window.width >= 1199">
-                <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                <div class="job-info-item">{{ $t('Julkaistu') }} {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
                 <div class="job-info-item mt-2" >
                   <div class="area-container" :style="myListing ? 'margin-right: 50px;' : ''">
                     <template
@@ -92,7 +92,7 @@
               class="menu-action-btn text-red"
             >
               <v-list-item>
-                Poista listaus
+                {{ $t('Poista listaus') }}
               </v-list-item>
             </v-list-item>
           </v-list>

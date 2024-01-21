@@ -34,8 +34,8 @@ import { useRoute } from 'vue-router';
 const locale = localStorage.getItem('locale');
 const store = useAppStore();
 const route = useRoute();
+i18n.global.locale = 'en';
 if (locale) {
-  i18n.global.locale = locale;
 }
 
 const lightThemeEnabled = localStorage.getItem('light_theme');

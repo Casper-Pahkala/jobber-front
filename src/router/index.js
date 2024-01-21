@@ -1,5 +1,11 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
+import Account from '@/views/Account.vue';
+import AddJob from '@/views/AddJob.vue';
+import Home from '@/views/Home.vue';
+import Job from '@/views/Job.vue';
+import Jobs from '@/views/Jobs.vue';
+import Workers from '@/views/Workers.vue';
 
 const routes = [
   {

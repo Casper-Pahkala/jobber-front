@@ -41,7 +41,29 @@
     </div>
   </div>
 
-  <div class="info-container">
+  <div class="profile-container" v-if="!editing && profile">
+    <div class="info-item medium">
+        <label>{{ $t('Näkyvyys') }}</label>
+
+        <div>
+          {{ profileVisibility }}
+        </div>
+      </div>
+
+      <div class="info-item" v-if="profile.visibility === 1">
+        <div v-if="profile.show_publicly">
+          {{ $t('Profiili näkyy julkisilla listoilla') }}
+        </div>
+
+        <div v-else>
+          {{ $t('Profiilia ei näytetä julkisilla listoilla') }}
+        </div>
+      </div>
+
+
+  </div>
+
+  <div class="info-container" v-else-if="profile">
     <div class="info-item">
       <v-checkbox
         label="Näytä profiili julkisilla listoilla"
@@ -52,7 +74,7 @@
 
     <div class="info-item large row">
       <div class="info-item medium">
-        <label>Näkyvyys</label>
+        <label>{{ $t('Näkyvyys') }}</label>
         <v-select
           v-model="visibility"
           item-value="id"
@@ -64,7 +86,7 @@
       </div>
 
       <div class="info-item medium">
-        <label>Rooli</label>
+        <label>{{ $t('Rooli') }}</label>
         <v-select
           v-model="role"
           item-value="id"
@@ -78,12 +100,12 @@
 
     <div class="info-item large">
       <div class="label-container">
-        <label v-if="role === 1">Haettavat työt</label>
-        <label v-else-if="role === 2">Tarjottavat työt</label>
-        <label v-else>Tarjottavat palvelut</label>
+        <label v-if="role === 1">{{ $t('Haettavat työt') }}</label>
+        <label v-else-if="role === 2">{{ $t('Tarjottavat työt') }}</label>
+        <label v-else>{{ $t('Tarjottavat palvelut') }}</label>
 
         <div class="label-info">
-          Lisää painamalla enter tai klikkaamalla ulos kentästä
+          {{ $t('Lisää painamalla Enter tai klikkaamalla ulos kentästä') }}
         </div>
       </div>
       <v-combobox
@@ -97,7 +119,7 @@
     </div>
 
     <div class="info-item large">
-      <label>Alue</label>
+      <label>{{ $t('Alue') }}</label>
       <v-chip-group
         mandatory
         selected-class="text-primary"
@@ -109,12 +131,12 @@
         class="chip"
         color="primary"
         >
-          Valitse kaupungit
+          {{ $t('Valitse kaupungit') }}
         </v-chip>
         <v-chip
         class="chip"
         >
-          Koko suomi
+          {{ $t('Koko suomi') }}
         </v-chip>
       </v-chip-group>
       <v-autocomplete
@@ -136,7 +158,7 @@
     </div>
 
     <div class="info-item large">
-      <label>Kuvaus</label>
+      <label>{{ $t('Kuvaus') }}</label>
       <v-textarea
         :no-resize="true"
         v-model="description"
@@ -156,7 +178,7 @@
         :theme="store.theme"
         variant="outlined"
       >
-        Peruuta
+        {{ $t('Peruuta') }}
       </v-btn>
 
       <v-btn
@@ -164,7 +186,7 @@
         color="primary"
         @click="saveProfile()"
       >
-        Tallenna
+        {{ $t('Tallenna') }}
       </v-btn>
     </div>
   </div>
@@ -196,15 +218,15 @@
             >
             </v-img>
           </div>
-          <div @click="openFileInput()" class="change-img-text">Vaihda kuva</div>
+          <div @click="openFileInput()" class="change-img-text">{{ $t('Vaihda kuva') }}</div>
         </div>
 
       </v-card-item>
 
       <v-card-actions>
         <v-col class="d-flex justify-space-between">
-          <v-btn @click="profileImageDialog = false" class="text-none">Peruuta</v-btn>
-          <v-btn color="primary" @click="confirmProfileImage()" class="text-none">Valmis</v-btn>
+          <v-btn @click="profileImageDialog = false" class="text-none">{{ $t('Peruuta') }}</v-btn>
+          <v-btn color="primary" @click="confirmProfileImage()" class="text-none">{{ $t('Valmis') }}</v-btn>
         </v-col>
       </v-card-actions>
     </v-card>
@@ -213,7 +235,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
 import { nextTick } from 'vue';
@@ -224,6 +246,7 @@ const store = useAppStore();
 const fileInput = ref(null);
 const profileImageDialog = ref(false);
 
+const editing = ref(false);
 const showInPublicLists = ref(false);
 const newProfileImageResult = ref(null);
 const newProfileImage = ref(null);
@@ -245,6 +268,14 @@ const roleItems = [
   { id: 2, text: 'Työnantaja' },
   { id: 3, text: 'Palvelun tarjoaja' },
 ];
+
+const profile = computed(() => {
+  return store.user.profile ?? null;
+})
+
+const profileVisibility = computed(() => {
+  return visibilityItems.find(v => v.id === profile.value.visibility).text;
+})
 
 const fullName = computed(() => {
   if (!store.user) {
@@ -269,16 +300,15 @@ function handleFileChange(event) {
   if (selectedFile) {
     // Check if the selected file is an image (you can adjust the accepted image types)
     if (selectedFile.type.startsWith('image/') && !selectedFile.type.startsWith('image/gif')) {
+      var reader = new FileReader();
       newProfileImage.value = null;
       newProfileImageResult.value = null;
-      store.loading = true;
-      // selectedFiles.value.push(selectedFile);
       profileImageDialog.value = true;
-      var reader = new FileReader();
       reader.onload = function (e) {
         // selectedFileResults.value.push(e.target.result);
         const img = new Image();
         img.onload = () => {
+          store.loading = true;
           let targetWidth = 1080;
           let targetHeight = 1080;
 
@@ -320,6 +350,15 @@ function handleFileChange(event) {
             store.loading = false;
           }, selectedFile.type, 0.8);
         };
+
+        img.onerror = () => {
+          // Handle the case where the selected file is not a genuine image
+          store.snackbarText = 'Tiedosto ei ole kelpaava kuvaksi';
+          store.snackbarColor = 'red-darken-2';
+          store.snackbar = true;
+          store.loading = false;
+          profileImageDialog.value = false;
+        };
         img.src = e.target.result;
       };
       reader.readAsDataURL(selectedFile);
@@ -352,6 +391,10 @@ function saveProfile() {
 
   store.saveProfile(payload);
 }
+
+onMounted(() => {
+  store.getProfile();
+}),
 
 watch(areas, (newVal, oldVal) => {
   if (newVal.length > oldVal.length) {
@@ -466,7 +509,8 @@ watch(lookingOrOfferingJobs, (newVal, oldVal) => {
   .profile-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
+    margin-top: 20px;
   }
 
   .info-wrapper {

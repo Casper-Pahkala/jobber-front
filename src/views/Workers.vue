@@ -2,7 +2,8 @@
   <!-- <h1>Työntekijät</h1> -->
   <div class="container">
     <h1>
-      Tulossa pian
+      {{ $t('Tulossa pian') }}
+
     </h1>
   </div>
 </template>

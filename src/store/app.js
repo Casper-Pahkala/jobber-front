@@ -762,9 +762,29 @@ export const useAppStore = defineStore('app', {
           reject(error);
         })
       })
+    },
+    getProfile() {
+      return new Promise((resolve, reject) => {
+        this.axios.get(this.url + `/api/users/profile.json`).then((response) => {
+          let data = response.data;
+          if (data.status !== 'success') {
+            this.errorToast('Profiilin haussa tapahtui virhe:' + data.message);
+            reject(data.message);
+            return;
+          }
+          this.user.profile = data.profile;
+          console.log(this.user);
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.feedbackDialog = false;
+          this.loadingBackground = false;
+          this.errorToast('Profiilin tallennuksessa tapahtui tuntematon virhe');
+          reject(error);
+        })
+      })
     }
-
-
   },
   getters: {
     theme() {

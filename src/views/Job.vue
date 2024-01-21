@@ -22,7 +22,11 @@
                   id="mainJobImage"
                 >
                   <template v-slot:placeholder>
-                    <v-skeleton-loader type="image" :theme="store.theme" height="100%" />
+                    <v-skeleton-loader
+                      style="width: 100%; height: 100%;"
+                      class="job-image"
+                      :theme="store.theme"
+                    ></v-skeleton-loader>
                   </template>
                 </v-img>
                 <v-btn
@@ -98,7 +102,7 @@
                 {{ jobSalary() }}
             </div>
             <v-divider class="mt-5"></v-divider>
-            <h4 class="mt-3">Kuvaus</h4>
+            <h4 class="mt-3">{{ $t('Kuvaus') }}</h4>
             <p id="job-description" class="mt-2">
               {{ job.description }}
             </p>
@@ -117,7 +121,7 @@
                     </h3>
                   </div>
                   <div class="mt-2">
-                    Käyttäjä luotu {{ store.formatDate(job.user.created_at) }}
+                    {{ $t('Käyttäjä luotu') }} {{ store.formatDate(job.user.created_at) }}
                   </div>
                 </div>
 
@@ -128,7 +132,7 @@
                   color="primary"
                   @click="contact()"
                 >
-                  Ota yhteyttä
+                  {{ $t('Ota yhteyttä') }}
                 </v-btn>
 
                 <v-btn
@@ -138,11 +142,11 @@
                   style="color: white"
                   @click="deleteListing()"
                 >
-                  Poista listaus
+                  {{ $t('Poista listaus') }}
                 </v-btn>
               </v-card>
             </v-container>
-            <v-divider class="mt-5 mb-5"></v-divider>
+            <!-- <v-divider class="mt-5 mb-5"></v-divider> -->
           </div>
         </div>
       </transition>
@@ -150,13 +154,13 @@
       <template v-if="!loading && job.is_deleted">
         <div class="listing-deleted">
           <div>
-            Listaus poistettu
+            {{ $t('Listaus poistettu') }}
           </div>
           <v-btn
             color="primary"
             @click="toJobs()"
           >
-            Selaa töitä
+            {{ $t('Selaa töitä') }}
           </v-btn>
         </div>
       </template>
@@ -195,10 +199,10 @@
 
               <div style="display: flex; gap: 5px; align-items: center;">
                 <v-icon icon="mdi-account"></v-icon>
-                <v-skeleton-loader type="text" width="300px" :theme="store.theme"></v-skeleton-loader>
+                <v-skeleton-loader width="300px" height="24px" :theme="store.theme"></v-skeleton-loader>
               </div>
-              <div class="mb-7">
-                <v-skeleton-loader type="text" width="300px" height="20px" style="margin-top: -10px;" :theme="store.theme"></v-skeleton-loader>
+              <div class="mt-5">
+                <v-skeleton-loader width="300px" height="18px" :theme="store.theme"></v-skeleton-loader>
               </div>
             </div>
 
@@ -275,7 +279,6 @@ function contact() {
 function imageUrl(index = 0, lazy = false) {
   if (job.value.job_images && job.value.job_images.length > 0) {
     return store.url + '/job-image/' + job.value.job_images[index].name + '.jpg';
-
   } else {
     return store.url + '/no-img.png';
   }
@@ -343,6 +346,7 @@ document.addEventListener("fullscreenchange", () => {
   .main-wrapper {
     display: flex;
     justify-content: center;
+    padding-bottom: 40px;
   }
   .main-content {
     max-width: 1000px;
@@ -489,9 +493,5 @@ document.addEventListener("fullscreenchange", () => {
 <style>
   .job-info .v-icon {
     width: 40px;
-  }
-
-  .v-skeleton-loader .v-skeleton-loader__bone {
-    height: 100%;
   }
 </style>

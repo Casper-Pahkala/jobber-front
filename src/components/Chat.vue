@@ -227,7 +227,7 @@
           :theme="store.theme"
         >
           <v-card-title>
-            Vahvista liite
+            {{ $t('Vahvista liite') }}
           </v-card-title>
           <v-card-item>
             <div @click="openAttachment" class="attachmentName">
@@ -240,8 +240,8 @@
 
           <v-card-actions>
             <v-col class="d-flex justify-space-between">
-              <v-btn @click="confirmAttachmentDialog = false" class="text-none">Peruuta</v-btn>
-              <v-btn color="primary" @click="sendAttachment()" class="text-none">Lähetä</v-btn>
+              <v-btn @click="confirmAttachmentDialog = false" class="text-none">{{ $t('Peruuta') }}</v-btn>
+              <v-btn color="primary" @click="sendAttachment()" class="text-none">{{ $t('Lähetä') }}</v-btn>
             </v-col>
           </v-card-actions>
         </v-card>

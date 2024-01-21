@@ -9,7 +9,7 @@
           class="title"
         >
         <h4>
-          Nimi
+          {{ $t('Nimi') }}
         </h4>
         </v-col>
 
@@ -56,7 +56,7 @@
                 class="text-none"
                 @click="cancelNameEditing()"
               >
-                Peruuta
+                {{ $t('Peruuta') }}
               </v-btn>
 
               <v-btn
@@ -66,7 +66,7 @@
                 @click="saveFullname()"
                 :disabled="!fullNameValid"
               >
-                Tallenna
+                {{ $t('Tallenna') }}
               </v-btn>
             </v-form>
           </template>
@@ -84,7 +84,7 @@
             color="primary"
             @click="editingName = true"
           >
-            Muokkaa
+            {{ $t('Muokkaa') }}
           </v-btn>
         </v-col>
       </v-row>
@@ -100,7 +100,7 @@
           class="title"
         >
         <h4>
-          Sähköposti
+          {{ $t('Sähköposti') }}
         </h4>
         </v-col>
 
@@ -145,7 +145,7 @@
                 @click="saveEmail()"
                 :disabled="!valid"
               >
-                Tallenna
+                {{ $t('Tallenna') }}
               </v-btn>
             </v-form>
           </template>
@@ -163,7 +163,7 @@
             @click="editingEmail = true"
             v-if="!editingEmail"
           >
-            Muokkaa
+            {{ $t('Muokkaa') }}
           </v-btn>
         </v-col>
       </v-row>
@@ -179,7 +179,7 @@
           class="title"
         >
         <h4>
-          Vaihda salasana
+          {{ $t('Vaihda salasana') }}
         </h4>
         </v-col>
 
@@ -235,7 +235,7 @@
                 @click="savePassword()"
                 :disabled="!canSavePassword"
               >
-                Tallenna
+                {{ $t('Tallenna') }}
               </v-btn>
             </v-form>
           </template>
@@ -253,7 +253,7 @@
             @click="editingPassword = true"
             v-if="!editingPassword"
           >
-            Vaihda salasana
+            {{ $t('Vaihda salasana') }}
           </v-btn>
         </v-col>
       </v-row>
@@ -267,7 +267,7 @@
           class="title"
         >
         <h4>
-          Puhelinnumero
+          {{ $t('Puhelinnumero') }}
         </h4>
         </v-col>
 
@@ -302,7 +302,7 @@
                 class="text-none"
                 @click="cancelPhonenumberEditing()"
               >
-                Peruuta
+                {{ $t('Peruuta') }}
               </v-btn>
 
               <v-btn
@@ -312,7 +312,7 @@
                 @click="savePhonenumber()"
                 :disabled="!phonenumberValid"
               >
-                Tallenna
+                {{ $t('Tallenna') }}
               </v-btn>
             </v-form>
           </template>
@@ -330,7 +330,7 @@
             @click="editingPhonenumber = true"
             v-if="!editingPhonenumber"
           >
-            Muokkaa
+            {{ $t('Muokkaa') }}
           </v-btn>
         </v-col>
       </v-row>
@@ -401,15 +401,15 @@
           >
           </v-img>
         </div>
-        <div @click="openFileInput()" class="change-img-text">Vaihda kuva</div>
+        <div @click="openFileInput()" class="change-img-text">{{ $t('Vaihda kuva') }}</div>
       </div>
 
     </v-card-item>
 
     <v-card-actions>
       <v-col class="d-flex justify-space-between">
-        <v-btn @click="profileImageDialog = false" class="text-none">Peruuta</v-btn>
-        <v-btn color="primary" @click="confirmProfileImage()" class="text-none">Valmis</v-btn>
+        <v-btn @click="profileImageDialog = false" class="text-none">{{ $t('Peruuta') }}</v-btn>
+        <v-btn color="primary" @click="confirmProfileImage()" class="text-none">{{ $t('Valmis') }}</v-btn>
       </v-col>
     </v-card-actions>
   </v-card>
@@ -418,7 +418,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
 
@@ -503,16 +503,6 @@ if (!store.user) {
 }
 return 'Käyttäjä luotu ' + store.formatDate(store.user.created_at);
 });
-if (store.user) {
-userEmail.value = store.user.email;
-userFirstName.value = store.user.first_name;
-userLastName.value = store.user.last_name;
-// router.replace({ path: '/' })
-// store.tab = '';
-// fullName.value = ;
-} else {
-store.loginDialogShowing = true;
-}
 
 function handleFileChange(event) {
 const selectedFile = event.target.files[0];
@@ -729,6 +719,19 @@ function validateConfirmPassword() {
     confirmPasswordError.value = '';
   }
 }
+
+onMounted(() => {
+  if (store.user) {
+    userEmail.value = store.user.email;
+    userFirstName.value = store.user.first_name;
+    userLastName.value = store.user.last_name;
+    // router.replace({ path: '/' })
+    // store.tab = '';
+    // fullName.value = ;
+  } else {
+    store.loginDialogShowing = true;
+  }
+})
 
 
 </script>
