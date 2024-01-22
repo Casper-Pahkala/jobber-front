@@ -1,6 +1,6 @@
 // en.js
 export default {
-  "Avoimet työt": "Open jobs",
+  "Avoimet työt": "Available jobs",
   "Henkilöt ja palvelut": "People and services",
   "Luo listaus": "Create listing",
   "Tili": "Account",
@@ -70,5 +70,17 @@ export default {
   "Näytä kaikki": "Show all",
   "Tyhjää täynnä": "Full of emptiness",
   "Luo ilmoitus": "Create listing",
-  "Kieli": "Language"
+  "Kieli": "Language",
+  "Teema": "Theme",
+  "Kirjaudu ulos": "Log out",
+  "Työn otsikko": "Job title",
+  "Sopimuksen mukaan": "By Agreement",
+  "Tarkka päivämäärä": "Exact Date",
+  "Keikkatyö": "Gig Work",
+  "Vakituinen": "Permanent",
+  "Toistaiseksi voimassa oleva": "Indefinite",
+  "Tuntipalkka": "Hourly Wage",
+  "Urakkapalkka": "Piecework Wage",
+  "Kuukausipalkka": "Monthly Salary",
+  "Valitse kaupunki": "Choose a city",
 };

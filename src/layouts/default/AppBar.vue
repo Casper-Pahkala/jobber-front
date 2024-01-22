@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" temporary :theme="store.theme">
+  <v-navigation-drawer v-model="drawer" temporary>
     <v-list>
 
       <template v-if="store.user">
@@ -124,7 +124,6 @@
                   v-model="messagesMenu"
                   class="mr-1"
                   :close-on-content-click="false"
-                  :theme="store.theme"
                   location="bottom end"
                 >
                   <template v-slot:activator="{ props }">
@@ -207,7 +206,6 @@
                   :class="{ 'light-theme': store.lightTheme }"
                   :close-on-content-click="false"
                   v-model="accountMenu"
-                  :theme="store.theme"
                   location="bottom end"
                 >
                   <template v-slot:activator="{ props }">
@@ -241,7 +239,7 @@
                         </template>
                     </v-list-item>
 
-                    <v-menu v-else-if="item.element && item.element === 'language'" :theme="store.theme" location="left">
+                    <v-menu v-else-if="item.element && item.element === 'language'" location="left">
                       <template v-slot:activator="{ props }">
                         <v-list-item
                           v-bind="props"
@@ -325,6 +323,7 @@ let currentTab = route.name || 'jobs';
 store.tab = currentTab;
 
 const accountTabs = [
+  'account',
   'profile',
   'messages',
   'listings'
@@ -337,7 +336,7 @@ function changeTab(tab) {
 
   if (accountTabs.includes(tab)) {
     store.tab = 'account';
-    if (tab === 'profile') {
+    if (tab === 'account') {
       router.push('/account');
     } else {
       router.push('/account/' + tab);
@@ -364,6 +363,7 @@ function updateTab(tab) {
 }
 
 function logOut() {
+  accountMenu.value = false;
   drawer.value = false;
   store.logOut().then(() => {
     // router.replace('/')
@@ -375,26 +375,32 @@ function openRecentMessage(message) {
   store.openChat(message);
 }
 
-const accountItems = [
+const accountItems = computed(() => {
+  return [
   {
-    title: 'Tili',
+    title: i18n.global.t('Tili'),
+    onClick: () => changeTab('account'),
+    icon: 'mdi-account'
+  },
+  {
+    title: i18n.global.t('Profiili'),
     onClick: () => changeTab('profile'),
     icon: 'mdi-account'
   },
   {
-    title: 'Viestit',
+    title: i18n.global.t('Viestit'),
     onClick: () => changeTab('messages'),
     icon: 'mdi-message-text'
   },
   {
-    title: 'Omat listaukset',
+    title: i18n.global.t('Omat listaukset'),
     onClick: () => changeTab('listings'),
     icon: 'mdi-clipboard-account'
   },
   {
-    title: 'Teema',
+    title: i18n.global.t('Teema'),
     onClick: () => {
-      // store.lightTheme = !store.lightTheme;
+      store.lightTheme = !store.lightTheme;
       theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
     },
     element: 'theme'
@@ -406,11 +412,12 @@ const accountItems = [
     element: 'language'
   },
   {
-    title: 'Kirjaudu ulos',
+    title: i18n.global.t('Kirjaudu ulos'),
     onClick: () => logOut(),
     icon: 'mdi-logout'
   }
 ];
+})
 
 
 const recentMessages = computed(() => {
@@ -519,10 +526,6 @@ if (window.scrollY > 0) {
     display: none;
   }
 
-  .recent-messages::-webkit-scrollbar-track {
-    background-color: var(--card-bg-color);
-  }
-
   .recent-messages::-webkit-scrollbar-thumb {
     background: #888; /* Handle color */
   }
@@ -576,7 +579,6 @@ if (window.scrollY > 0) {
     letter-spacing: 0.001rem;
     font-size: 1rem;
     font-weight: 700;
-    color: var(--main-text-color);
   }
 
   .messages-count {
@@ -617,13 +619,12 @@ if (window.scrollY > 0) {
 
   .app-bar {
     background: var(--main-bg-color) !important;
-    /* transition: all 0.4s ease; */
-    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     height: var(--app-bar-height);
   }
 
   .app-bar.scrolled {
-    background-color: var(--app-bar-bg-color) !important;
+    background: var(--app-bar-bg-color) !important;
+    transition: 0.3s ease;
   }
 
   .app-bar-content-wrapper {
@@ -646,7 +647,6 @@ if (window.scrollY > 0) {
   .rekrytor-text {
     font-size: 28px;
     font-weight: 600;
-    color: var(--main-text-color);
     padding-left: 15px;
   }
 
@@ -715,11 +715,5 @@ if (window.scrollY > 0) {
     .tabs {
       display: none;
     }
-  }
-</style>
-
-<style>
-  .v-slide-group-item--active {
-    color: var(--main-text-plain-color) !important;
   }
 </style>

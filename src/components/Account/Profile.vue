@@ -12,7 +12,7 @@
           @click.stop="openFileInput()"
         >
           <template v-slot:placeholder>
-            <v-skeleton-loader type="image" round :theme="store.theme"/>
+            <v-skeleton-loader type="image" round/>
           </template>
         </v-img>
         <div v-else class="profile-image empty">
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <div class="profile-container" v-if="!editing && profile">
+  <div class="profile-container" v-if="false">
     <div class="info-item medium">
         <label>{{ $t('Näkyvyys') }}</label>
 
@@ -63,12 +63,11 @@
 
   </div>
 
-  <div class="info-container" v-else-if="profile">
+  <div class="info-container" v-else>
     <div class="info-item">
       <v-checkbox
         label="Näytä profiili julkisilla listoilla"
         v-model="showInPublicLists"
-        :theme="store.theme"
       ></v-checkbox>
     </div>
 
@@ -81,7 +80,6 @@
           item-title="text"
           variant="outlined"
           :items="visibilityItems"
-          :theme="store.theme"
         ></v-select>
       </div>
 
@@ -93,7 +91,6 @@
           item-title="text"
           variant="outlined"
           :items="roleItems"
-          :theme="store.theme"
         ></v-select>
       </div>
     </div>
@@ -114,7 +111,6 @@
         multiple
         variant="outlined"
         :placeholder="role !== 3 ? 'Esim. Nurmikonleikkuu, Lastenhoito' : 'Esim. Muuttopalvelut'"
-        :theme="store.theme"
       ></v-combobox>
     </div>
 
@@ -151,7 +147,6 @@
         item-value="id"
         item-title="name"
         variant="outlined"
-        :theme="store.theme"
         :items="store.finnishCities"
         placeholder="Valitse kaupunki"
       ></v-autocomplete>
@@ -167,7 +162,6 @@
         auto-grow
         :rows="1"
         :max-rows="1"
-        :theme="store.theme"
       >
       </v-textarea>
     </div>
@@ -175,7 +169,6 @@
     <div class="actions">
       <v-btn
         class="text-none"
-        :theme="store.theme"
         variant="outlined"
       >
         {{ $t('Peruuta') }}
@@ -204,7 +197,7 @@
     width="500"
   >
 
-    <v-card :theme="store.theme">
+    <v-card>
       <canvas id="imageCanvas" style="display: none;"></canvas>
       <v-card-item>
         <div class="new-profile-img-wrapper">
@@ -582,7 +575,6 @@ watch(lookingOrOfferingJobs, (newVal, oldVal) => {
 
 .label-info {
   margin-left: 10px;
-  color: var(--text-light-color);
   font-size: 14px;
 }
 @media (max-width: 960px) {

@@ -14,7 +14,7 @@
           class="job-image"
         >
           <template v-slot:placeholder>
-            <v-skeleton-loader type="image" round :theme="store.theme"/>
+            <v-skeleton-loader type="image" round/>
           </template>
         </v-img>
 
@@ -135,7 +135,6 @@ function latestMessage(message) {
     padding: 10px;
     margin: 20px 0;
     position: relative;
-    background-color: var(--card-bg-color);
   }
 
   .message-wrapper {
