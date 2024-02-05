@@ -9,10 +9,10 @@
           class="d-sm-flex profile-tabs"
           v-model="accountTab"
         >
-        <v-tab @click="changeTab('account')" value="account" class="text-none tab">Tili</v-tab>
-          <v-tab @click="changeTab('profile')" value="profile" class="text-none tab">Profiili</v-tab>
-          <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">Viestit</v-tab>
-          <v-tab @click="changeTab('listings')" value="listings" class="text-none tab">Omat listaukset</v-tab>
+        <v-tab @click="changeTab('account')" value="account" class="text-none tab">{{ $t('Tili') }}</v-tab>
+          <v-tab @click="changeTab('profile')" value="profile" class="text-none tab">{{ $t('Profiili') }}</v-tab>
+          <v-tab @click="changeTab('messages')" value="messages" class="text-none tab">{{ $t('Viestit') }}</v-tab>
+          <v-tab @click="changeTab('listings')" value="listings" class="text-none tab">{{ $t('Omat listaukset') }}</v-tab>
 
           <div id="tabs-bottom">
 
@@ -55,8 +55,7 @@ const route = useRoute();
 const store = useAppStore();
 let currentTab = route.name || '';
 
-if (store.user) {
-} else {
+if (!store.user) {
   store.loginDialogShowing = true;
 }
 
@@ -77,6 +76,21 @@ function changeTab(tab) {
     router.replace(`/account/${tab}`);
   }
 }
+
+watch(() => route.name, (newVal, oldVal) => {
+  if (newVal === 'account') {
+    accountTab.value = 'account';
+  }
+  if (newVal === 'profile') {
+    accountTab.value = 'profile';
+  }
+  if (newVal === 'messages') {
+    accountTab.value = 'messages';
+  }
+  if (newVal === 'listings') {
+    accountTab.value = 'listings';
+  }
+})
 </script>
 
 <style scoped>

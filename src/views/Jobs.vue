@@ -83,12 +83,12 @@
 
     <div class="loading-container" v-if="error">
       <div v-if="error" class="error-container">
-        <span>Töiden haussa tapahtui virhe</span>
+        <span>{{ $t('Töiden haussa tapahtui virhe') }}</span>
         <v-btn
           prepend-icon="mdi-refresh"
           @click="getJobs()"
         >
-          Päivitä työt
+          {{ $t('Päivitä työt') }}
         </v-btn>
       </div>
     </div>

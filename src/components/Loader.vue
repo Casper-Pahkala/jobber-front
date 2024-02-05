@@ -5,7 +5,7 @@
     persistent
   >
     <div class="loading-overlay">
-      <span class="loader" :style="store.loadingBackground ? 'border-color: #fff' : ''"></span> 
+      <span class="loader" :style="store.loadingBackground ? 'border-color: #fff' : ''"></span>
     </div>
   </v-dialog>
 </template>

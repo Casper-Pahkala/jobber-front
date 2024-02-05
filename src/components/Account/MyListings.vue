@@ -11,12 +11,12 @@
             class="chip"
             color="primary"
             >
-              Aktiiviset
+              {{ $t('Aktiiviset') }}
             </v-chip>
             <v-chip
             class="chip"
             >
-              Poistetut
+              {{ $t('Poistetut') }}
             </v-chip>
           </v-chip-group>
         <template v-for="listing in filteredListings" :key="listing.id">
@@ -30,21 +30,21 @@
 
 
       <div v-if="filteredListings.length == 0 && store.user && !loading" class="no-listings-text">
-        Ei listauksia
+        {{ $t('Ei listauksia') }}
         <v-btn color="primary" class="text-none" @click="toAdd()">
-          Luo listaus
+          {{ $t('Luo listaus') }}
         </v-btn>
       </div>
 
       <div v-if="!store.user" class="no-messages-text">
-        Kirjaudu sisään niin pääset näkemään listauksesi
+        {{ $t('Kirjaudu sisään niin pääset näkemään listauksesi') }}
         <v-btn
           class="mt-7"
           size="large"
           color="primary"
           @click="store.loginDialogShowing = true"
         >
-          Kirjaudu
+          {{ $t('Kirjaudu') }}
         </v-btn>
       </div>
 </template>

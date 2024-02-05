@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" temporary :theme="store.theme">
+  <v-navigation-drawer v-model="drawer" temporary>
     <v-list>
 
       <template v-if="store.user">
@@ -42,7 +42,7 @@
           rounded="lg"
           class="text-none bg-primary mb-3 mt-2 drawer-login-btn"
           @click="store.loginDialogShowing = true"
-        >Kirjaudu sisään</v-btn>
+        >{{ $t('Kirjaudu sisään') }}</v-btn>
         </v-list-item>
 
       </template>
@@ -124,7 +124,6 @@
                   v-model="messagesMenu"
                   class="mr-1"
                   :close-on-content-click="false"
-                  :theme="store.theme"
                   location="bottom end"
                 >
                   <template v-slot:activator="{ props }">
@@ -147,11 +146,11 @@
                     <v-card-title
                      style="font-size: 18px;"
                     >
-                      Lukemattomat viestit
+                      {{ $t('Lukemattomat viestit') }}
                     </v-card-title>
 
                     <div class="show-all-messages" @click="changeTab('messages')">
-                      Näytä kaikki
+                      {{ $t('Näytä kaikki') }}
                     </div>
                     <v-divider></v-divider>
                     <v-list
@@ -199,7 +198,7 @@
                     </v-list>
 
                     <div v-else class="no-messages-text">
-                      Tyhjää täynnä
+                      {{ $t('Tyhjää täynnä') }}
                     </div>
                   </v-card>
                 </v-menu>
@@ -207,7 +206,6 @@
                   :class="{ 'light-theme': store.lightTheme }"
                   :close-on-content-click="false"
                   v-model="accountMenu"
-                  :theme="store.theme"
                   location="bottom end"
                 >
                   <template v-slot:activator="{ props }">
@@ -225,32 +223,69 @@
                     v-for="(item, index) in accountItems"
                     :key="index"
                   >
-                  <v-list-item
-                    :value="index"
-                    @click="item.onClick()"
-                    v-if="item.element && item.element === 'theme'"
-                  >
-                      <v-list-item-title>{{ item.title }}</v-list-item-title>
-                      <template v-slot:append>
-                        <v-switch
-                          inset
-                          hide-details
-                          v-model="store.lightTheme"
-                          density="compact"
-                        ></v-switch>
+                    <v-list-item
+                      :value="index"
+                      @click="item.onClick()"
+                      v-if="item.element && item.element === 'theme'"
+                    >
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                        <template v-slot:append>
+                          <v-switch
+                            inset
+                            hide-details
+                            v-model="store.lightTheme"
+                            density="compact"
+                          ></v-switch>
+                        </template>
+                    </v-list-item>
+
+                    <v-menu v-else-if="item.element && item.element === 'language'" location="left">
+                      <template v-slot:activator="{ props }">
+                        <v-list-item
+                          v-bind="props"
+                          :value="index"
+                        >
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            <template v-slot:append>
+                              <img class="flag" :src="languageSrc()">
+                            </template>
+                        </v-list-item>
                       </template>
-                  </v-list-item>
-                  <v-list-item
-                    :value="index"
-                    @click="item.onClick()"
-                    :append-icon="item.icon ?? ''"
-                    v-else
-                  >
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  </v-list-item>
-                  </template>
-                  </v-list>
-                </v-menu>
+                      <v-list>
+
+                        <v-list-item @click="changeLanguage('fi')">
+                          <div class="list-language-item">
+                            <img class="flag" src="/finnish_flag.png">
+                            Suomi
+                          </div>
+                        </v-list-item>
+
+                        <v-list-item @click="changeLanguage('sv')">
+                          <div class="list-language-item">
+                            <img class="flag" src="/swedish_flag.png">
+                            Svenska
+                          </div>
+                        </v-list-item>
+
+                        <v-list-item @click="changeLanguage('en')">
+                          <div class="list-language-item">
+                            <img class="flag" src="/english_flag.png">
+                            English
+                          </div>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                    <v-list-item
+                      :value="index"
+                      @click="item.onClick()"
+                      :append-icon="item.icon ?? ''"
+                      v-else
+                    >
+                      <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                    </template>
+                    </v-list>
+                  </v-menu>
               </template>
 
               <template v-else>
@@ -260,7 +295,7 @@
                   rounded="xl"
                   class="text-none login-btn bg-primary"
                   @click="store.loginDialogShowing = true"
-                >Kirjaudu sisään</v-btn>
+                >{{ $t('Kirjaudu sisään') }}</v-btn>
               </template>
             </div>
         </div>
@@ -273,7 +308,10 @@ import { useAppStore } from '@/store/app'
 import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
 import moment from 'moment';
+import i18n from "@/i18n/i18n";
+import { useTheme } from 'vuetify'
 
+const theme = useTheme()
 const store = useAppStore();
 const drawer = ref(false);
 const router = useRouter();
@@ -285,6 +323,7 @@ let currentTab = route.name || 'jobs';
 store.tab = currentTab;
 
 const accountTabs = [
+  'account',
   'profile',
   'messages',
   'listings'
@@ -297,7 +336,7 @@ function changeTab(tab) {
 
   if (accountTabs.includes(tab)) {
     store.tab = 'account';
-    if (tab === 'profile') {
+    if (tab === 'account') {
       router.push('/account');
     } else {
       router.push('/account/' + tab);
@@ -324,6 +363,7 @@ function updateTab(tab) {
 }
 
 function logOut() {
+  accountMenu.value = false;
   drawer.value = false;
   store.logOut().then(() => {
     // router.replace('/')
@@ -335,35 +375,50 @@ function openRecentMessage(message) {
   store.openChat(message);
 }
 
-const accountItems = [
+const accountItems = computed(() => {
+  return [
   {
-    title: 'Tili',
+    title: i18n.global.t('Tili'),
+    onClick: () => changeTab('account'),
+    icon: 'mdi-account'
+  },
+  {
+    title: i18n.global.t('Profiili'),
     onClick: () => changeTab('profile'),
     icon: 'mdi-account'
   },
   {
-    title: 'Viestit',
+    title: i18n.global.t('Viestit'),
     onClick: () => changeTab('messages'),
     icon: 'mdi-message-text'
   },
   {
-    title: 'Omat listaukset',
+    title: i18n.global.t('Omat listaukset'),
     onClick: () => changeTab('listings'),
     icon: 'mdi-clipboard-account'
   },
   {
-    title: 'Teema',
+    title: i18n.global.t('Teema'),
     onClick: () => {
       store.lightTheme = !store.lightTheme;
+      theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
     },
     element: 'theme'
   },
   {
-    title: 'Kirjaudu ulos',
+    title: i18n.global.t('Kieli'),
+    onClick: () => {
+    },
+    element: 'language'
+  },
+  {
+    title: i18n.global.t('Kirjaudu ulos'),
     onClick: () => logOut(),
     icon: 'mdi-logout'
   }
 ];
+})
+
 
 const recentMessages = computed(() => {
   return store.unseenMessages;
@@ -404,6 +459,37 @@ window.addEventListener("scroll", function(ev){
   }
 });
 
+function changeLanguage(language) {
+  i18n.global.locale = language;
+  localStorage.setItem('locale', language);
+}
+
+function languageName() {
+  switch (i18n.global.locale) {
+    case 'fi':
+      return 'Suomi'
+    case 'sv':
+      return 'Svenska'
+    case 'en':
+      return 'English'
+    default:
+      return 'Suomi'
+  }
+}
+
+function languageSrc() {
+  switch (i18n.global.locale) {
+    case 'fi':
+      return '/finnish_flag.png'
+    case 'sv':
+      return '/swedish_flag.png'
+    case 'en':
+      return '/english_flag.png'
+    default:
+      return '/finnish_flag.png'
+  }
+}
+
 if (window.scrollY > 0) {
   scrolled.value = true;
 } else {
@@ -438,10 +524,6 @@ if (window.scrollY > 0) {
   .recent-messages::-webkit-scrollbar {
     width: 6px; /* Scrollbar width */
     display: none;
-  }
-
-  .recent-messages::-webkit-scrollbar-track {
-    background-color: var(--card-bg-color);
   }
 
   .recent-messages::-webkit-scrollbar-thumb {
@@ -497,7 +579,6 @@ if (window.scrollY > 0) {
     letter-spacing: 0.001rem;
     font-size: 1rem;
     font-weight: 700;
-    color: var(--main-text-color);
   }
 
   .messages-count {
@@ -538,13 +619,12 @@ if (window.scrollY > 0) {
 
   .app-bar {
     background: var(--main-bg-color) !important;
-    /* transition: all 0.4s ease; */
-    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     height: var(--app-bar-height);
   }
 
   .app-bar.scrolled {
-    background-color: var(--app-bar-bg-color) !important;
+    background: var(--app-bar-bg-color) !important;
+    transition: 0.3s ease;
   }
 
   .app-bar-content-wrapper {
@@ -567,7 +647,6 @@ if (window.scrollY > 0) {
   .rekrytor-text {
     font-size: 28px;
     font-weight: 600;
-    color: var(--main-text-color);
     padding-left: 15px;
   }
 
@@ -607,6 +686,17 @@ if (window.scrollY > 0) {
     padding: 0 5px;
   }
 
+  .flag {
+    height: 20px;
+  }
+
+  .list-language-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+  }
+
   @media (max-width: 1199px) {
     .add-job-btn {
       display: none;
@@ -625,11 +715,5 @@ if (window.scrollY > 0) {
     .tabs {
       display: none;
     }
-  }
-</style>
-
-<style>
-  .v-slide-group-item--active {
-    color: var(--main-text-plain-color) !important;
   }
 </style>

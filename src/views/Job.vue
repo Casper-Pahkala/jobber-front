@@ -22,7 +22,10 @@
                   id="mainJobImage"
                 >
                   <template v-slot:placeholder>
-                    <v-skeleton-loader type="image" :theme="store.theme" height="100%" />
+                    <v-skeleton-loader
+                      style="width: 100%; height: 100%;"
+                      class="job-image"
+                    ></v-skeleton-loader>
                   </template>
                 </v-img>
                 <v-btn
@@ -60,7 +63,7 @@
                   aspect-ratio="1"
                 >
                   <template v-slot:placeholder>
-                    <v-skeleton-loader type="image" round :theme="store.theme"/>
+                    <v-skeleton-loader type="image" round/>
                   </template>
                 </v-img>
               </div>
@@ -75,13 +78,13 @@
             <div class="job-info" v-if="job.area">
               <v-icon icon="mdi-map-marker"></v-icon>
               <div class="area-container">
-                <div
+                <v-chip
                   v-for="(area, index) in job.area"
                   :key="index"
                   class="area-chip"
                 >
                   {{ area }}
-                </div>
+                </v-chip>
               </div>
             </div>
             <div class="job-info" v-if="job.date">
@@ -98,7 +101,7 @@
                 {{ jobSalary() }}
             </div>
             <v-divider class="mt-5"></v-divider>
-            <h4 class="mt-3">Kuvaus</h4>
+            <h4 class="mt-3">{{ $t('Kuvaus') }}</h4>
             <p id="job-description" class="mt-2">
               {{ job.description }}
             </p>
@@ -117,7 +120,7 @@
                     </h3>
                   </div>
                   <div class="mt-2">
-                    Käyttäjä luotu {{ store.formatDate(job.user.created_at) }}
+                    {{ $t('Käyttäjä luotu') }} {{ store.formatDate(job.user.created_at) }}
                   </div>
                 </div>
 
@@ -128,7 +131,7 @@
                   color="primary"
                   @click="contact()"
                 >
-                  Ota yhteyttä
+                  {{ $t('Ota yhteyttä') }}
                 </v-btn>
 
                 <v-btn
@@ -138,11 +141,11 @@
                   style="color: white"
                   @click="deleteListing()"
                 >
-                  Poista listaus
+                  {{ $t('Poista listaus') }}
                 </v-btn>
               </v-card>
             </v-container>
-            <v-divider class="mt-5 mb-5"></v-divider>
+            <!-- <v-divider class="mt-5 mb-5"></v-divider> -->
           </div>
         </div>
       </transition>
@@ -150,13 +153,13 @@
       <template v-if="!loading && job.is_deleted">
         <div class="listing-deleted">
           <div>
-            Listaus poistettu
+            {{ $t('Listaus poistettu') }}
           </div>
           <v-btn
             color="primary"
             @click="toJobs()"
           >
-            Selaa töitä
+            {{ $t('Selaa töitä') }}
           </v-btn>
         </div>
       </template>
@@ -175,7 +178,6 @@
               <v-skeleton-loader
                 style="width: 100%; height: 100%;"
                 class="job-image"
-                :theme="store.theme"
               ></v-skeleton-loader>
             </v-container>
             <div
@@ -184,25 +186,25 @@
             </div>
         </v-container>
 
-          <v-skeleton-loader type="article" :theme="store.theme"></v-skeleton-loader>
+          <v-skeleton-loader type="article"></v-skeleton-loader>
 
           <v-divider class="mt-5"></v-divider>
 
-          <v-skeleton-loader type="list-item-three-line" :theme="store.theme"></v-skeleton-loader>
+          <v-skeleton-loader type="list-item-three-line"></v-skeleton-loader>
           <v-divider class="mt-5 mb-5"></v-divider>
-          <v-card class="pa-5" elevation="8" :theme="store.theme">
+          <v-card class="pa-5" elevation="8">
             <div>
 
               <div style="display: flex; gap: 5px; align-items: center;">
                 <v-icon icon="mdi-account"></v-icon>
-                <v-skeleton-loader type="text" width="300px" :theme="store.theme"></v-skeleton-loader>
+                <v-skeleton-loader width="300px" height="24px"></v-skeleton-loader>
               </div>
-              <div class="mb-7">
-                <v-skeleton-loader type="text" width="300px" height="20px" style="margin-top: -10px;" :theme="store.theme"></v-skeleton-loader>
+              <div class="mt-5">
+                <v-skeleton-loader width="300px" height="18px"></v-skeleton-loader>
               </div>
             </div>
 
-            <v-skeleton-loader width="200px" height="40px" class="mt-6" :theme="store.theme"></v-skeleton-loader>
+            <v-skeleton-loader width="200px" height="40px" class="mt-6"></v-skeleton-loader>
           </v-card>
         </v-container>
       </template>
@@ -275,7 +277,6 @@ function contact() {
 function imageUrl(index = 0, lazy = false) {
   if (job.value.job_images && job.value.job_images.length > 0) {
     return store.url + '/job-image/' + job.value.job_images[index].name + '.jpg';
-
   } else {
     return store.url + '/no-img.png';
   }
@@ -343,6 +344,7 @@ document.addEventListener("fullscreenchange", () => {
   .main-wrapper {
     display: flex;
     justify-content: center;
+    padding-bottom: 40px;
   }
   .main-content {
     max-width: 1000px;
@@ -374,7 +376,6 @@ document.addEventListener("fullscreenchange", () => {
     height: 60px;
     font-size: 20px;
     border-radius: 50%;
-    background-color: var(--card-bg-color);
   }
 
   .carousel {
@@ -400,7 +401,6 @@ document.addEventListener("fullscreenchange", () => {
     height: 500px;
     display: flex;
     justify-content: center;
-    background-color: var(--main-very-light-color);
     padding: 0;
     position: relative;
     /* margin: 10px; */
@@ -431,10 +431,6 @@ document.addEventListener("fullscreenchange", () => {
     opacity: 1;
   }
 
-  .area-chip {
-    text-wrap: nowrap;
-  }
-
   .area-container {
     display: flex;
     flex-wrap: wrap;
@@ -444,7 +440,6 @@ document.addEventListener("fullscreenchange", () => {
     top: 10px;
     right: 10px;
     position: absolute;
-    background-color: var(--card-bg-color);
   }
 
   .close-btn {
@@ -452,11 +447,6 @@ document.addEventListener("fullscreenchange", () => {
     top: 10px;
     right: 10px;
     z-index: 100;
-    background-color: var(--card-bg-color);
-  }
-
-  .user-card {
-    background-color: var(--card-bg-color);
   }
 
   .carousel {
@@ -489,9 +479,5 @@ document.addEventListener("fullscreenchange", () => {
 <style>
   .job-info .v-icon {
     width: 40px;
-  }
-
-  .v-skeleton-loader .v-skeleton-loader__bone {
-    height: 100%;
   }
 </style>

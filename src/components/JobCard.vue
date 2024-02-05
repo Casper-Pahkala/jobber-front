@@ -17,7 +17,7 @@
             class="job-image"
           >
             <template v-slot:placeholder>
-              <v-skeleton-loader type="image" round :theme="store.theme"/>
+              <v-skeleton-loader type="image" round/>
             </template>
           </v-img>
           <!-- <v-divider :vertical="true"></v-divider> -->
@@ -27,7 +27,7 @@
                   <div class="job-description">{{ store.jobShortInfo(job) }}</div>
 
                   <div class="job-info small" v-show="store.window.width < 1199">
-                    <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                    <div class="job-info-item">{{ $t('Julkaistu') }} {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
                     <div class="job-info-item" >
                       <div class="area-container" :style="myListing ? 'margin-right: 50px;' : ''">
                         <template
@@ -47,16 +47,16 @@
               </div>
 
               <div class="job-info" v-show="store.window.width >= 1199">
-                <div class="job-info-item">Julkaistu {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
+                <div class="job-info-item">{{ $t('Julkaistu') }} {{ store.formatDate(job.created_at, 'DD.MM') }}</div>
                 <div class="job-info-item mt-2" >
                   <div class="area-container" :style="myListing ? 'margin-right: 50px;' : ''">
                     <template
                       v-for="(area, index) in job.area"
                       :key="index"
                     >
-                      <div v-if="index < 2" class="area-chip">
+                      <v-chip v-if="index < 2" class="area-chip">
                         {{ area }}
-                      </div>
+                      </v-chip>
                     </template>
                     <div v-if="job.area.length > 2" style="line-height: 25px; letter-spacing: 2px;">
                       +{{ job.area.length - 2 }}
@@ -75,7 +75,7 @@
         v-if="myListing"
         class="action-btns"
       >
-        <v-menu @click.stop :theme="store.theme" location="bottom end">
+        <v-menu @click.stop location="bottom end">
           <template v-slot:activator="{ props }">
             <v-btn
             @click.stop
@@ -92,7 +92,7 @@
               class="menu-action-btn text-red"
             >
               <v-list-item>
-                Poista listaus
+                {{ $t('Poista listaus') }}
               </v-list-item>
             </v-list-item>
           </v-list>
@@ -168,7 +168,6 @@ function menuButtonColor(job) {
     position: relative;
     margin: 10px 0;
     text-decoration: none;
-    background-color: var(--card-bg-color);
   }
   .job-image {
       width: 80px;
@@ -248,7 +247,6 @@ function menuButtonColor(job) {
 
     .area-chip {
       padding: 0;
-      background-color: transparent;
       display: flex;
       align-items: center;
       padding-right: 5px;
@@ -273,7 +271,6 @@ function menuButtonColor(job) {
 
   .job .deleted::after {
     content: "Poistettu";
-    color: var(--main-text-light-color);
     font-size: 24px;
     font-weight: 600;
     transform: rotate(0deg);

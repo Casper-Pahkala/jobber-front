@@ -14,7 +14,7 @@
           class="job-image"
         >
           <template v-slot:placeholder>
-            <v-skeleton-loader type="image" round :theme="store.theme"/>
+            <v-skeleton-loader type="image" round/>
           </template>
         </v-img>
 
@@ -52,21 +52,21 @@
 
   </div>
   <div v-if="messages.length == 0 && store.user && !loading" class="no-messages-text">
-    Ei viestejä
+    {{ $t('Ei viestejä') }}
     <v-btn color="primary" class="text-none" @click="toJobs()">
-      Etsi töitä
+      {{ $t('Etsi töitä') }}
     </v-btn>
   </div>
 
   <div v-if="!store.user" class="no-messages-text">
-    Kirjaudu sisään niin pääset näkemään viestisi
+    {{ $t('Kirjaudu sisään niin pääset näkemään viestisi') }}
     <v-btn
       class="mt-7"
       size="large"
       color="primary"
       @click="store.loginDialogShowing = true"
     >
-      Kirjaudu
+      {{ $t('Kirjaudu') }}
     </v-btn>
   </div>
 </template>
@@ -135,7 +135,6 @@ function latestMessage(message) {
     padding: 10px;
     margin: 20px 0;
     position: relative;
-    background-color: var(--card-bg-color);
   }
 
   .message-wrapper {

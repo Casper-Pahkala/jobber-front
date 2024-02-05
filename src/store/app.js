@@ -4,9 +4,12 @@ import axios from 'axios';
 import moment from 'moment';
 import Cookies from 'js-cookie';
 import finnishCities from './finnish_cities';
+import i18n from "@/i18n/i18n";
 
+const t = i18n.global.t;
 export const useAppStore = defineStore('app', {
   state: () => ({
+    refreshKey: 0,
     lightTheme: false,
     allowed: true,
     feedbackDialog: false,
@@ -673,7 +676,7 @@ export const useAppStore = defineStore('app', {
     jobShortInfo(job) {
       let description = '';
       if (job.contract_type === 0) {
-        description += 'Keikkatyö';
+        description += t('Keikkatyö');
 
         if (job.salary) {
           if (job.salary_type === 0) {
@@ -685,7 +688,7 @@ export const useAppStore = defineStore('app', {
           }
         }
       } else if (job.contract_type === 1) {
-        description += 'Vakituinen työsuhde';
+        description += t('Vakituinen');
 
         if (job.salary) {
           if (job.salary_type === 0) {
@@ -697,7 +700,7 @@ export const useAppStore = defineStore('app', {
           }
         }
       } else {
-        description += 'Toistaiseksi voimassa oleva';
+        description += t('Määräaikainen');
 
         if (job.salary) {
           if (job.salary_type === 0) {
@@ -762,9 +765,29 @@ export const useAppStore = defineStore('app', {
           reject(error);
         })
       })
+    },
+    getProfile() {
+      return new Promise((resolve, reject) => {
+        this.axios.get(this.url + `/api/users/profile.json`).then((response) => {
+          let data = response.data;
+          if (data.status !== 'success') {
+            this.errorToast('Profiilin haussa tapahtui virhe:' + data.message);
+            reject(data.message);
+            return;
+          }
+          this.user.profile = data.profile;
+          console.log(this.user);
+          resolve(data);
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.feedbackDialog = false;
+          this.loadingBackground = false;
+          this.errorToast('Profiilin tallennuksessa tapahtui tuntematon virhe');
+          reject(error);
+        })
+      })
     }
-
-
   },
   getters: {
     theme() {

@@ -2,7 +2,7 @@
   <v-container
     class="add-container"
   >
-    <h1 class="title pb-5">Luo listaus</h1>
+    <h1 class="title pb-5">{{ $t('Luo listaus') }}</h1>
       <v-window v-model="jobTab" class="main-window" disabled>
         <v-window-item value="one" class="window">
           <!-- <div class="title">
@@ -60,7 +60,7 @@
                         style="font-size: 35px;"
                       >
                       </v-icon>
-                      Lisää kuva
+                      {{ $t('Lisää kuva') }}
                     </div>
                   </v-btn>
               </v-card>
@@ -68,7 +68,7 @@
           </div>
 
           <div class="actions">
-            <v-btn color="primary" class="text-none" append-icon="mdi-chevron-right" style="float: right;" @click="changeJobTab('two')" :disabled="!allImagesUploaded">Seuraava</v-btn>
+            <v-btn color="primary" class="text-none" append-icon="mdi-chevron-right" style="float: right;" @click="changeJobTab('two')" :disabled="!allImagesUploaded">{{ $t('Seuraava') }}</v-btn>
           </div>
 
         </v-window-item>
@@ -80,21 +80,20 @@
           <div class="content">
             <v-form @submit.prevent="changeJobTab('three')" ref="jobForm">
               <v-container>
-                  <h4 class="pl-1">Mikä on työn otsikko? *</h4>
-                  <span class="pl-1">Esim. Lastenhoitaja tai Nurmikonleikkaaja</span>
+                  <h4 class="pl-1">{{ $t('Mikä on työn otsikko?') }} *</h4>
+                  <span class="pl-1">{{ $t('Esim. Lastenhoitaja tai Nurmikonleikkaaja') }}</span>
                   <v-text-field
                     v-model="title"
-                    label="Työn otsikko"
+                    :label="$t('Työn otsikko')"
                     :rules="jobTitleRules"
                     required
-                    :theme="store.theme"
                   ></v-text-field>
                 </v-container>
 
                 <v-container>
-                  <h4 class="pl-1">Mikä on kohde alueesi? *</h4>
-                  <span class="pl-1">Syötä mikä tahansa kaupungin tai alueen nimi</span>
+                  <h4 class="pl-1">{{ $t('Mikä on kohde alueesi?') }} *</h4>
                   <v-autocomplete
+                    v-if="false"
                     label="Alue"
                     :items="areaSearchTerm.length > 0 ? areaSuggestions : defaultSuggestions"
                     @update:search="getAddressSuggestions()"
@@ -108,31 +107,44 @@
                     chips
                     closable-chips
                     no-data-text="Aluetta ei löytynyt"
-                    :theme="store.theme"
+                  ></v-autocomplete>
+
+                  <v-autocomplete
+                    v-model="area"
+                    v-model:search="areaSearchTerm"
+                    auto-select-first
+                    clearable
+                    multiple
+                    chips
+                    closable-chips
+                    item-value="id"
+                    item-title="name"
+                    :items="store.finnishCities"
+                    :placeholder="$t('Valitse kaupunki')"
                   ></v-autocomplete>
                 </v-container>
 
                 <v-container>
-                  <v-textarea label="Kuvaus" :rules="descriptionRules" required v-model="description" no-resize></v-textarea>
+                  <v-textarea :label="$t('Kuvaus')" :rules="descriptionRules" required v-model="description" no-resize></v-textarea>
                 </v-container>
 
               </v-form>
             </div>
             <div class="actions">
-              <v-btn @click="changeJobTab('one')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
-              <v-btn color="primary" type="submit" class="text-none" @click="changeJobTab('three')" append-icon="mdi-chevron-right">Seuraava</v-btn>
+              <v-btn @click="changeJobTab('one')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">{{ $t('Takaisin') }}</v-btn>
+              <v-btn color="primary" type="submit" class="text-none" @click="changeJobTab('three')" append-icon="mdi-chevron-right">{{ $t('Seuraava') }}</v-btn>
             </div>
         </v-window-item>
 
         <v-window-item value="three" class="window">
           <div class="title">
-            <h2>Tiedot</h2>
+            <h2>{{ $t('Tiedot') }}</h2>
           </div>
 
           <div class="content">
 
             <v-container>
-              <h4 class="pl-1">Milloin työt alkavat? *</h4>
+              <h4 class="pl-1">{{ $t('Milloin työt alkavat?') }} *</h4>
               <v-chip-group
                 mandatory
                 selected-class="text-primary"
@@ -152,16 +164,15 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="formattedDate"
-                    label="Päivä"
+                    :label="$t('Päivä')"
                     readonly
                     v-on="on"
                     @update:focused="dateDialogShowing = true"
                     :rules="jobDateRules"
                     required
-                    :theme="store.theme"
                   ></v-text-field>
                 </template>
-                <v-card :theme="store.theme">
+                <v-card>
                   <v-card-item>
                     <v-locale-provider locale="fi">
                       <v-date-picker
@@ -174,15 +185,15 @@
                     </v-locale-provider>
                   </v-card-item>
                   <v-card-actions style="direction: rtl;">
-                    <v-btn flat @click="confirmDateSelection">OK</v-btn>
-                    <v-btn flat @click="dateDialogShowing = false">Peruuta</v-btn>
+                    <v-btn flat @click="confirmDateSelection">{{ $t('OK') }}</v-btn>
+                    <v-btn flat @click="dateDialogShowing = false">{{ $t('Peruuta') }}</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
             </v-container>
 
             <v-container>
-                  <h4 class="pl-1">Mikä on työsopimuksen tyyppi?</h4>
+                  <h4 class="pl-1">{{ $t('Mikä on työsopimuksen tyyppi?') }}</h4>
                   <v-chip-group
                     mandatory
                     selected-class="text-primary"
@@ -200,23 +211,22 @@
                   <template
                   v-if="contractType == 0"
                   >
-                  <h4 class="pl-1">Mikä on työn kesto?</h4>
-                  <span class="pl-1">Jätä tyhjäksi jos ei tiedossa</span>
+                  <h4 class="pl-1">{{ $t('Mikä on työn kesto?') }}</h4>
+                  <span class="pl-1">{{ $t('Jätä tyhjäksi jos ei tiedossa') }}</span>
 
                   <v-text-field
-                    label="kesto"
+                    :label="$t('kesto')"
                     suffix="h"
                     type="number"
                     v-model="duration"
                     @update:model-value="estimatedTimeUpdated"
                     min="0"
                     :rules="numberRules"
-                    :theme="store.theme"
                   >
                   </v-text-field>
 
-                  <h4 class="pl-1">Mikä on palkan tyyppi?</h4>
-                  <span class="pl-1">Jätä tyhjäksi jos ei tiedossa</span>
+                  <h4 class="pl-1">{{ $t('Mikä on palkan tyyppi?') }}</h4>
+                  <span class="pl-1">{{ $t('Jätä tyhjäksi jos ei tiedossa') }}</span>
                   <v-chip-group
                     mandatory
                     selected-class="text-primary"
@@ -239,29 +249,27 @@
                     min="0"
                     @change="sanitizeSalary()"
                     :rules="numberRules"
-                    :theme="store.theme"
                   >
                   </v-text-field>
                   </template>
 
                   <template v-else>
 
-                    <h4 class="pl-1">Paljonko tunteja viikossa?</h4>
-                    <span class="pl-1">Jätä tyhjäksi jos ei tiedossa</span>
+                    <h4 class="pl-1">{{ $t('Paljonko tunteja viikossa?') }}</h4>
+                    <span class="pl-1">{{ $t('Jätä tyhjäksi jos ei tiedossa') }}</span>
 
                     <v-text-field
-                      label="Tunteja viikossa"
+                      :label="$t('Tunteja viikossa')"
                       suffix="h"
                       type="number"
                       v-model="hoursPerWeek"
                       min="0"
                       :rules="numberRules"
-                      :theme="store.theme"
                     >
                     </v-text-field>
 
-                    <h4 class="pl-1">Mikä on palkan tyyppi?</h4>
-                    <span class="pl-1">Jätä tyhjäksi jos ei tiedossa</span>
+                    <h4 class="pl-1">{{ $t('Mikä on palkan tyyppi?') }}</h4>
+                    <span class="pl-1">{{ $t('Jätä tyhjäksi jos ei tiedossa') }}</span>
                     <v-chip-group
                       mandatory
                       selected-class="text-primary"
@@ -283,7 +291,6 @@
                       min="0"
                       :rules="numberRules"
                       @change="sanitizeSalary()"
-                      :theme="store.theme"
                     >
                     </v-text-field>
                   </template>
@@ -291,9 +298,9 @@
           </div>
 
           <div class="actions">
-            <v-btn @click="changeJobTab('two')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">Takaisin</v-btn>
-            <v-btn color="primary" class="text-none" append-icon="mdi-plus" style="float: right;" @click="addjob" v-if="store.user">Luo listaus</v-btn>
-            <v-btn color="primary" class="text-none" style="float: right;" @click="store.loginDialogShowing = true" v-else>Kirjaudu sisään</v-btn>
+            <v-btn @click="changeJobTab('two')" class="back-btn text-none" :color="store.lightTheme ? 'grey-lighten-3' : 'grey-darken-3'">{{ $t('Takaisin') }}</v-btn>
+            <v-btn color="primary" class="text-none" append-icon="mdi-plus" style="float: right;" @click="addjob" v-if="store.user">{{ $t('Luo listaus') }}</v-btn>
+            <v-btn color="primary" class="text-none" style="float: right;" @click="store.loginDialogShowing = true" v-else>{{ $t('Kirjaudu sisään') }}</v-btn>
           </div>
         </v-window-item>
       </v-window>
@@ -317,6 +324,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useAppStore } from '@/store/app';
 import moment from 'moment';
 import { useRouter } from 'vue-router';
+import i18n from "@/i18n/i18n";
 
 const router = useRouter();
 const store = useAppStore();
@@ -325,10 +333,10 @@ const selectedFiles = ref([]);
 const fileInput = ref(null);
 const jobTab = ref('one');
 
-const dateTypes = ['Sopimuksen mukaan', 'Tarkka päivämäärä'];
-const contractTypes = ['Keikkatyö', 'Vakituinen', 'Toistaiseksi voimassa oleva'];
-const salaryTypes = ['Tuntipalkka', 'Urakkapalkka'];
-const salaryTypes2 = ['Tuntipalkka', 'Kuukausipalkka'];
+const dateTypes = computed(() => { return [i18n.global.t('Sopimuksen mukaan'), i18n.global.t('Tarkka päivämäärä')]});
+const contractTypes = computed(() => { return [i18n.global.t('Keikkatyö'), i18n.global.t('Vakituinen')]});
+const salaryTypes = computed(() => { return [i18n.global.t('Tuntipalkka'), i18n.global.t('Urakkapalkka')]});
+const salaryTypes2 = computed(() => { return [i18n.global.t('Tuntipalkka'), i18n.global.t('Kuukausipalkka')]});
 const title = ref('');
 
 const area = ref([]);
@@ -596,7 +604,6 @@ function sanitizeSalary() {
     top: 10px;
     right: 10px;
     z-index: 100;
-    background-color: var(--card-bg-color);
     border-radius: 50%;
   }
 
@@ -651,7 +658,6 @@ function sanitizeSalary() {
     gap: 20px;
   }
   .image-card {
-    background-color: var(--card-bg-color) !important;
     width: 180px;
     height: 180px;
   }
@@ -672,7 +678,7 @@ function sanitizeSalary() {
 
     .window .content {
       flex: 10;
-      justify-content: start;
+      /* justify-content: start; */
     }
   }
 
