@@ -16,13 +16,11 @@
               <v-skeleton-loader
                 class="profile-image"
                 type="image"
-                :theme="store.theme"
               >
 
               </v-skeleton-loader>
 
               <v-skeleton-loader
-                :theme="store.theme"
                 type="list-item-two-line"
               ></v-skeleton-loader>
             </template>
@@ -34,7 +32,7 @@
                 class="profile-image"
               >
                 <template v-slot:placeholder>
-                  <v-skeleton-loader type="image" round :theme="store.theme"/>
+                  <v-skeleton-loader type="image" round/>
                 </template>
               </v-img>
 
@@ -86,7 +84,7 @@
                       v-else
                     >
                       <template v-slot:placeholder>
-                        <v-skeleton-loader type="image" :theme="store.theme"/>
+                        <v-skeleton-loader type="image"/>
                       </template>
                     </v-img>
                   </div>
@@ -122,14 +120,12 @@
                   <div class="job-container">
                     <template v-if="loading">
                       <v-skeleton-loader
-                        :theme="store.theme"
                         type="image"
                         class="job-image"
                       >
                       </v-skeleton-loader>
 
                       <v-skeleton-loader
-                        :theme="store.theme"
                         class="job-content"
                         type="list-item-two-line"
                       ></v-skeleton-loader>
@@ -142,7 +138,7 @@
                         class="job-image"
                       >
                         <template v-slot:placeholder>
-                          <v-skeleton-loader type="image" round :theme="store.theme"/>
+                          <v-skeleton-loader type="image" round/>
                         </template>
                       </v-img>
 
@@ -187,7 +183,6 @@
                     :max-rows="3"
                     :bg-color="store.lightTheme ? 'grey-lighten-2' : 'grey-darken-3'"
                     :disabled="!job || job.is_deleted"
-                    :theme="store.theme"
                   ></v-textarea>
 
                   <v-btn v-if="message.length == 0" @click="openFileInput" color="primary" dark fab small class="send-btn mr-1" :disabled="!job || job.is_deleted">
@@ -224,7 +219,6 @@
         width="500"
       >
         <v-card
-          :theme="store.theme"
         >
           <v-card-title>
             {{ $t('Vahvista liite') }}
@@ -264,7 +258,7 @@
           class="large-image"
         >
           <template v-slot:placeholder>
-            <v-skeleton-loader type="image" round :theme="store.theme"/>
+            <v-skeleton-loader type="image" round/>
           </template>
         </v-img>
 
@@ -692,7 +686,6 @@ body, html {
 }
 .chat .messages .date {
   font-size: 0.8rem;
-  background-color: var(--chat-light-bg);
   padding: 0.25rem 1rem;
   border-radius: 2rem;
   color: #999;
@@ -728,7 +721,6 @@ body, html {
   box-sizing: border-box;
   padding: 0.5rem 1rem;
   margin: 1.6rem;
-  background-color: var(--chat-other-color);
   border-radius: 1.125rem 1.125rem 1.125rem 0;
   min-height: 2.25rem;
   width: -webkit-fit-content;
@@ -741,7 +733,6 @@ body, html {
   margin: 1.6rem 1rem 1.6rem auto;
   border-radius: 1.125rem 1.125rem 0 1.125rem;
   color: white;
-  background-color: var(--chat-my-color);
 }
 
 .chat .messages .message.sent div {
@@ -753,7 +744,6 @@ body, html {
   height: 0.8rem;
   margin-right: 0rem;
   box-sizing: border-box;
-  background-color: var(--chat-other-color);
   border-radius: 50%;
 }
 .chat .messages .message .typing.typing-1 {
@@ -879,10 +869,6 @@ body, html {
   background-color: #171717; /* Scrollbar thumb color */
 }
 
-/* Customize the scrollbar track (background) */
-#messages::-webkit-scrollbar-track {
-  background-color: var(--card-bg-color);
-}
 
 .job-container {
   position: fixed;
@@ -998,14 +984,6 @@ body, html {
 .pdf-loader {
   width: 24px;
   height: 24px;
-}
-
-.chat-card {
-  background-color: var(--card-bg-color);
-}
-
-.chat-container {
-  background-color: var(--card-bg-color);
 }
 </style>
 <style>

@@ -1,8 +1,7 @@
 <template>
   <v-main>
     <div style="min-height: calc(100vh - var(--app-bar-height))">
-      <router-view>
-      </router-view>
+      <router-view />
     </div>
 
     <v-footer
@@ -195,12 +194,7 @@ export default {
     bottom: 20px;
   }
 
-  .feedback-card {
-    background-color: var(--card-bg-color);
-  }
-
   .some-btn {
-    color: var(--main-text-color);
     color: white;
   }
 </style>

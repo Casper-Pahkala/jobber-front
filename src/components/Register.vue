@@ -8,23 +8,21 @@
         <v-card-title class="headline pa-4">{{ $t('Luo käyttäjä') }}</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="register">
-            <v-text-field v-model="firstName" label="Etunimi" type="text" name="fname" :theme="store.theme"></v-text-field>
-            <v-text-field v-model="lastName" label="Sukunimi" type="text" name="lname" :theme="store.theme"></v-text-field>
+            <v-text-field v-model="firstName" label="Etunimi" type="text" name="fname"></v-text-field>
+            <v-text-field v-model="lastName" label="Sukunimi" type="text" name="lname"></v-text-field>
             <v-text-field
               v-model="email"
               label="Sähköposti"
               type="email"
-              :theme="store.theme"
               :error="emailError"
               @input="isValidEmail(email)"
               name="email"
             ></v-text-field>
-            <v-text-field v-model="password" label="Salasana" type="password" :theme="store.theme"></v-text-field>
+            <v-text-field v-model="password" label="Salasana" type="password"></v-text-field>
             <v-text-field
               v-model="confirmPassword"
               label="Vahvista salasana"
               type="password"
-              :theme="store.theme"
               :error-messages="confirmPasswordError"
             ></v-text-field>
             <v-col class="text-right">
@@ -142,10 +140,6 @@ function validateConfirmPassword() {
 .headline {
   text-align: center;
   font-size: 25px;
-}
-
-.register-card {
-  background-color: var(--card-bg-color);
 }
 
 </style>

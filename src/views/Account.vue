@@ -76,6 +76,21 @@ function changeTab(tab) {
     router.replace(`/account/${tab}`);
   }
 }
+
+watch(() => route.name, (newVal, oldVal) => {
+  if (newVal === 'account') {
+    accountTab.value = 'account';
+  }
+  if (newVal === 'profile') {
+    accountTab.value = 'profile';
+  }
+  if (newVal === 'messages') {
+    accountTab.value = 'messages';
+  }
+  if (newVal === 'listings') {
+    accountTab.value = 'listings';
+  }
+})
 </script>
 
 <style scoped>

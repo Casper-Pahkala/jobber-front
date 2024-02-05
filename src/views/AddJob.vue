@@ -84,10 +84,9 @@
                   <span class="pl-1">{{ $t('Esim. Lastenhoitaja tai Nurmikonleikkaaja') }}</span>
                   <v-text-field
                     v-model="title"
-                    label="Työn otsikko"
+                    :label="$t('Työn otsikko')"
                     :rules="jobTitleRules"
                     required
-                    :theme="store.theme"
                   ></v-text-field>
                 </v-container>
 
@@ -108,7 +107,6 @@
                     chips
                     closable-chips
                     no-data-text="Aluetta ei löytynyt"
-                    :theme="store.theme"
                   ></v-autocomplete>
 
                   <v-autocomplete
@@ -121,14 +119,13 @@
                     closable-chips
                     item-value="id"
                     item-title="name"
-                    :theme="store.theme"
                     :items="store.finnishCities"
-                    placeholder="Valitse kaupunki"
+                    :placeholder="$t('Valitse kaupunki')"
                   ></v-autocomplete>
                 </v-container>
 
                 <v-container>
-                  <v-textarea label="Kuvaus" :rules="descriptionRules" required v-model="description" no-resize></v-textarea>
+                  <v-textarea :label="$t('Kuvaus')" :rules="descriptionRules" required v-model="description" no-resize></v-textarea>
                 </v-container>
 
               </v-form>
@@ -167,16 +164,15 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="formattedDate"
-                    label="Päivä"
+                    :label="$t('Päivä')"
                     readonly
                     v-on="on"
                     @update:focused="dateDialogShowing = true"
                     :rules="jobDateRules"
                     required
-                    :theme="store.theme"
                   ></v-text-field>
                 </template>
-                <v-card :theme="store.theme">
+                <v-card>
                   <v-card-item>
                     <v-locale-provider locale="fi">
                       <v-date-picker
@@ -219,14 +215,13 @@
                   <span class="pl-1">{{ $t('Jätä tyhjäksi jos ei tiedossa') }}</span>
 
                   <v-text-field
-                    label="kesto"
+                    :label="$t('kesto')"
                     suffix="h"
                     type="number"
                     v-model="duration"
                     @update:model-value="estimatedTimeUpdated"
                     min="0"
                     :rules="numberRules"
-                    :theme="store.theme"
                   >
                   </v-text-field>
 
@@ -254,7 +249,6 @@
                     min="0"
                     @change="sanitizeSalary()"
                     :rules="numberRules"
-                    :theme="store.theme"
                   >
                   </v-text-field>
                   </template>
@@ -265,13 +259,12 @@
                     <span class="pl-1">{{ $t('Jätä tyhjäksi jos ei tiedossa') }}</span>
 
                     <v-text-field
-                      label="Tunteja viikossa"
+                      :label="$t('Tunteja viikossa')"
                       suffix="h"
                       type="number"
                       v-model="hoursPerWeek"
                       min="0"
                       :rules="numberRules"
-                      :theme="store.theme"
                     >
                     </v-text-field>
 
@@ -298,7 +291,6 @@
                       min="0"
                       :rules="numberRules"
                       @change="sanitizeSalary()"
-                      :theme="store.theme"
                     >
                     </v-text-field>
                   </template>
@@ -332,6 +324,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useAppStore } from '@/store/app';
 import moment from 'moment';
 import { useRouter } from 'vue-router';
+import i18n from "@/i18n/i18n";
 
 const router = useRouter();
 const store = useAppStore();
@@ -340,10 +333,10 @@ const selectedFiles = ref([]);
 const fileInput = ref(null);
 const jobTab = ref('one');
 
-const dateTypes = ['Sopimuksen mukaan', 'Tarkka päivämäärä'];
-const contractTypes = ['Keikkatyö', 'Vakituinen', 'Toistaiseksi voimassa oleva'];
-const salaryTypes = ['Tuntipalkka', 'Urakkapalkka'];
-const salaryTypes2 = ['Tuntipalkka', 'Kuukausipalkka'];
+const dateTypes = computed(() => { return [i18n.global.t('Sopimuksen mukaan'), i18n.global.t('Tarkka päivämäärä')]});
+const contractTypes = computed(() => { return [i18n.global.t('Keikkatyö'), i18n.global.t('Vakituinen')]});
+const salaryTypes = computed(() => { return [i18n.global.t('Tuntipalkka'), i18n.global.t('Urakkapalkka')]});
+const salaryTypes2 = computed(() => { return [i18n.global.t('Tuntipalkka'), i18n.global.t('Kuukausipalkka')]});
 const title = ref('');
 
 const area = ref([]);
@@ -611,7 +604,6 @@ function sanitizeSalary() {
     top: 10px;
     right: 10px;
     z-index: 100;
-    background-color: var(--card-bg-color);
     border-radius: 50%;
   }
 
@@ -666,7 +658,6 @@ function sanitizeSalary() {
     gap: 20px;
   }
   .image-card {
-    background-color: var(--card-bg-color) !important;
     width: 180px;
     height: 180px;
   }

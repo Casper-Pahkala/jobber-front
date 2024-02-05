@@ -35,28 +35,27 @@
 :root {
     --app-bar-height: 80px;
     
-    --main-text-plain-color: rgb(255, 255, 255);
+    --main-bg-color: rgb(18,18,18); /* Dark background */
+    // --main-text-plain-color: rgb(255, 255, 255);
 
-    --main-bg-color: rgb(25,25,25); /* Dark background */
-    --main-text-color: rgb(240, 240, 240); /* Light text */
-    --main-text-light-color: rgb(184, 184, 184); /* Lighter text */
-    --card-bg-color: rgb(33,33,33); /* Darker card background */
-    --main-light-color: #292929; /* Dark light color */
-    --main-very-light-color: rgb(40, 40, 40); /* Very dark light color */
-    --app-bar-bg-color: #131313;
+    // --main-text-color: rgb(240, 240, 240); /* Light text */
+    // --main-text-light-color: rgb(184, 184, 184); /* Lighter text */
+    // --card-bg-color: rgb(33,33,33); /* Darker card background */
+    // --main-light-color: #292929; /* Dark light color */
+    // --main-very-light-color: rgb(40, 40, 40); /* Very dark light color */
+    --app-bar-bg-color: rgb(16,16,16);
     
-    
-    --chat-other-color: rgb(45, 45, 45);
-    --chat-my-color: rgb(20,20,20);
-    --chat-light-bg: rgb(42, 42, 42);
+    // --chat-other-color: rgb(45, 45, 45);
+    // --chat-my-color: rgb(20,20,20);
+    // --chat-light-bg: rgb(42, 42, 42);
 
-    --scrollbar-track-color: rgb(25, 25, 25);
-    --scrollbar-color: rgb(70, 70, 70);
+    // --scrollbar-track-color: rgb(25, 25, 25);
+    // --scrollbar-color: rgb(70, 70, 70);
 
     --edit-pencil-bg: #3f3f3f;
     --edit-pencil-color: #8e8e8e;
 
-    --text-light-color: rgb(120, 120, 120);
+    // --text-light-color: rgb(120, 120, 120);
 }
 
 ::-webkit-scrollbar {
@@ -79,26 +78,26 @@
 
 /* Light theme */
 .light-theme {
-    --main-text-plain-color: rgb(0, 0, 0);
+    // --main-text-plain-color: rgb(0, 0, 0);
 
-    --main-bg-color: rgb(237, 237, 237); /* Light background */
-    --main-text-color: rgb(33,33,33); /* Dark text */
-    --main-text-light-color: rgb(100, 100, 100); /* Darker text */
-    --card-bg-color: #f0f0f0; /* Lighter card background */
-    --main-light-color: #e0e0e0; /* Light light color */
-    --main-very-light-color: rgb(225, 225, 225); /* Lighter very light color */
+    --main-bg-color: rgb(250, 250, 250); /* Light background */
+    // --main-text-color: rgb(33,33,33); /* Dark text */
+    // --main-text-light-color: rgb(100, 100, 100); /* Darker text */
+    // --card-bg-color: #f0f0f0; /* Lighter card background */
+    // --main-light-color: #e0e0e0; /* Light light color */
+    // --main-very-light-color: rgb(225, 225, 225); /* Lighter very light color */
     --app-bar-bg-color: #f7f7f7;
 
-    --chat-light-bg: #e2e2e2;
-    --chat-other-color: #ccc;
-    --chat-my-color: #333;
+    // --chat-light-bg: #e2e2e2;
+    // --chat-other-color: #ccc;
+    // --chat-my-color: #333;
 
     --edit-pencil-bg: #e7e7e7;
     --edit-pencil-color: #646464;
 }
 
 div {
-    color: var(--main-text-color);
+    // color: var(--main-text-color);
 }
 
 .app-bar {
@@ -144,5 +143,12 @@ div {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera, and Edge */
-  }
-  
+}
+
+* {
+    // transition: color 0.1s ease;
+}
+// This modifies the dialog background color, because it is white in dark theme for some reason
+.v-overlay__scrim {
+    background-color: rgb(0, 0, 0);
+}

@@ -20,7 +20,6 @@
       </v-alert>
       <v-form @submit.prevent="login">
         <v-text-field
-          :theme="store.theme"
           v-model="email"
           label="Sähköposti"
           outlined
@@ -30,7 +29,6 @@
           class="my-2"
         ></v-text-field>
         <v-text-field
-          :theme="store.theme"
           v-model="password"
           label="Salasana"
           outlined
@@ -97,14 +95,10 @@ function login() {
           store.snackbarColor = 'green-darken-2';
           store.snackbar = true;
 
-          // store.updateMainComponent++;
-
           if (store.redirect) {
             router.replace({ path: '/' + store.redirect.url })
             store.tab = store.redirect.tab;
           }
-
-          // store.preloadImage(`${store.url}/profile-image/${store.user.id}`);
           store.userInit();
         });
       }, 10);
@@ -167,9 +161,5 @@ function toRegister() {
   color: #1565C0;
   cursor: pointer;
   text-decoration: underline;
-}
-
-.login-card {
-  background-color: var(--card-bg-color);
 }
 </style>

@@ -32,7 +32,6 @@
                     density="compact"
                     v-model="userFirstName"
                     label="Etunimi"
-                    :theme="store.theme"
                   >
                   </v-text-field>
                 </v-col>
@@ -44,7 +43,6 @@
                     density="compact"
                     v-model="userLastName"
                     label="Sukunimi"
-                    :theme="store.theme"
                   >
                   </v-text-field>
                 </v-col>
@@ -126,7 +124,6 @@
                 type="email"
                 name="email"
                 label="Sähköposti"
-                :theme="store.theme"
               >
               </v-text-field>
 
@@ -203,7 +200,6 @@
                 type="password"
                 name="password"
                 label="Uusi salasana"
-                :theme="store.theme"
               >
               </v-text-field>
 
@@ -216,7 +212,6 @@
                 type="password"
                 label="Vahvista salasana"
                 :error-messages="confirmPasswordError"
-                :theme="store.theme"
               >
               </v-text-field>
 
@@ -293,7 +288,6 @@
                 type="phonenumber"
                 name="phonenumber"
                 label="Puhelinnumero"
-                :theme="store.theme"
               >
               </v-text-field>
 
@@ -387,7 +381,7 @@
   width="500"
 >
 
-  <v-card :theme="store.theme">
+  <v-card>
     <canvas id="imageCanvas" style="display: none;"></canvas>
     <v-card-item>
       <div class="new-profile-img-wrapper">
@@ -742,7 +736,6 @@ onMounted(() => {
 position: absolute;
 height: 40px;
 width: 40px;
-background-color: var(--edit-pencil-bg);
 border-radius: 50%;
 right: 0px;
 bottom: 0px;

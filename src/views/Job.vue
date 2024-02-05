@@ -25,7 +25,6 @@
                     <v-skeleton-loader
                       style="width: 100%; height: 100%;"
                       class="job-image"
-                      :theme="store.theme"
                     ></v-skeleton-loader>
                   </template>
                 </v-img>
@@ -64,7 +63,7 @@
                   aspect-ratio="1"
                 >
                   <template v-slot:placeholder>
-                    <v-skeleton-loader type="image" round :theme="store.theme"/>
+                    <v-skeleton-loader type="image" round/>
                   </template>
                 </v-img>
               </div>
@@ -79,13 +78,13 @@
             <div class="job-info" v-if="job.area">
               <v-icon icon="mdi-map-marker"></v-icon>
               <div class="area-container">
-                <div
+                <v-chip
                   v-for="(area, index) in job.area"
                   :key="index"
                   class="area-chip"
                 >
                   {{ area }}
-                </div>
+                </v-chip>
               </div>
             </div>
             <div class="job-info" v-if="job.date">
@@ -179,7 +178,6 @@
               <v-skeleton-loader
                 style="width: 100%; height: 100%;"
                 class="job-image"
-                :theme="store.theme"
               ></v-skeleton-loader>
             </v-container>
             <div
@@ -188,25 +186,25 @@
             </div>
         </v-container>
 
-          <v-skeleton-loader type="article" :theme="store.theme"></v-skeleton-loader>
+          <v-skeleton-loader type="article"></v-skeleton-loader>
 
           <v-divider class="mt-5"></v-divider>
 
-          <v-skeleton-loader type="list-item-three-line" :theme="store.theme"></v-skeleton-loader>
+          <v-skeleton-loader type="list-item-three-line"></v-skeleton-loader>
           <v-divider class="mt-5 mb-5"></v-divider>
-          <v-card class="pa-5" elevation="8" :theme="store.theme">
+          <v-card class="pa-5" elevation="8">
             <div>
 
               <div style="display: flex; gap: 5px; align-items: center;">
                 <v-icon icon="mdi-account"></v-icon>
-                <v-skeleton-loader width="300px" height="24px" :theme="store.theme"></v-skeleton-loader>
+                <v-skeleton-loader width="300px" height="24px"></v-skeleton-loader>
               </div>
               <div class="mt-5">
-                <v-skeleton-loader width="300px" height="18px" :theme="store.theme"></v-skeleton-loader>
+                <v-skeleton-loader width="300px" height="18px"></v-skeleton-loader>
               </div>
             </div>
 
-            <v-skeleton-loader width="200px" height="40px" class="mt-6" :theme="store.theme"></v-skeleton-loader>
+            <v-skeleton-loader width="200px" height="40px" class="mt-6"></v-skeleton-loader>
           </v-card>
         </v-container>
       </template>
@@ -378,7 +376,6 @@ document.addEventListener("fullscreenchange", () => {
     height: 60px;
     font-size: 20px;
     border-radius: 50%;
-    background-color: var(--card-bg-color);
   }
 
   .carousel {
@@ -404,7 +401,6 @@ document.addEventListener("fullscreenchange", () => {
     height: 500px;
     display: flex;
     justify-content: center;
-    background-color: var(--main-very-light-color);
     padding: 0;
     position: relative;
     /* margin: 10px; */
@@ -435,10 +431,6 @@ document.addEventListener("fullscreenchange", () => {
     opacity: 1;
   }
 
-  .area-chip {
-    text-wrap: nowrap;
-  }
-
   .area-container {
     display: flex;
     flex-wrap: wrap;
@@ -448,7 +440,6 @@ document.addEventListener("fullscreenchange", () => {
     top: 10px;
     right: 10px;
     position: absolute;
-    background-color: var(--card-bg-color);
   }
 
   .close-btn {
@@ -456,11 +447,6 @@ document.addEventListener("fullscreenchange", () => {
     top: 10px;
     right: 10px;
     z-index: 100;
-    background-color: var(--card-bg-color);
-  }
-
-  .user-card {
-    background-color: var(--card-bg-color);
   }
 
   .carousel {
